@@ -7,7 +7,7 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "com.example.go4lunch"
+        applicationId 'com.example.gtlabgo4lunch'
         minSdkVersion 29
         targetSdkVersion 30
         versionCode 1

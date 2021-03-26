@@ -22,4 +22,10 @@
         android:name="com.example.go4lunch.ui.slideshow.SlideshowFragment"
         android:label="@string/menu_slideshow"
         tools:layout="@layout/fragment_slideshow" />
+
+    <fragment
+        android:id="@+id/nav_authentification"
+        android:name="com.example.go4lunch.ui.authentification.AuthentificationFragment"
+        android:label="@string/menu_authentification"
+        tools:layout="@layout/fragment_autentification" />
 </navigation>
