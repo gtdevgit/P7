@@ -1,13 +1,17 @@
 package com.example.go4lunch;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
 
+import com.example.go4lunch.ui.SettingActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.annotation.NonNull;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -59,5 +63,28 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    private void setting(){
+
+            Intent intent = new Intent(this, SettingActivity.class);
+            startActivity(intent);
+
+            //Intent intent = new Intent(MainActivity.this, AddActivity.class);
+            //startActivityForResult(intent, REQUESTCODE_START_ACTIVITY_ADD_ACTIVITY);
+
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                setting();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

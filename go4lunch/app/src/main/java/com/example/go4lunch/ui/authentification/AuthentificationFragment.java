@@ -24,7 +24,7 @@ public class AuthentificationFragment extends Fragment {
         authentificationViewModel =
                 new ViewModelProvider(this).get(AuthentificationViewModel.class);
         View root = inflater.inflate(R.layout.fragment_autentification, container, false);
-        final TextView textView = root.findViewById(R.id.text_authentification);
+        final TextView textView = root.findViewById(R.id.text_frag_authentification);
         authentificationViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {

@@ -10,6 +10,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Go4lunch">
         <activity
+            android:name=".ui.SettingActivity"
+            android:label="@string/title_activity_setting"
+            android:theme="@style/Theme.Go4lunch.NoActionBar"></activity>
+        <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.Go4lunch.NoActionBar">
