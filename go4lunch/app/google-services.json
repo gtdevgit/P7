@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "860721757911-o8dl35vkmj18jelt8a7s2fpmt2bodiug.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.gtlabgo4lunch",
+            "certificate_hash": "26c1bdec239289045400af00b5e0b10141818f5e"
+          }
+        },
+        {
           "client_id": "860721757911-jvtolmj8c983kqp7qqr4m0arekhuv9sh.apps.googleusercontent.com",
           "client_type": 3
         }

@@ -23,16 +23,28 @@
         app:layout_constraintTop_toTopOf="parent" />
     <!-- BUTTON LOGIN -->
     <Button
-        android:id="@+id/setting_activity_button_login"
+        android:id="@+id/setting_activity_button_login_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="login"
-        android:textSize="30sp"
+        android:text="Connectez-vous par email"
+        android:textSize="20sp"
         android:layout_margin="30dp"
         android:padding="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/setting_activity_button_login_google"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        />
+    <Button
+        android:id="@+id/setting_activity_button_login_google"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Connectez-vous avec google"
+        android:textSize="20sp"
+        android:layout_margin="30dp"
+        android:padding="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
