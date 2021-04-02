@@ -36,6 +36,7 @@ public class SettingActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private Button buttonEmail;
     private Button buttonGoogle;
+    private Button buttonFacebook;
     private CoordinatorLayout coordinatorLayout;
 
     @Override
@@ -69,6 +70,14 @@ public class SettingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startSignInActivity(SupportedProvider.GOOGLE);
+            }
+        });
+
+        buttonFacebook = findViewById(R.id.setting_activity_button_login_facebook);
+        buttonFacebook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startSignInActivity(SupportedProvider.FACEBOOK);
             }
         });
 
