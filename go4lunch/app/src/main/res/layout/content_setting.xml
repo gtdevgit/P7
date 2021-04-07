@@ -1,63 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <TextView
-        android:id="@+id/setting_activity_text_info"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:text="TEST"
-        android:textAlignment="viewStart"
-        android:textSize="16sp"
-        android:layout_margin="30dp"
-        android:padding="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_margin="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        >
+        app:layout_constraintTop_toTopOf="parent">
 
+        <ImageView
+            android:id="@+id/content_setting_imageView_profile"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            app:srcCompat="@drawable/ic_baseline_account_circle_24"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="@dimen/default_large_margin"/>
 
+        <TextView
+            android:id="@+id/content_setting_textView_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/label_email"
+            android:textSize="@dimen/default_text_size"
+            android:layout_marginTop="@dimen/default_large_margin"
+            android:layout_marginLeft="@dimen/default_large_margin"
+            android:layout_marginRight="@dimen/default_large_margin"
+            android:layout_marginBottom="@dimen/default_margin"/>
 
-    <!-- BUTTON LOGIN -->
-
-    <Button
-        android:id="@+id/setting_activity_button_login_google"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Connectez-vous avec Google"
-        android:textSize="16sp"
-        android:layout_margin="10dp"
-        android:padding="10dp"
-         />
-    <Button
-        android:id="@+id/setting_activity_button_login_facebook"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Connectez-vous avec Facebook"
-        android:textSize="16sp"
-        android:layout_margin="10dp"
-        android:padding="10dp"
-        />
-    <Button
-        android:id="@+id/setting_activity_button_logout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Déconnectez-vous"
-        android:textSize="16sp"
-        android:layout_margin="10dp"
-        android:padding="10dp"
-        />
+        <TextView
+            android:id="@+id/content_setting_textView_userName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/label_user_name"
+            android:textSize="@dimen/default_text_size"
+            android:layout_marginLeft="@dimen/default_large_margin"
+            android:layout_marginRight="@dimen/default_large_margin"
+            android:layout_marginBottom="@dimen/default_margin" />
     </LinearLayout>
+
+
+    <Button
+        android:id="@+id/content_setting_button_logout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/default_large_margin"
+        android:padding="@dimen/default_padding"
+        android:text="@string/logout"
+        android:textColor="@color/white"
+        android:textSize="@dimen/default_text_size"
+        app:cornerRadius="@dimen/default_button_corner_radius"
+        app:icon="@drawable/ic_baseline_logout_24"
+        app:iconTint="@color/secondaryTextColor"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

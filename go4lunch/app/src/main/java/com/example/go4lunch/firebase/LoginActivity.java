@@ -16,6 +16,7 @@ import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.FirebaseUiException;
 import com.firebase.ui.auth.IdpResponse;
+import com.google.android.gms.common.SignInButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
@@ -26,7 +27,7 @@ public class LoginActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 1;
 
     private Button buttonFacebook;
-    private Button buttonGoogle;
+    private SignInButton buttonGoogle;
     private ConstraintLayout constraintLayout;
 
     @Override

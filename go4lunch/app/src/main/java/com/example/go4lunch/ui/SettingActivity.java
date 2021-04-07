@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.FirebaseUiException;
@@ -19,9 +21,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.go4lunch.R;
@@ -39,10 +43,12 @@ public class SettingActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 1;
 
     private FirebaseAuth mAuth;
-    private Button buttonGoogle;
-    private Button buttonFacebook;
-    private Button buttonLogout;
     private CoordinatorLayout coordinatorLayout;
+    private ImageView imageViewProfile;
+    private TextView textViewEmail;
+    private TextView textViewUserName;
+
+    private Button buttonLogout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,33 +58,11 @@ public class SettingActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         coordinatorLayout = findViewById(R.id.setting_activity_coordinator_layout);
+        imageViewProfile = findViewById(R.id.content_setting_imageView_profile);
+        textViewEmail = findViewById(R.id.content_setting_textView_email);
+        textViewUserName = findViewById(R.id.content_setting_textView_userName);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
-        buttonGoogle = findViewById(R.id.setting_activity_button_login_google);
-        buttonGoogle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startSignInActivity(SupportedProvider.GOOGLE);
-            }
-        });
-
-        buttonFacebook = findViewById(R.id.setting_activity_button_login_facebook);
-        buttonFacebook.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startSignInActivity(SupportedProvider.FACEBOOK);
-            }
-        });
-
-        buttonLogout = findViewById(R.id.setting_activity_button_logout);
+        buttonLogout = findViewById(R.id.content_setting_button_logout);
         buttonLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -96,96 +80,8 @@ public class SettingActivity extends AppCompatActivity {
         reload();
     }
 
-    private List<AuthUI.IdpConfig> getProviderBySupportedProvider(SupportedProvider supportedProvider){
-        switch(supportedProvider){
-            case GOOGLE:
-                return Arrays.asList(new AuthUI.IdpConfig.GoogleBuilder().build());
-            case FACEBOOK:
-                return Arrays.asList(new AuthUI.IdpConfig.FacebookBuilder().build());
-            case TWITTER:
-                return Arrays.asList(new AuthUI.IdpConfig.TwitterBuilder().build());
-            default:
-                return null;
-        }
-    }
-
-    private void startSignInActivity(SupportedProvider supportedProvider){
-        List<AuthUI.IdpConfig> providers = getProviderBySupportedProvider(supportedProvider);
-
-        startActivityForResult(
-                AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAvailableProviders(providers)
-                        .build(),
-                RC_SIGN_IN);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        this.handleResponseAfterSignIn(requestCode, resultCode, data);
-    }
-
-    private void showSnackBar(CoordinatorLayout coordinatorLayout, String message){
+    private void showSnackBar(String message){
         Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_SHORT).show();
-    }
-
-    private void handleResponseAfterSignIn(int requestCode, int resultCode, Intent data){
-
-        IdpResponse response = IdpResponse.fromResultIntent(data);
-
-        if (requestCode == RC_SIGN_IN) {
-            if (resultCode == RESULT_OK) { // SUCCESS
-                showSnackBar(this.coordinatorLayout, getString(R.string.connection_succeed));
-            } else { // ERRORS
-                if (response == null) {
-                    showSnackBar(this.coordinatorLayout, getString(R.string.error_authentication_canceled));
-                }
-                else {
-                    FirebaseUiException firebaseUiException = response.getError();
-                    if (firebaseUiException != null) {
-                        if (firebaseUiException.getErrorCode() == ErrorCodes.NO_NETWORK) {
-                            showSnackBar(this.coordinatorLayout, getString(R.string.error_no_internet));
-                        } else if (firebaseUiException.getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
-                            showSnackBar(this.coordinatorLayout, getString(R.string.error_unknown_error));
-                        } else {
-                            showSnackBar(this.coordinatorLayout, "other exception");
-                        }
-                    }
-                    else {
-                        showSnackBar(this.coordinatorLayout, "no exception");
-                    }
-                }
-            }
-        }
-        reload();
-    }
-
-    private void reload(){
-        Log.d(TAG, "reload() called");
-        TextView text = findViewById(R.id.setting_activity_text_info);
-
-        StringBuilder sb = new StringBuilder();
-
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null){
-//            reload();
-            sb.append("DisplayName = " + currentUser.getDisplayName() + "\n") ;
-            sb.append("Email = " + currentUser.getEmail()+ "\n");
-            sb.append("PhoneNumber = " + currentUser.getPhoneNumber() + "\n");
-            sb.append("ProviderId = " + currentUser.getProviderId() + "\n");
-            sb.append("TenantId = " + currentUser.getTenantId()+ "\n");
-            sb.append("Uid = " + currentUser.getUid() + "\n");
-            // pour authentification back-end
-            //currentUser.getIdToken()
-
-        } else {
-            sb.append("NO USER");
-        }
-
-        text.setText(sb.toString());
     }
 
     private void logout(){
@@ -200,4 +96,28 @@ public class SettingActivity extends AppCompatActivity {
                 });
     }
 
+    private void reload(){
+        Log.d(TAG, "reload() called");
+
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if(currentUser != null){
+            if (currentUser.getPhotoUrl() != null) {
+                Glide.with(this)
+                        .load(currentUser.getPhotoUrl())
+                        .apply(RequestOptions.circleCropTransform())
+                        .into(imageViewProfile);
+            }
+
+            //Get email & username from Firebase
+            String email = TextUtils.isEmpty(currentUser.getEmail()) ? getString(R.string.info_no_email_found) : currentUser.getEmail();
+            //Update views with data
+            this.textViewEmail.setText(email);
+
+            String username = TextUtils.isEmpty(currentUser.getDisplayName()) ? getString(R.string.info_no_username_found) : currentUser.getDisplayName();
+            this.textViewUserName.setText(username);
+        } else {
+            this.textViewUserName.setText(R.string.no_user_connected);
+        }
+    }
 }

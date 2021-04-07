@@ -10,8 +10,7 @@
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
-    <string name="menu_authentification">Authentification</string>
-    <string name="title_activity_setting">SettingActivity</string>
+    <string name="title_activity_setting">User informations</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
@@ -22,12 +21,22 @@
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="floatingactionbutton">FloatingActionButton</string>
 
-    <string name="connection_succeed">Authentification réussie !</string>
-    <string name="error_authentication_canceled">Authentification annulée&#8230;</string>
-    <string name="error_no_internet">Aucune connexion internet !</string>
-    <string name="error_unknown_error">Une erreur inconnue s\'est produite&#8230;</string>
+    <string name="connection_succeed">Successful authentication</string>
+    <string name="error_authentication_canceled">Authentication canceled</string>
+    <string name="error_no_internet">No internet connection</string>
+    <string name="error_unknown_error">An unknown error has occurred</string>
 
     <string name="facebook_application_id">757140525003096</string>
     <string name="facebook_login_protocol_scheme" translatable="false" tools:ignore="UnusedResources">fb757140525003096</string>
+    <string name="logout">logout</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="sign_in_with_facebook">Login with Facebook</string>
+    <string name="login_subtitle">find a nice restaurant and invite you co-workers for lunch !</string>
+    <string name="login_title">Go4Lunch</string>
+    <string name="info_no_email_found">No email</string>
+    <string name="info_no_username_found">No user name</string>
+    <string name="no_user_connected">No user connected !</string>
+    <string name="label_email">email</string>
+    <string name="label_user_name">user name</string>
 
 </resources>

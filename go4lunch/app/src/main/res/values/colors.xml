@@ -8,6 +8,18 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="button_facebook">#FF507CC0</color>
-    <color name="button_google">#FFDF4930</color>
+    <color name="button_facebook">#3B5998</color>
+    <color name="button_google">#FF4285F4</color>
+
+    <color name="primaryColor">#ff5722</color>
+    <color name="primaryLightColor">#ff8a50</color>
+    <color name="primaryDarkColor">#c41c00</color>
+    <color name="secondaryColor">#6200ee</color>
+    <color name="secondaryLightColor">#9e47ff</color>
+    <color name="secondaryDarkColor">#0400ba</color>
+    <color name="primaryTextColor">#000000</color>
+    <color name="secondaryTextColor">#ffffff</color>
+
+
+
 </resources>

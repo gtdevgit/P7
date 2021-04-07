@@ -33,7 +33,7 @@
         android:id="@+id/activity_login_textView_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Go4Lunch"
+        android:text="@string/login_title"
         android:textColor="@color/white"
         android:textSize="68dp"
         android:textStyle="bold"
@@ -46,7 +46,7 @@
         android:id="@+id/activity_login_textView_subtitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="find a nice restaurant and invite you co-workers for lunch !"
+        android:text="@string/login_subtitle"
         android:textAlignment="center"
         android:textColor="@color/white"
         app:layout_constraintLeft_toLeftOf="@+id/activity_login_textView_title"
@@ -57,30 +57,28 @@
         android:id="@+id/activity_login_button_login_facebook"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_margin="3dp"
         android:backgroundTint="@color/button_facebook"
-        android:padding="@dimen/default_large_margin"
-        android:text="Sign in with Facebook"
-        android:textColor="#fff"
-        android:textSize="@dimen/default_text_size"
-        app:cornerRadius="10dp"
-        app:layout_constraintLeft_toLeftOf="@+id/activity_login_textView_title"
-        app:layout_constraintRight_toRightOf="@+id/activity_login_textView_title"
+        android:drawableLeft="@drawable/f_logo_rgb_blue_30"
+        android:text="@string/sign_in_with_facebook"
+        android:textAllCaps="false"
+        android:textColor="@color/secondaryTextColor"
+        app:cornerRadius="2dp"
         app:layout_constraintBottom_toTopOf="@+id/activity_login_button_login_google"
-         />
-    <Button
+        app:layout_constraintLeft_toLeftOf="@+id/activity_login_textView_title"
+        app:layout_constraintRight_toRightOf="@+id/activity_login_textView_title" />
+
+    <com.google.android.gms.common.SignInButton
         android:id="@+id/activity_login_button_login_google"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/button_google"
-        android:padding="@dimen/default_large_margin"
-        android:text="Sign in with Google"
-        android:textColor="#fff"
-        android:textSize="@dimen/default_text_size"
-        app:cornerRadius="10dp"
         android:layout_marginBottom="50dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="@+id/activity_login_textView_title"
         app:layout_constraintRight_toRightOf="@+id/activity_login_textView_title"
-        app:layout_constraintBottom_toBottomOf="parent"
-        />
+        app:buttonSize="wide"
+        app:colorScheme="auto"/>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
