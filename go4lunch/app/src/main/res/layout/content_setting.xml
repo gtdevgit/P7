@@ -14,49 +14,50 @@
         android:layout_marginEnd="8dp"
         android:text="TEST"
         android:textAlignment="viewStart"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:layout_margin="30dp"
         android:padding="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-    <!-- BUTTON LOGIN -->
-    <Button
-        android:id="@+id/setting_activity_button_login_email"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Connectez-vous par email"
-        android:textSize="20sp"
-        android:layout_margin="30dp"
-        android:padding="10dp"
-        app:layout_constraintBottom_toTopOf="@+id/setting_activity_button_login_google"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        />
+        android:orientation="vertical"
+        android:layout_margin="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        >
+
+
+
+    <!-- BUTTON LOGIN -->
+
     <Button
         android:id="@+id/setting_activity_button_login_google"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Connectez-vous avec Google"
-        android:textSize="20sp"
-        android:layout_margin="30dp"
+        android:textSize="16sp"
+        android:layout_margin="10dp"
         android:padding="10dp"
-        app:layout_constraintBottom_toTopOf="@+id/setting_activity_button_login_facebook"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
          />
     <Button
         android:id="@+id/setting_activity_button_login_facebook"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Connectez-vous avec Facebook"
-        android:textSize="20sp"
-        android:layout_margin="30dp"
+        android:textSize="16sp"
+        android:layout_margin="10dp"
         android:padding="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         />
-
+    <Button
+        android:id="@+id/setting_activity_button_logout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Déconnectez-vous"
+        android:textSize="16sp"
+        android:layout_margin="10dp"
+        android:padding="10dp"
+        />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

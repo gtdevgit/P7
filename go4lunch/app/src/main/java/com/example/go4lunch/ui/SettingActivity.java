@@ -8,14 +8,18 @@ import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.FirebaseUiException;
 import com.firebase.ui.auth.IdpResponse;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -31,12 +35,13 @@ import java.util.List;
 
 public class SettingActivity extends AppCompatActivity {
 
+    private static final String TAG = "SettingActivity";
     private static final int RC_SIGN_IN = 1;
 
     private FirebaseAuth mAuth;
-    private Button buttonEmail;
     private Button buttonGoogle;
     private Button buttonFacebook;
+    private Button buttonLogout;
     private CoordinatorLayout coordinatorLayout;
 
     @Override
@@ -57,14 +62,6 @@ public class SettingActivity extends AppCompatActivity {
             }
         });
 
-        buttonEmail = findViewById(R.id.setting_activity_button_login_email);
-        buttonEmail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startSignInActivity(SupportedProvider.EMAIL);
-            }
-        });
-
         buttonGoogle = findViewById(R.id.setting_activity_button_login_google);
         buttonGoogle.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,6 +78,14 @@ public class SettingActivity extends AppCompatActivity {
             }
         });
 
+        buttonLogout = findViewById(R.id.setting_activity_button_logout);
+        buttonLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                logout();
+            }
+        });
+
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
     }
@@ -88,35 +93,11 @@ public class SettingActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-
-        TextView text = findViewById(R.id.setting_activity_text_info);
-
-        StringBuilder sb = new StringBuilder();
-
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null){
-//            reload();
-            sb.append("DisplayName = " + currentUser.getDisplayName() + "\n") ;
-            sb.append("Email = " + currentUser.getEmail()+ "\n");
-            sb.append("PhoneNumber = " + currentUser.getPhoneNumber() + "\n");
-            sb.append("ProviderId = " + currentUser.getProviderId() + "\n");
-            sb.append("TenantId = " + currentUser.getTenantId()+ "\n");
-            sb.append("Uid = " + currentUser.getUid() + "\n");
-            // pour authentification back-end
-            //currentUser.getIdToken()
-
-        } else {
-            sb.append("NO USER");
-        }
-
-        text.setText(sb.toString());
+        reload();
     }
 
     private List<AuthUI.IdpConfig> getProviderBySupportedProvider(SupportedProvider supportedProvider){
         switch(supportedProvider){
-            case EMAIL:
-                return Arrays.asList(new AuthUI.IdpConfig.EmailBuilder().build());
             case GOOGLE:
                 return Arrays.asList(new AuthUI.IdpConfig.GoogleBuilder().build());
             case FACEBOOK:
@@ -146,10 +127,6 @@ public class SettingActivity extends AppCompatActivity {
         this.handleResponseAfterSignIn(requestCode, resultCode, data);
     }
 
-    private void reload(){
-
-    }
-
     private void showSnackBar(CoordinatorLayout coordinatorLayout, String message){
         Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_SHORT).show();
     }
@@ -157,8 +134,6 @@ public class SettingActivity extends AppCompatActivity {
     private void handleResponseAfterSignIn(int requestCode, int resultCode, Intent data){
 
         IdpResponse response = IdpResponse.fromResultIntent(data);
-
-        FirebaseUiException firebaseUiException = response.getError();
 
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) { // SUCCESS
@@ -168,17 +143,61 @@ public class SettingActivity extends AppCompatActivity {
                     showSnackBar(this.coordinatorLayout, getString(R.string.error_authentication_canceled));
                 }
                 else {
+                    FirebaseUiException firebaseUiException = response.getError();
                     if (firebaseUiException != null) {
                         if (firebaseUiException.getErrorCode() == ErrorCodes.NO_NETWORK) {
                             showSnackBar(this.coordinatorLayout, getString(R.string.error_no_internet));
                         } else if (firebaseUiException.getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
                             showSnackBar(this.coordinatorLayout, getString(R.string.error_unknown_error));
+                        } else {
+                            showSnackBar(this.coordinatorLayout, "other exception");
                         }
+                    }
+                    else {
+                        showSnackBar(this.coordinatorLayout, "no exception");
                     }
                 }
             }
         }
+        reload();
     }
 
+    private void reload(){
+        Log.d(TAG, "reload() called");
+        TextView text = findViewById(R.id.setting_activity_text_info);
+
+        StringBuilder sb = new StringBuilder();
+
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if(currentUser != null){
+//            reload();
+            sb.append("DisplayName = " + currentUser.getDisplayName() + "\n") ;
+            sb.append("Email = " + currentUser.getEmail()+ "\n");
+            sb.append("PhoneNumber = " + currentUser.getPhoneNumber() + "\n");
+            sb.append("ProviderId = " + currentUser.getProviderId() + "\n");
+            sb.append("TenantId = " + currentUser.getTenantId()+ "\n");
+            sb.append("Uid = " + currentUser.getUid() + "\n");
+            // pour authentification back-end
+            //currentUser.getIdToken()
+
+        } else {
+            sb.append("NO USER");
+        }
+
+        text.setText(sb.toString());
+    }
+
+    private void logout(){
+        Log.d(TAG, "logout() called");
+        AuthUI.getInstance()
+                .signOut(this)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        reload();
+                    }
+                });
+    }
 
 }
