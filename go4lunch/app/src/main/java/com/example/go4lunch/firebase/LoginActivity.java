@@ -1,16 +1,107 @@
 package com.example.go4lunch.firebase;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 
 import com.example.go4lunch.R;
+import com.example.go4lunch.ui.SupportedProvider;
+import com.firebase.ui.auth.AuthUI;
+import com.firebase.ui.auth.ErrorCodes;
+import com.firebase.ui.auth.FirebaseUiException;
+import com.firebase.ui.auth.IdpResponse;
+import com.google.android.material.snackbar.Snackbar;
+
+import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
+
+    private static final String TAG = "LoginActivity";
+    private static final int RC_SIGN_IN = 1;
+
+    private Button buttonFacebook;
+    private Button buttonGoogle;
+    private ConstraintLayout constraintLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        constraintLayout = findViewById(R.id.activity_login_constraint_layout);
+
+        buttonFacebook = findViewById(R.id.activity_login_button_login_facebook);
+        buttonFacebook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startSignInActivity(SupportedProvider.FACEBOOK);
+            }
+        });
+
+        buttonGoogle = findViewById(R.id.activity_login_button_login_google);
+        buttonGoogle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startSignInActivity(SupportedProvider.GOOGLE);
+            }
+        });
+    }
+
+    private void startSignInActivity(SupportedProvider supportedProvider){
+        List<AuthUI.IdpConfig> providers = Authentication.getProviderBySupportedProvider(supportedProvider);
+
+        startActivityForResult(
+                AuthUI.getInstance()
+                        .createSignInIntentBuilder()
+                        .setAvailableProviders(providers)
+                        .build(),
+                RC_SIGN_IN);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        this.handleResponseAfterSignIn(requestCode, resultCode, data);
+    }
+
+    private void handleResponseAfterSignIn(int requestCode, int resultCode, Intent data){
+
+        IdpResponse response = IdpResponse.fromResultIntent(data);
+
+        if (requestCode == RC_SIGN_IN) {
+            if (resultCode == RESULT_OK) { // SUCCESS
+                showSnackBar(getString(R.string.connection_succeed));
+            } else { // ERRORS
+                if (response == null) {
+                    showSnackBar(getString(R.string.error_authentication_canceled));
+                }
+                else {
+                    FirebaseUiException firebaseUiException = response.getError();
+                    if (firebaseUiException != null) {
+                        if (firebaseUiException.getErrorCode() == ErrorCodes.NO_NETWORK) {
+                            showSnackBar(getString(R.string.error_no_internet));
+                        } else if (firebaseUiException.getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
+                            showSnackBar(getString(R.string.error_unknown_error));
+                        } else {
+                            showSnackBar("other exception");
+                        }
+                    }
+                    else {
+                        showSnackBar("no exception");
+                    }
+                }
+            }
+        }
+    }
+
+    private void showSnackBar(String message){
+        Snackbar.make(this.constraintLayout, message, Snackbar.LENGTH_SHORT).show();
     }
 }
