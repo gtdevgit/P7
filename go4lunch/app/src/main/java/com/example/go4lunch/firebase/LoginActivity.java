@@ -10,7 +10,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.example.go4lunch.MainActivity;
 import com.example.go4lunch.R;
+import com.example.go4lunch.navigation.NavigationActivity;
 import com.example.go4lunch.ui.SupportedProvider;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
@@ -79,6 +81,14 @@ public class LoginActivity extends AppCompatActivity {
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) { // SUCCESS
                 showSnackBar(getString(R.string.connection_succeed));
+
+                // go to main after login
+                if (Authentication.isConnected()) {
+                    Intent intent;
+                    intent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
             } else { // ERRORS
                 if (response == null) {
                     showSnackBar(getString(R.string.error_authentication_canceled));

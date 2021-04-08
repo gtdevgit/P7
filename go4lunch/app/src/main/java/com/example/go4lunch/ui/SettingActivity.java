@@ -178,7 +178,6 @@ public class SettingActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             }
-
         }
     }
 }
