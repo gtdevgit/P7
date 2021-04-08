@@ -6,11 +6,16 @@ import android.os.Bundle;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.go4lunch.MainActivity;
+import com.example.go4lunch.firebase.Authentication;
+import com.example.go4lunch.firebase.LoginActivity;
+import com.example.go4lunch.navigation.NavigationActivity;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.FirebaseUiException;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -40,7 +45,10 @@ import java.util.List;
 public class SettingActivity extends AppCompatActivity {
 
     private static final String TAG = "SettingActivity";
-    private static final int RC_SIGN_IN = 1;
+
+    private static final int SIGN_OUT_TASK = 10;
+    private static final int DELETE_USER_TASK = 20;
+    private static final int UPDATE_USERNAME = 30;
 
     private FirebaseAuth mAuth;
     private CoordinatorLayout coordinatorLayout;
@@ -49,6 +57,7 @@ public class SettingActivity extends AppCompatActivity {
     private TextView textViewUserName;
 
     private Button buttonLogout;
+    private Button buttonDeleteUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +75,15 @@ public class SettingActivity extends AppCompatActivity {
         buttonLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                logout();
+                signOutUserFromFirebase();
+            }
+        });
+
+        buttonDeleteUser = findViewById(R.id.content_setting_button_delete_user);
+        buttonDeleteUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteUserFromFirebase();
             }
         });
 
@@ -84,17 +101,45 @@ public class SettingActivity extends AppCompatActivity {
         Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_SHORT).show();
     }
 
-    private void logout(){
-        Log.d(TAG, "logout() called");
+    private void signOutUserFromFirebase(){
+        Log.d(TAG, "signOutUserFromFirebase() called");
         AuthUI.getInstance()
                 .signOut(this)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        reload();
-                    }
-                });
+                .addOnSuccessListener(this, this.updateUIAfterRESTRequestsCompleted(SIGN_OUT_TASK));
     }
+
+    private void deleteUserFromFirebase(){
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            AuthUI.getInstance()
+                    .delete(this)
+                    .addOnSuccessListener(this, this.updateUIAfterRESTRequestsCompleted(DELETE_USER_TASK));
+        }
+    }
+
+    private OnSuccessListener<Void> updateUIAfterRESTRequestsCompleted(final int origin){
+        return new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                switch (origin){
+//                    case UPDATE_USERNAME:
+//                        progressBar.setVisibility(View.INVISIBLE);
+//                        break;
+                    case SIGN_OUT_TASK:
+                        reload();
+                        //finish();
+                        break;
+                    case DELETE_USER_TASK:
+                        reload();
+                        //finish();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
+    }
+
 
     private void reload(){
         Log.d(TAG, "reload() called");
@@ -110,14 +155,30 @@ public class SettingActivity extends AppCompatActivity {
             }
 
             //Get email & username from Firebase
-            String email = TextUtils.isEmpty(currentUser.getEmail()) ? getString(R.string.info_no_email_found) : currentUser.getEmail();
+            String email = TextUtils.isEmpty(currentUser.getEmail()) ? getString(R.string.info_no_user_email) : currentUser.getEmail();
             //Update views with data
             this.textViewEmail.setText(email);
 
             String username = TextUtils.isEmpty(currentUser.getDisplayName()) ? getString(R.string.info_no_username_found) : currentUser.getDisplayName();
             this.textViewUserName.setText(username);
         } else {
+            // Clear
+            Glide.with(this)
+                    .load("")
+                    .placeholder(R.drawable.ic_baseline_account_circle_24)
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(imageViewProfile);
+            this.textViewEmail.setText("");
             this.textViewUserName.setText(R.string.no_user_connected);
+
+            // Redirect to login activity
+            if (!Authentication.isConnected()) {
+                Intent intent;
+                intent = new Intent(SettingActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+            }
+
         }
     }
 }
