@@ -37,7 +37,12 @@
     <string name="info_no_user_email">No user email</string>
     <string name="info_no_username_found">No user name found</string>
     <string name="no_user_connected">No user connected</string>
-    <string name="label_email">email</string>
-    <string name="label_user_name">user name</string>
+    <string name="label_email">EMail :</string>
+    <string name="label_email_value">Email value</string>
+    <string name="label_user_name">User Name :</string>
+    <string name="label_user_name_value">User Name value</string>
+    <string name="update_user_name">Update User Name</string>
+    <string name="profile_picture_description">Profile picture</string>
+
 
 </resources>

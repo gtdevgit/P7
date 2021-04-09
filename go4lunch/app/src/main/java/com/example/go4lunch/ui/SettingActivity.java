@@ -15,6 +15,7 @@ import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.FirebaseUiException;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -32,8 +33,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.go4lunch.R;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -53,11 +56,12 @@ public class SettingActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private CoordinatorLayout coordinatorLayout;
     private ImageView imageViewProfile;
-    private TextView textViewEmail;
+    private TextView textViewUserEmail;
     private TextView textViewUserName;
 
     private Button buttonLogout;
     private Button buttonDeleteUser;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +72,8 @@ public class SettingActivity extends AppCompatActivity {
 
         coordinatorLayout = findViewById(R.id.setting_activity_coordinator_layout);
         imageViewProfile = findViewById(R.id.content_setting_imageView_profile);
-        textViewEmail = findViewById(R.id.content_setting_textView_email);
-        textViewUserName = findViewById(R.id.content_setting_textView_userName);
+        textViewUserEmail = findViewById(R.id.content_setting_textView_user_email);
+        textViewUserName = findViewById(R.id.content_setting_textView_user_name);
 
         buttonLogout = findViewById(R.id.content_setting_button_logout);
         buttonLogout.setOnClickListener(new View.OnClickListener() {
@@ -101,6 +105,15 @@ public class SettingActivity extends AppCompatActivity {
         Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_SHORT).show();
     }
 
+    protected OnFailureListener onFailureListener(){
+        return new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                showSnackBar(getResources().getString(R.string.error_unknown_error) + " " + e.getMessage());
+            }
+        };
+    }
+
     private void signOutUserFromFirebase(){
         Log.d(TAG, "signOutUserFromFirebase() called");
         AuthUI.getInstance()
@@ -122,9 +135,10 @@ public class SettingActivity extends AppCompatActivity {
             @Override
             public void onSuccess(Void aVoid) {
                 switch (origin){
-//                    case UPDATE_USERNAME:
-//                        progressBar.setVisibility(View.INVISIBLE);
-//                        break;
+                    case UPDATE_USERNAME:
+                        showSnackBar("User Name updated");
+                        //progressBar.setVisibility(View.INVISIBLE);
+                        break;
                     case SIGN_OUT_TASK:
                         reload();
                         //finish();
@@ -157,7 +171,7 @@ public class SettingActivity extends AppCompatActivity {
             //Get email & username from Firebase
             String email = TextUtils.isEmpty(currentUser.getEmail()) ? getString(R.string.info_no_user_email) : currentUser.getEmail();
             //Update views with data
-            this.textViewEmail.setText(email);
+            this.textViewUserEmail.setText(email);
 
             String username = TextUtils.isEmpty(currentUser.getDisplayName()) ? getString(R.string.info_no_username_found) : currentUser.getDisplayName();
             this.textViewUserName.setText(username);
@@ -168,7 +182,7 @@ public class SettingActivity extends AppCompatActivity {
                     .placeholder(R.drawable.ic_baseline_account_circle_24)
                     .apply(RequestOptions.circleCropTransform())
                     .into(imageViewProfile);
-            this.textViewEmail.setText("");
+            this.textViewUserEmail.setText("");
             this.textViewUserName.setText(R.string.no_user_connected);
 
             // Redirect to login activity
