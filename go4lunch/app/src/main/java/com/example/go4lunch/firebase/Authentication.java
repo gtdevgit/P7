@@ -1,6 +1,5 @@
 package com.example.go4lunch.firebase;
 
-import com.example.go4lunch.ui.SupportedProvider;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;

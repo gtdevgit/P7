@@ -3,7 +3,6 @@ package com.example.go4lunch.firebase;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,8 +11,6 @@ import android.widget.Button;
 
 import com.example.go4lunch.MainActivity;
 import com.example.go4lunch.R;
-import com.example.go4lunch.navigation.NavigationActivity;
-import com.example.go4lunch.ui.SupportedProvider;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.FirebaseUiException;
