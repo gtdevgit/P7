@@ -115,12 +115,12 @@ public class MainActivity extends AppCompatActivity {
 
             //Get email & username from Firebase
             if (textViewUserName != null) {
-                String username = TextUtils.isEmpty(currentUser.getDisplayName()) ? getString(R.string.info_no_username_found) : currentUser.getDisplayName();
+                String username = TextUtils.isEmpty(currentUser.getDisplayName()) ? getString(R.string.no_user_name_found) : currentUser.getDisplayName();
                 textViewUserName.setText(username);
             }
 
             if (textViewUserEmail != null) {
-                String email = TextUtils.isEmpty(currentUser.getEmail()) ? getString(R.string.info_no_user_email) : currentUser.getEmail();
+                String email = TextUtils.isEmpty(currentUser.getEmail()) ? getString(R.string.no_user_email) : currentUser.getEmail();
                 textViewUserEmail.setText(email);
             }
         }

@@ -39,8 +39,8 @@
     <string name="sign_in_with_facebook">Login with Facebook</string>
     <string name="login_subtitle">Find a nice restaurant and invite you co-workers for lunch !</string>
     <string name="login_title">Go4Lunch</string>
-    <string name="info_no_user_email">No user email</string>
-    <string name="info_no_username_found">No user name found</string>
+    <string name="no_user_email">No user email</string>
+    <string name="no_user_name_found">No user name found</string>
     <string name="no_user_connected">No user connected</string>
     <string name="label_email">EMail :</string>
     <string name="label_email_value">Email value</string>
