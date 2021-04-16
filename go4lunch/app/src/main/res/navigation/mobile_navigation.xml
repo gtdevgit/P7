@@ -20,7 +20,7 @@
     <fragment
         android:id="@+id/navigation_drawer_logout"
         android:name="com.example.go4lunch.ui.logout.LogoutFragment"
-        android:label="@string/menu_slideshow"
+        android:label="@string/menu_logout"
         tools:layout="@layout/fragment_logout" />
 
 </navigation>
