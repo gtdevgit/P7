@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.go4lunch.tag.Tag;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -18,7 +19,7 @@ import java.util.concurrent.Executors;
 
 public class LogoutViewModel extends ViewModel {
 
-    private static final String TAG = "LogoutFragment";
+    private static final String TAG = Tag.TAG;
     private static final int SIGN_OUT_TASK = 10;
     private static final int DELETE_USER_TASK = 20;
 
@@ -83,6 +84,7 @@ public class LogoutViewModel extends ViewModel {
     }
 
     public void deleteUserFromFirebase(Context context){
+        Log.d(TAG, "deleteUserFromFirebase() called with: context = [" + context + "]");
         Executor executor = Executors.newSingleThreadExecutor();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
@@ -93,6 +95,7 @@ public class LogoutViewModel extends ViewModel {
     }
 
     private OnSuccessListener<Void> updateUIAfterRESTRequestsCompleted(final int origin){
+        Log.d(TAG, "updateUIAfterRESTRequestsCompleted() called with: origin = [" + origin + "]");
         return new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
@@ -103,6 +106,7 @@ public class LogoutViewModel extends ViewModel {
                         break;
                     case DELETE_USER_TASK:
                         loadData();
+                        listenerLogoutUser.onSuccessLogoutUser();
                         break;
                     default:
                         break;

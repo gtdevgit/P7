@@ -6,11 +6,13 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import com.example.go4lunch.MainActivity;
 import com.example.go4lunch.R;
+import com.example.go4lunch.tag.Tag;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.FirebaseUiException;
@@ -22,7 +24,7 @@ import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private static final String TAG = "LoginActivity";
+    private static final String TAG = Tag.TAG;
     private static final int RC_SIGN_IN = 1;
 
     private Button buttonFacebook;
@@ -54,6 +56,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void startSignInActivity(SupportedProvider supportedProvider){
+        Log.d(TAG, "startSignInActivity() called with: supportedProvider = [" + supportedProvider + "]");
         List<AuthUI.IdpConfig> providers = Authentication.getProviderBySupportedProvider(supportedProvider);
 
         startActivityForResult(
@@ -72,7 +75,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void handleResponseAfterSignIn(int requestCode, int resultCode, Intent data){
-
+        Log.d(TAG, "handleResponseAfterSignIn() called with: requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
         IdpResponse response = IdpResponse.fromResultIntent(data);
 
         if (requestCode == RC_SIGN_IN) {

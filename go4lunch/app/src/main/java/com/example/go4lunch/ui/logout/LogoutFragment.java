@@ -1,5 +1,6 @@
 package com.example.go4lunch.ui.logout;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,10 +20,14 @@ import androidx.lifecycle.ViewModelProvider;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.R;
+import com.example.go4lunch.firebase.Authentication;
+import com.example.go4lunch.firebase.LoginActivity;
+import com.example.go4lunch.tag.Tag;
+import com.example.go4lunch.ui.SettingActivity;
 
 public class LogoutFragment extends Fragment {
 
-    private static final String TAG = "LogoutFragment";
+    private static final String TAG = Tag.TAG;
 
     private LogoutViewModel logoutViewModel;
     private ImageView imageViewUserPicture;
@@ -36,17 +41,25 @@ public class LogoutFragment extends Fragment {
 
         logoutViewModel = new ViewModelProvider(this).get(LogoutViewModel.class);
 
+
         //callback after logout user
         logoutViewModel.setListenerLogoutUser(new ListenerLogoutUser() {
             @Override
             public void onSuccessLogoutUser() {
                 Log.d(TAG, "logoutViewModel.onSuccessLogoutUser()->loadData()");
                 // => go to login activity
+                if (!Authentication.isConnected()) {
+                    Intent intent;
+                    intent = new Intent(getContext(), LoginActivity.class);
+                    startActivity(intent);
+                    getActivity().finish();
+                }
             }
         });
 
-        // user email observer
+            // user email observer
         final TextView textViewUserEmail = root.findViewById(R.id.fragment_logout__textView_user_email);
+
         logoutViewModel.getUserEmail().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
@@ -109,8 +122,8 @@ public class LogoutFragment extends Fragment {
         buttonDeleteUser.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+                Log.d(TAG, "buttonDeleteUser.setOnClickListener.onClick()");
                 logoutViewModel.deleteUserFromFirebase(getContext());
-                logoutViewModel.loadData();
             }
         });
 

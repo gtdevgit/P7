@@ -48,8 +48,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        //loadMap();
-
+        loadFragmentMap();
         return root;
     }
 
@@ -57,42 +56,35 @@ public class HomeFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.menu_item_map_view:
                 Toast.makeText(this.getContext(), "map view", LENGTH_SHORT).show();
-                loadMap();
+                loadFragmentMap();
                 return true;
             case R.id.menu_item_list_view:
                 Toast.makeText(this.getContext(), "list view", LENGTH_SHORT).show();
-                loadListView();
+                loadFragmentListView();
                 return true;
             case R.id.menu_item_workmates:
                 Toast.makeText(this.getContext(), "workmates view", LENGTH_SHORT).show();
-                loadWorkmates();
+                loadFragmentWorkmates();
                 return true;
         }
         return false;
     }
 
-    private void loadMap(){
-        MapFragment mapFragment = new MapFragment();
-        FragmentTransaction ft = getParentFragmentManager().beginTransaction();
-        ft.replace(R.id.fragment_home_container, mapFragment );
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        ft.addToBackStack(null);
-        ft.commit();
+    private void loadFragmentMap(){
+        loadFragment(new MapFragment());
     }
 
-    private void loadListView(){
-        ListViewFragment listViewFragment = new ListViewFragment();
-        FragmentTransaction ft = getParentFragmentManager().beginTransaction();
-        ft.replace(R.id.fragment_home_container, listViewFragment );
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        ft.addToBackStack(null);
-        ft.commit();
+    private void loadFragmentListView(){
+        loadFragment(new ListViewFragment());
     }
 
-    private void loadWorkmates(){
-        WorkmatesFragment workmatesFragment = new WorkmatesFragment();
+    private void loadFragmentWorkmates(){
+        loadFragment(new WorkmatesFragment());
+    }
+
+    private void loadFragment(Fragment fragment){
         FragmentTransaction ft = getParentFragmentManager().beginTransaction();
-        ft.replace(R.id.fragment_home_container, workmatesFragment);
+        ft.replace(R.id.fragment_home_container, fragment);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         ft.addToBackStack(null);
         ft.commit();

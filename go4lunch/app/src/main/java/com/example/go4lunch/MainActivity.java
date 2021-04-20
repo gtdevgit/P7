@@ -12,8 +12,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.ui.SettingActivity;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -27,6 +25,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+//implements OnMapReadyCallback
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
@@ -60,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
             textViewUserName = headView.findViewById(R.id.navigation_header_user_name);
             textViewUserEmail = headView.findViewById(R.id.navigation_header_user_email);
         }
+
+
     }
 
     @Override
@@ -125,5 +126,4 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
 }

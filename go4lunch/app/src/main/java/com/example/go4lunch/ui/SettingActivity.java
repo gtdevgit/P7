@@ -10,6 +10,7 @@ import com.example.go4lunch.MainActivity;
 import com.example.go4lunch.firebase.Authentication;
 import com.example.go4lunch.firebase.LoginActivity;
 import com.example.go4lunch.navigation.NavigationActivity;
+import com.example.go4lunch.tag.Tag;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.FirebaseUiException;
@@ -47,7 +48,7 @@ import java.util.List;
 
 public class SettingActivity extends AppCompatActivity {
 
-    private static final String TAG = "SettingActivity";
+    private static final String TAG = Tag.TAG;
 
     private static final int SIGN_OUT_TASK = 10;
     private static final int DELETE_USER_TASK = 20;
@@ -131,6 +132,7 @@ public class SettingActivity extends AppCompatActivity {
     }
 
     private OnSuccessListener<Void> updateUIAfterRESTRequestsCompleted(final int origin){
+        Log.d(TAG, "updateUIAfterRESTRequestsCompleted() called with: origin = [" + origin + "]");
         return new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
@@ -156,10 +158,10 @@ public class SettingActivity extends AppCompatActivity {
 
 
     private void reload(){
-        Log.d(TAG, "reload() called");
 
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
+        Log.d(TAG, "reload() called with: currentUser  = [\" + currentUser + \"]\"); ");
         if(currentUser != null){
             if (currentUser.getPhotoUrl() != null) {
                 Glide.with(this)
