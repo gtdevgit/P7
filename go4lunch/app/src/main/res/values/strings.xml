@@ -60,6 +60,9 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="show_notifications">Show notifications</string>
     <string name="search">search</string>
+    <string name="confirm_delete_account">Please, confirm delete account ?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
 
 </resources>

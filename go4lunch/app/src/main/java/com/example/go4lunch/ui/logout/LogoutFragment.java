@@ -1,5 +1,7 @@
 package com.example.go4lunch.ui.logout;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -38,10 +40,7 @@ public class LogoutFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
 
         View root = inflater.inflate(R.layout.fragment_logout, container, false);
-
         logoutViewModel = new ViewModelProvider(this).get(LogoutViewModel.class);
-
-
         //callback after logout user
         logoutViewModel.setListenerLogoutUser(new ListenerLogoutUser() {
             @Override
@@ -69,7 +68,6 @@ public class LogoutFragment extends Fragment {
                 } else {
                     textViewUserEmail.setText(R.string.no_user_email);
                 }
-
             }
         });
 
@@ -123,12 +121,20 @@ public class LogoutFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "buttonDeleteUser.setOnClickListener.onClick()");
-                logoutViewModel.deleteUserFromFirebase(getContext());
+                new AlertDialog.Builder(getContext())
+                        .setMessage(R.string.confirm_delete_account)
+                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                logoutViewModel.deleteUserFromFirebase(getContext());
+                            }
+                        })
+                        .setNegativeButton(R.string.no, null)
+                        .show();
             }
         });
 
         logoutViewModel.loadData();
-
         return root;
     }
 }
