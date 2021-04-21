@@ -29,15 +29,11 @@ public class LogoutViewModel extends ViewModel {
     private MutableLiveData<String> userName;
     private MutableLiveData<Uri> userPictureUri;
 
-    private FirebaseAuth mAuth;
-
     public LogoutViewModel() {
         userEmail = new MutableLiveData<>();
         userName = new MutableLiveData<>();
         userPictureUri = new MutableLiveData<>();
 
-        // Initialize Firebase Auth
-        mAuth = FirebaseAuth.getInstance();
         loadData();
     }
 
@@ -47,7 +43,7 @@ public class LogoutViewModel extends ViewModel {
 
     public void loadData() {
         Log.d(TAG, "loadData() called");
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if(currentUser == null){
             Log.d(TAG, "loadData() current user == null");
             // use postValue instead of setValue to avoid error
@@ -77,17 +73,17 @@ public class LogoutViewModel extends ViewModel {
 
     public void signOutUserFromFirebase(Context context){
         Executor executor = Executors.newSingleThreadExecutor();
-
-        AuthUI.getInstance()
-                .signOut(context)
-                .addOnSuccessListener(executor, this.updateUIAfterRESTRequestsCompleted(SIGN_OUT_TASK));
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            AuthUI.getInstance()
+                    .signOut(context)
+                    .addOnSuccessListener(executor, this.updateUIAfterRESTRequestsCompleted(SIGN_OUT_TASK));
+        }
     }
 
     public void deleteUserFromFirebase(Context context){
         Log.d(TAG, "deleteUserFromFirebase() called with: context = [" + context + "]");
         Executor executor = Executors.newSingleThreadExecutor();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             AuthUI.getInstance()
                     .delete(context)
                     .addOnSuccessListener(executor, this.updateUIAfterRESTRequestsCompleted(DELETE_USER_TASK));

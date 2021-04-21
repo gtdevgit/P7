@@ -17,8 +17,11 @@ import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.FirebaseUiException;
 import com.firebase.ui.auth.IdpResponse;
+import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
 
@@ -77,10 +80,17 @@ public class LoginActivity extends AppCompatActivity {
     private void handleResponseAfterSignIn(int requestCode, int resultCode, Intent data){
         Log.d(TAG, "handleResponseAfterSignIn() called with: requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
         IdpResponse response = IdpResponse.fromResultIntent(data);
+        Log.d(TAG, "handleResponseAfterSignIn() response = [" + response + "]");
 
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) { // SUCCESS
                 showSnackBar(getString(R.string.connection_succeed));
+
+                FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                Log.d(TAG, "handleResponseAfterSignIn() currentUser = [" + currentUser + "]");
+                Log.d(TAG, "handleResponseAfterSignIn() currentUser.getEmail() = [" + currentUser.getEmail() + "]");
+                Log.d(TAG, "handleResponseAfterSignIn() currentUser.getUid() = [" + currentUser.getUid() + "]");
+
 
                 // go to main after login
                 if (Authentication.isConnected()) {
