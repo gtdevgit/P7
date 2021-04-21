@@ -4,12 +4,15 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.go4lunch.api.UserHelper;
 import com.example.go4lunch.tag.Tag;
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -74,9 +77,22 @@ public class LogoutViewModel extends ViewModel {
     public void signOutUserFromFirebase(Context context){
         Executor executor = Executors.newSingleThreadExecutor();
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            AuthUI.getInstance()
-                    .signOut(context)
-                    .addOnSuccessListener(executor, this.updateUIAfterRESTRequestsCompleted(SIGN_OUT_TASK));
+            UserHelper.logoutUser(FirebaseAuth.getInstance().getCurrentUser().getUid())
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    listenerLogoutUser.onFailureLogout(e.getMessage());
+                }
+            })
+            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                    public void onSuccess(Void aVoid) {
+                        AuthUI.getInstance()
+                            .signOut(context)
+                            .addOnSuccessListener(executor, updateUIAfterRESTRequestsCompleted(SIGN_OUT_TASK));
+
+                    }
+            });
         }
     }
 
@@ -84,9 +100,21 @@ public class LogoutViewModel extends ViewModel {
         Log.d(TAG, "deleteUserFromFirebase() called with: context = [" + context + "]");
         Executor executor = Executors.newSingleThreadExecutor();
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            AuthUI.getInstance()
-                    .delete(context)
-                    .addOnSuccessListener(executor, this.updateUIAfterRESTRequestsCompleted(DELETE_USER_TASK));
+
+            UserHelper.deleteUser(FirebaseAuth.getInstance().getCurrentUser().getUid()).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    listenerLogoutUser.onFailureDelete(e.getMessage());
+                }
+            })
+            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    AuthUI.getInstance()
+                            .delete(context)
+                            .addOnSuccessListener(executor, updateUIAfterRESTRequestsCompleted(DELETE_USER_TASK));
+                }
+            });
         }
     }
 
@@ -97,12 +125,9 @@ public class LogoutViewModel extends ViewModel {
             public void onSuccess(Void aVoid) {
                 switch (origin){
                     case SIGN_OUT_TASK:
-                        loadData();
-                        listenerLogoutUser.onSuccessLogoutUser();
-                        break;
                     case DELETE_USER_TASK:
                         loadData();
-                        listenerLogoutUser.onSuccessLogoutUser();
+                        listenerLogoutUser.onSuccess();
                         break;
                     default:
                         break;

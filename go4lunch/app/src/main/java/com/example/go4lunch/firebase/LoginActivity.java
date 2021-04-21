@@ -1,5 +1,6 @@
 package com.example.go4lunch.firebase;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -12,6 +13,7 @@ import android.widget.Button;
 
 import com.example.go4lunch.MainActivity;
 import com.example.go4lunch.R;
+import com.example.go4lunch.api.UserHelper;
 import com.example.go4lunch.tag.Tag;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
@@ -19,11 +21,14 @@ import com.firebase.ui.auth.FirebaseUiException;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
+import java.util.logging.LogManager;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -77,6 +82,27 @@ public class LoginActivity extends AppCompatActivity {
         this.handleResponseAfterSignIn(requestCode, resultCode, data);
     }
 
+    private void createUserInFirestore(){
+        Log.d(TAG, "createUserInFirestore() called");
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null){
+
+            String urlPicture = (currentUser.getPhotoUrl() != null) ? currentUser.getPhotoUrl().toString() : null;
+            String userName = currentUser.getDisplayName();
+            String userEmail = currentUser.getEmail();
+            String uid = currentUser.getUid();
+
+            UserHelper.createUser(uid, userName, userEmail, urlPicture)
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(TAG, "onFailure() called with: e = [" + e + "]");
+                        showSnackBar(R.string.error_during_connection);
+                    }
+                });
+        }
+    }
+
     private void handleResponseAfterSignIn(int requestCode, int resultCode, Intent data){
         Log.d(TAG, "handleResponseAfterSignIn() called with: requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
         IdpResponse response = IdpResponse.fromResultIntent(data);
@@ -84,13 +110,14 @@ public class LoginActivity extends AppCompatActivity {
 
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) { // SUCCESS
-                showSnackBar(getString(R.string.connection_succeed));
+                this.createUserInFirestore();
 
                 FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
                 Log.d(TAG, "handleResponseAfterSignIn() currentUser = [" + currentUser + "]");
                 Log.d(TAG, "handleResponseAfterSignIn() currentUser.getEmail() = [" + currentUser.getEmail() + "]");
                 Log.d(TAG, "handleResponseAfterSignIn() currentUser.getUid() = [" + currentUser.getUid() + "]");
 
+                showSnackBar(R.string.connection_succeed);
 
                 // go to main after login
                 if (Authentication.isConnected()) {
@@ -101,28 +128,29 @@ public class LoginActivity extends AppCompatActivity {
                 }
             } else { // ERRORS
                 if (response == null) {
-                    showSnackBar(getString(R.string.error_authentication_canceled));
+                    showSnackBar(R.string.error_authentication_canceled);
                 }
                 else {
                     FirebaseUiException firebaseUiException = response.getError();
                     if (firebaseUiException != null) {
                         if (firebaseUiException.getErrorCode() == ErrorCodes.NO_NETWORK) {
-                            showSnackBar(getString(R.string.error_no_internet));
+                            showSnackBar(R.string.error_no_internet);
                         } else if (firebaseUiException.getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
-                            showSnackBar(getString(R.string.error_unknown_error));
+                            showSnackBar(R.string.error_unknown_error);
                         } else {
-                            showSnackBar("other exception");
+                            showSnackBar(R.string.other_exception);
                         }
                     }
                     else {
-                        showSnackBar("no exception");
+                        showSnackBar(R.string.no_exception);
                     }
                 }
             }
         }
     }
 
-    private void showSnackBar(String message){
-        Snackbar.make(this.constraintLayout, message, Snackbar.LENGTH_SHORT).show();
+    private void showSnackBar(int resId){
+        Snackbar.make(this.constraintLayout, getString(resId), Snackbar.LENGTH_SHORT).show();
     }
+
 }

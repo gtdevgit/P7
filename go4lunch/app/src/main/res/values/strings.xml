@@ -63,6 +63,11 @@
     <string name="confirm_delete_account">Please, confirm delete account ?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="error_deleting_account">Error deleting account</string>
+    <string name="error_disconnecting_account">Error while disconnecting the account</string>
+    <string name="error_during_connection">Error during connection</string>
+    <string name="other_exception">other exception</string>
+    <string name="no_exception">no exception</string>
 
 
 </resources>

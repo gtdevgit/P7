@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,6 +27,8 @@ import com.example.go4lunch.firebase.Authentication;
 import com.example.go4lunch.firebase.LoginActivity;
 import com.example.go4lunch.tag.Tag;
 import com.example.go4lunch.ui.SettingActivity;
+
+import static android.widget.Toast.LENGTH_SHORT;
 
 public class LogoutFragment extends Fragment {
 
@@ -44,8 +47,8 @@ public class LogoutFragment extends Fragment {
         //callback after logout user
         logoutViewModel.setListenerLogoutUser(new ListenerLogoutUser() {
             @Override
-            public void onSuccessLogoutUser() {
-                Log.d(TAG, "logoutViewModel.onSuccessLogoutUser()->loadData()");
+            public void onSuccess() {
+                Log.d(TAG, "logoutViewModel.onSuccess()");
                 // => go to login activity
                 if (!Authentication.isConnected()) {
                     Intent intent;
@@ -53,6 +56,16 @@ public class LogoutFragment extends Fragment {
                     startActivity(intent);
                     getActivity().finish();
                 }
+            }
+            @Override
+            public void onFailureDelete(String message) {
+                Log.d(TAG, "logoutViewModel.onFailureDelete() " + message);
+                Toast.makeText(getContext(), getString(R.string.error_deleting_account), LENGTH_SHORT).show();
+            }
+            @Override
+            public void onFailureLogout(String message){
+                Log.d(TAG, "logoutViewModel.onFailureLogout() " + message);
+                Toast.makeText(getContext(), getString(R.string.error_disconnecting_account), LENGTH_SHORT).show();
             }
         });
 
