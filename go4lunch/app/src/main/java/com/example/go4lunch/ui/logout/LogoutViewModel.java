@@ -76,6 +76,7 @@ public class LogoutViewModel extends ViewModel {
 
     public void signOutUserFromFirebase(Context context){
         Executor executor = Executors.newSingleThreadExecutor();
+
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             UserHelper.logoutUser(FirebaseAuth.getInstance().getCurrentUser().getUid())
             .addOnFailureListener(new OnFailureListener() {

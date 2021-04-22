@@ -2,13 +2,27 @@ package com.example.go4lunch.ui.home;
 
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.go4lunch.R;
+import com.example.go4lunch.models.User;
+import com.example.go4lunch.tag.Tag;
+import com.example.go4lunch.ui.logout.LogoutViewModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -16,51 +30,52 @@ import com.example.go4lunch.R;
  * create an instance of this fragment.
  */
 public class WorkmatesFragment extends Fragment {
+    private static final String TAG = Tag.TAG;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private WorkmatesViewModel workmatesViewModel;
+    private List<User> usersList;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    TextView TextViewUserList;
+    private RecyclerView recyclerView;
+    private RecyclerView.LayoutManager layoutManager;
+    private WorkmatesAdapter workmatesAdapter;
 
     public WorkmatesFragment() {
         // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment WorkmatesFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static WorkmatesFragment newInstance(String param1, String param2) {
-        WorkmatesFragment fragment = new WorkmatesFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_workmates, container, false);
+        View root = inflater.inflate(R.layout.fragment_workmates, container, false);
+        workmatesViewModel = new ViewModelProvider(this).get(WorkmatesViewModel.class);
+
+        recyclerView = root.findViewById(R.id.fragment_workmates_recyclerview);
+        layoutManager = new LinearLayoutManager(root.getContext());
+        recyclerView.setLayoutManager(layoutManager);
+
+        usersList = new ArrayList<>();
+        workmatesAdapter = new WorkmatesAdapter(usersList);
+        recyclerView.setAdapter(workmatesAdapter);
+
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+                DividerItemDecoration.VERTICAL);
+        recyclerView.addItemDecoration(dividerItemDecoration);
+
+        workmatesViewModel.getWorkmates().observe(getViewLifecycleOwner(), new Observer<List<User>>() {
+            @Override
+            public void onChanged(List<User> users) {
+                Log.d(TAG, "WorkmatesFragment: onChanged() called with: users = [" + users + "]");
+                usersList.clear();
+                usersList.addAll(users);
+                Log.d(TAG, "WorkmatesFragment: onChanged() called with: usersList = [" + usersList + "]");
+                Log.d(TAG, "WorkmatesFragment: onChanged() usersList.size() = [" + usersList.size() + "]");
+                workmatesAdapter.notifyDataSetChanged();
+            }
+        });
+
+        workmatesViewModel.loadData();
+        return root;
     }
 }
