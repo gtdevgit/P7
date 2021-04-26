@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.go4lunch.R;
@@ -39,6 +40,7 @@ public class WorkmatesFragment extends Fragment {
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private WorkmatesAdapter workmatesAdapter;
+    private ProgressBar workmateProgressBar;
 
     public WorkmatesFragment() {
         // Required empty public constructor
@@ -49,6 +51,7 @@ public class WorkmatesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d(TAG, "WorkmatesFragment.onCreateView() called with: inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_workmates, container, false);
         workmatesViewModel = new ViewModelProvider(this).get(WorkmatesViewModel.class);
@@ -73,9 +76,13 @@ public class WorkmatesFragment extends Fragment {
                 usersList.addAll(users);
                 Log.d(TAG, "WorkmatesFragment: onChanged() called with: usersList = [" + usersList + "]");
                 Log.d(TAG, "WorkmatesFragment: onChanged() usersList.size() = [" + usersList.size() + "]");
+                workmateProgressBar.setVisibility(View.INVISIBLE);
                 workmatesAdapter.notifyDataSetChanged();
             }
         });
+
+        workmateProgressBar = root.findViewById(R.id.fragment_workmates_progress_bar);
+        workmateProgressBar.setVisibility(View.VISIBLE);
 
         workmatesViewModel.loadData();
         return root;

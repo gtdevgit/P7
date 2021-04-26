@@ -13,4 +13,12 @@
         android:scrollbars="vertical"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
 
+    <ProgressBar
+        android:id="@+id/fragment_workmates_progress_bar"
+        android:layout_width="70dip"
+        android:layout_height="70dip"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/default_large_margin"
+        android:visibility="visible" />
+
 </FrameLayout>
