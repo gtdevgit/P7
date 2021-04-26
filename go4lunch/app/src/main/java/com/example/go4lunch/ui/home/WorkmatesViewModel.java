@@ -68,6 +68,5 @@ public class WorkmatesViewModel extends ViewModel {
                         Log.d(TAG, "WorkmatesViewModel.getWorkmates().onSuccess() called with: queryDocumentSnapshots = [" + queryDocumentSnapshots + "]");
                     }
                 });
-
     }
 }

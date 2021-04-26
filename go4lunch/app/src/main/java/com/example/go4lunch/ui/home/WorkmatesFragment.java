@@ -44,6 +44,8 @@ public class WorkmatesFragment extends Fragment {
         // Required empty public constructor
     }
 
+    //Todo: Workmates, adapter le style du texte en fonction du choix ou non d'un restaurant par le workmate. Utiliser Body1 quand un choix n'a pas été fait et Body 2 quand un restaurant à été choisi (android:textAppearance="@style/TextAppearance.AppCompat.Body1")
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

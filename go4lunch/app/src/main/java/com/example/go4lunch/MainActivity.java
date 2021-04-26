@@ -3,6 +3,7 @@ package com.example.go4lunch;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
@@ -27,6 +28,7 @@ import androidx.appcompat.widget.Toolbar;
 
 //implements OnMapReadyCallback
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "MainActivity";
 
     private AppBarConfiguration mAppBarConfiguration;
     private ImageView imageView;
@@ -66,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+        Log.d(TAG, "onCreateOptionsMenu() called with: menu = [" + menu + "]");
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
