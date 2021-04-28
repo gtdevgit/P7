@@ -50,6 +50,7 @@ public class SettingActivity extends AppCompatActivity {
 
     private static final String TAG = Tag.TAG;
 
+
     private static final int SIGN_OUT_TASK = 10;
     private static final int DELETE_USER_TASK = 20;
     private static final int UPDATE_USERNAME = 30;

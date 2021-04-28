@@ -2,11 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.go4lunch">
 
-    <uses-permission
-        android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -15,12 +14,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Go4lunch">
+        <activity android:name=".PermissionActivity"></activity>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_api_key" />
 
-        <activity android:name=".firebase.LoginActivity"></activity>
+        <activity android:name=".firebase.LoginActivity" />
         <activity
             android:name=".ui.SettingActivity"
             android:label="@string/title_activity_setting"
@@ -28,7 +28,7 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Go4lunch.NoActionBar"></activity>
+            android:theme="@style/Theme.Go4lunch.NoActionBar" />
         <activity android:name=".navigation.NavigationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
