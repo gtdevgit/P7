@@ -72,8 +72,8 @@
     <string name="permission_message">Application needs permission to access device location to provide required services. Please allow the permission.</string>
     <string name="grant_permission">Grant permission</string>
     <string name="discard_permission">Discard permission</string>
-    <string name="localisation_allowed">Localization is allowed for this app</string>
-    <string name="localisation_not_allowed">Localization is not allowed for this app</string>
+    <string name="localisation_allowed">Localization permission is allowed for this app</string>
+    <string name="localisation_not_allowed">Localization permission is not allowed for this app</string>
 
 
 </resources>
