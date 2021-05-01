@@ -1,29 +1,36 @@
 package com.example.go4lunch.ui.home;
 
+import android.content.Context;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.go4lunch.R;
+import com.example.go4lunch.GPS.GPS;
+import com.example.go4lunch.tag.Tag;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import static android.widget.Toast.LENGTH_SHORT;
 
 public class HomeFragment extends Fragment {
 
+    private static final String TAG = Tag.TAG;
     private HomeViewModel homeViewModel;
     private BottomNavigationView bottomNavigationView;
+
+    // GPS
+    LocationManager locationManager;
+    GPS gps;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -41,6 +48,7 @@ public class HomeFragment extends Fragment {
         });
 
         //load map
+        initGPS();
         loadFragmentMap();
         return root;
     }
@@ -64,7 +72,10 @@ public class HomeFragment extends Fragment {
     }
 
     private void loadFragmentMap(){
-        loadFragment(new MapFragment());
+        Log.d(TAG, "loadFragmentMap() called");
+        gps.stopLocalization();
+        MapFragment mapFragment = new MapFragment(gps);
+        loadFragment(mapFragment);
     }
 
     private void loadFragmentListView(){
@@ -81,5 +92,11 @@ public class HomeFragment extends Fragment {
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         ft.addToBackStack(null);
         ft.commit();
+    }
+
+    public void initGPS(){
+        Log.d(TAG, "initGPS() called");
+        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        gps = new GPS(locationManager);
     }
 }

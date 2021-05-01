@@ -61,8 +61,6 @@ public class MainActivity extends AppCompatActivity {
             textViewUserName = headView.findViewById(R.id.navigation_header_user_name);
             textViewUserEmail = headView.findViewById(R.id.navigation_header_user_email);
         }
-
-
     }
 
     @Override
@@ -129,4 +127,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+
 }
