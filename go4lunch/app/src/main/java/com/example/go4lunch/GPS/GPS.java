@@ -8,11 +8,6 @@ import android.location.LocationManager;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.go4lunch.models.User;
-
-import java.util.List;
-
-
 public class GPS {
 
     private LocationManager locationManager;
@@ -47,7 +42,7 @@ public class GPS {
 
     @SuppressLint("MissingPermission")
     public void startLocalization(){
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 25, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 25, locationListener);
     }
 
     public void stopLocalization(){

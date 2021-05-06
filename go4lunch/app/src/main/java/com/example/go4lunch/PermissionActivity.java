@@ -57,11 +57,11 @@ public class PermissionActivity extends AppCompatActivity implements ActivityCom
     }
 
     private void showGrandedMessage(){
-        Toast.makeText(PermissionActivity.this, "Permission Granted", Toast.LENGTH_SHORT).show();
+        Toast.makeText(PermissionActivity.this, getString(R.string.permission_granted_message), Toast.LENGTH_SHORT).show();
     }
 
     private void showDenieddMessage(){
-        Toast.makeText(PermissionActivity.this, "Permission Denied. The app can not be used.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(PermissionActivity.this, getString(R.string.permission_denied_message), Toast.LENGTH_SHORT).show();
     }
 
     private void closeActivity(){

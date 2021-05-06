@@ -12,7 +12,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.go4lunch.MyPlace.MyPlace;
 import com.example.go4lunch.ui.SettingActivity;
+import com.google.android.libraries.places.api.Places;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -34,12 +36,14 @@ public class MainActivity extends AppCompatActivity {
     private ImageView imageView;
     private TextView textViewUserName;
     private TextView textViewUserEmail;
+    private Toolbar toolbar;
+    private MenuItem menuItemSearch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -61,6 +65,13 @@ public class MainActivity extends AppCompatActivity {
             textViewUserName = headView.findViewById(R.id.navigation_header_user_name);
             textViewUserEmail = headView.findViewById(R.id.navigation_header_user_email);
         }
+
+        // Initialize Place and PlaceClient
+        MyPlace.getInstance().initialize(getApplicationContext(), getString(R.string.google_api_key));
+    }
+
+    public MenuItem getMenuItemSearch(){
+        return menuItemSearch;
     }
 
     @Override
@@ -68,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         Log.d(TAG, "onCreateOptionsMenu() called with: menu = [" + menu + "]");
         getMenuInflater().inflate(R.menu.main, menu);
+        menuItemSearch = toolbar.getMenu().findItem(R.id.menu_item_toolbar_search);
         return true;
     }
 
@@ -127,6 +139,4 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
-
 }

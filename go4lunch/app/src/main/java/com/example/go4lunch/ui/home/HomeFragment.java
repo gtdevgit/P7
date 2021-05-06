@@ -11,10 +11,14 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.go4lunch.MainActivity;
 import com.example.go4lunch.R;
 import com.example.go4lunch.GPS.GPS;
 import com.example.go4lunch.tag.Tag;
@@ -31,7 +35,6 @@ public class HomeFragment extends Fragment {
     // GPS
     LocationManager locationManager;
     GPS gps;
-
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -54,18 +57,23 @@ public class HomeFragment extends Fragment {
     }
 
     private boolean navigate(@NonNull MenuItem item) {
+        MenuItem menuItemSearch = ((MainActivity) getActivity()).getMenuItemSearch();
+
         switch (item.getItemId()) {
             case R.id.menu_item_map_view:
                 Toast.makeText(this.getContext(), "map view", LENGTH_SHORT).show();
                 loadFragmentMap();
+                menuItemSearch.setVisible(true);
                 return true;
             case R.id.menu_item_list_view:
                 Toast.makeText(this.getContext(), "list view", LENGTH_SHORT).show();
                 loadFragmentListView();
+                menuItemSearch.setVisible(true);
                 return true;
             case R.id.menu_item_workmates:
                 Toast.makeText(this.getContext(), "workmates view", LENGTH_SHORT).show();
                 loadFragmentWorkmates();
+                menuItemSearch.setVisible(false);
                 return true;
         }
         return false;

@@ -41,8 +41,12 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth'
     implementation 'com.google.firebase:firebase-firestore'
 
+    // google auth
     implementation 'com.google.android.gms:play-services-auth:19.0.0'
+    // google map
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
+    // google place
+    implementation 'com.google.android.libraries.places:places:2.4.0'
 
     implementation 'com.facebook.android:facebook-android-sdk:[4,5)'
 

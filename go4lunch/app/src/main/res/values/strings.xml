@@ -74,6 +74,8 @@
     <string name="discard_permission">Discard permission</string>
     <string name="localisation_allowed">Localization permission is allowed for this app</string>
     <string name="localisation_not_allowed">Localization permission is not allowed for this app</string>
+    <string name="permission_denied_message">Permission Denied. The app can not be used.</string>
+    <string name="permission_granted_message">Permission Granted</string>
 
 
 </resources>
