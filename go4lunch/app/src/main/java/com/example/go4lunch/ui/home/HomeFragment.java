@@ -21,7 +21,9 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.go4lunch.MainActivity;
 import com.example.go4lunch.R;
 import com.example.go4lunch.GPS.GPS;
+import com.example.go4lunch.repository.GooglePlacesApiRepository;
 import com.example.go4lunch.tag.Tag;
+import com.example.go4lunch.viewmodel.MainViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import static android.widget.Toast.LENGTH_SHORT;
@@ -35,6 +37,8 @@ public class HomeFragment extends Fragment {
     // GPS
     LocationManager locationManager;
     GPS gps;
+
+    private MainViewModel mainViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -52,6 +56,7 @@ public class HomeFragment extends Fragment {
 
         //load map
         initGPS();
+        initViewModel();
         loadFragmentMap();
         return root;
     }
@@ -82,7 +87,7 @@ public class HomeFragment extends Fragment {
     private void loadFragmentMap(){
         Log.d(TAG, "loadFragmentMap() called");
         gps.stopLocalization();
-        MapFragment mapFragment = new MapFragment(gps);
+        MapFragment mapFragment = new MapFragment(gps, mainViewModel);
         loadFragment(mapFragment);
     }
 
@@ -106,5 +111,9 @@ public class HomeFragment extends Fragment {
         Log.d(TAG, "initGPS() called");
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         gps = new GPS(locationManager);
+    }
+
+    public void initViewModel(){
+        mainViewModel = new MainViewModel(new GooglePlacesApiRepository(getString(R.string.google_api_key)));
     }
 }

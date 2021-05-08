@@ -20,7 +20,9 @@ import com.example.go4lunch.GPS.GPS;
 import com.example.go4lunch.MyPlace.GeographicHelper;
 import com.example.go4lunch.MyPlace.MyPlace;
 import com.example.go4lunch.R;
+import com.example.go4lunch.models.Autocomplete;
 import com.example.go4lunch.tag.Tag;
+import com.example.go4lunch.viewmodel.MainViewModel;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -58,16 +60,31 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private Location location;
 
     PlacesClient placesClient;
+    private MainViewModel mainViewModel;
+    private Observer<Autocomplete> autocompleteDataObserver;
 
-    public MapFragment(GPS gps) {
+    public MapFragment(GPS gps, MainViewModel mainViewModel) {
         // Required empty public constructor
+        Log.d(TAG, "MapFragment() called with: gps = [" + gps + "], mainViewModel = [" + mainViewModel + "]");
         this.gps = gps;
-        Log.d(TAG, "MapFragment() called with: gps = [" + gps + "]");
+        this.mainViewModel = mainViewModel;
+
+        autocompleteDataObserver = new Observer<Autocomplete>() {
+            @Override
+            public void onChanged(Autocomplete autocomplete) {
+                setAutoCompleteData(autocomplete);
+            }
+        };
+        mainViewModel.getAutocompleteData().observe(this, autocompleteDataObserver);
+    }
+
+    public void setAutoCompleteData(Autocomplete autocomplete){
+        // maj de la carte avec les points de proximités
+        Log.d(TAG, "setAutoCompleteData() called with: data = [" + autocomplete.getData() + "]");
     }
 
     public void setLocation(Location location) {
         Log.d(TAG, "setLocation() called with: location = [" + location + "]");
-
 
         this.location = location;
 
@@ -77,6 +94,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             mMap.addMarker(new MarkerOptions().position(latlng).title("You position"));
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, 14));
         }
+        // demande maj des points de proximités
+        mainViewModel.loadAutocompleteData(location);
     }
 
     @Override
@@ -97,7 +116,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 findAroundMe();
             }
         });
-
 
         return view;
     }
