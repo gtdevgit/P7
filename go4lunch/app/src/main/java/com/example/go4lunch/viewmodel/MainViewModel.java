@@ -8,6 +8,8 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.go4lunch.models.Autocomplete;
 import com.example.go4lunch.repository.GooglePlacesApiRepository;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -34,23 +36,24 @@ public class MainViewModel extends ViewModel {
     public void loadAutocompleteData(Location location){
         Log.d(TAG, "MainViewModel.loadAutocompleteData() called with: location = [" + location + "]");
 
-        Call<Autocomplete> call = googlePlacesApiRepository.getAutocomplete(location);
+        Call<JsonObject> call = googlePlacesApiRepository.getAutocomplete(location);
         Log.d(TAG, "loadAutocompleteData() 2 " + call);
-        call.enqueue(new Callback<Autocomplete>() {
+        call.enqueue(new Callback<JsonObject>() {
             @Override
-            public void onResponse(Call<Autocomplete> call, Response<Autocomplete> response) {
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 Log.d(TAG, "MainViewModel.loadAutocompleteData.onResponse() called with: call = [" + call + "], response = [" + response + "]");
                 if (response.isSuccessful()){
                     Log.d(TAG, "MainViewModel.loadAutocompleteData.onResponse() isSuccessful=true");
-                    Log.d(TAG, "response.body = " + response.body());
-                    autocompleteData.postValue(response.body());
+                    Gson gson = new Gson();
+                    String json = gson.toJson(response.body());
+                    Log.d(TAG, "onResponse() json = [" + json + "]");
                 } else {
                     Log.d(TAG, "MainViewModel.loadAutocompleteData.onResponse() isSuccessful=false");
                 }
             }
 
             @Override
-            public void onFailure(Call<Autocomplete> call, Throwable t) {
+            public void onFailure(Call<JsonObject> call, Throwable t) {
                 Log.d(TAG, "MainViewModel.loadAutocompleteData.onFailure() " + t.getMessage());
             }
         });

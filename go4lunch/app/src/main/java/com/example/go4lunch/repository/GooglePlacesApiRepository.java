@@ -7,6 +7,7 @@ import com.example.go4lunch.R;
 import com.example.go4lunch.api.GooglePlacesApiClient;
 import com.example.go4lunch.api.GooglePlacesApiInterface;
 import com.example.go4lunch.models.Autocomplete;
+import com.google.gson.JsonObject;
 
 import retrofit2.Call;
 
@@ -26,7 +27,7 @@ public class GooglePlacesApiRepository {
         return this.apiKey;
     }
 
-    public Call<Autocomplete> getAutocomplete(Location location) {
+    public Call<JsonObject> getAutocomplete(Location location) {
         Log.d(TAG, "GooglePlacesApiRepository.getAutocomplete() called with: location = [" + location + "]");
         String strLocation = "" + location.getLatitude() + "," + location.getLongitude();
         Log.d(TAG, "GooglePlacesApiRepository.getAutocomplete() strLocation = [" + strLocation + "]");

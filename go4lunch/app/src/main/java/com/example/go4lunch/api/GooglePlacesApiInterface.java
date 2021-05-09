@@ -1,6 +1,7 @@
 package com.example.go4lunch.api;
 
 import com.example.go4lunch.models.Autocomplete;
+import com.google.gson.JsonObject;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -20,7 +21,7 @@ public interface GooglePlacesApiInterface {
      */
 
     @GET("autocomplete/json")
-    Call<Autocomplete>getAutocomplete(
+    Call<JsonObject>getAutocomplete(
             @Query("input") String input,
             @Query("location") String location,
             @Query("radius") String radius,
