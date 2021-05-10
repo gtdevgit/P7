@@ -1,6 +1,9 @@
 package com.example.go4lunch.ui.home;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 
@@ -21,6 +24,7 @@ import com.example.go4lunch.MyPlace.GeographicHelper;
 import com.example.go4lunch.MyPlace.MyPlace;
 import com.example.go4lunch.R;
 import com.example.go4lunch.models.Autocomplete;
+import com.example.go4lunch.models.Restaurant;
 import com.example.go4lunch.tag.Tag;
 import com.example.go4lunch.viewmodel.MainViewModel;
 import com.google.android.gms.common.api.ApiException;
@@ -28,6 +32,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -62,6 +68,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     PlacesClient placesClient;
     private MainViewModel mainViewModel;
     private Observer<Autocomplete> autocompleteDataObserver;
+    private Observer<List<Restaurant>> restaurantsObserver;
 
     public MapFragment(GPS gps, MainViewModel mainViewModel) {
         // Required empty public constructor
@@ -76,11 +83,48 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
         };
         mainViewModel.getAutocompleteData().observe(this, autocompleteDataObserver);
+
+        restaurantsObserver = new Observer<List<Restaurant>>() {
+            @Override
+            public void onChanged(List<Restaurant> restaurants) {
+                setRestaurants(restaurants);
+            }
+        };
+        mainViewModel.getListRestaurant().observe(this, restaurantsObserver);
     }
 
     public void setAutoCompleteData(Autocomplete autocomplete){
         // maj de la carte avec les points de proximités
         Log.d(TAG, "setAutoCompleteData() called with: data = [" + autocomplete.getData() + "]");
+    }
+
+    public void setRestaurants(List<Restaurant> restaurants){
+        if(mMap!=null) {
+            progressBar.setVisibility(View.VISIBLE);
+
+            for (Restaurant restaurant : restaurants){
+//                Drawable drawable = getResources().getDrawable(R.drawable.ic_baseline_restaurant_24);
+//                BitmapDescriptor icon = getMarkerIconFromDrawable(drawable);
+
+                LatLng latlng = new LatLng(restaurant.getLatitude(), restaurant.getLongitude());
+                mMap.addMarker(new MarkerOptions()
+                        .position(latlng)
+                        .title(restaurant.getName())
+//                        .icon(icon)
+                );
+            }
+            //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, 14));
+            progressBar.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private BitmapDescriptor getMarkerIconFromDrawable(Drawable drawable) {
+        Canvas canvas = new Canvas();
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        canvas.setBitmap(bitmap);
+        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+        drawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
     public void setLocation(Location location) {

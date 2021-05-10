@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.example.go4lunch.api.googleplaces.GooglePlacesApiClient;
 import com.example.go4lunch.api.googleplaces.GooglePlacesApiInterface;
+import com.example.go4lunch.models.googleplaces.Textsearch;
 import com.google.gson.JsonObject;
 
 import retrofit2.Call;
@@ -55,7 +56,7 @@ public class GooglePlacesApiRepository {
         }
     }
 
-    public Call<JsonObject> getTextsearch(String query, Location location) {
+    public Call<Textsearch> getTextsearch(String query, Location location) {
         Log.d(TAG, "GooglePlacesApiRepository.getTextsearch() called with: location = [" + location + "]");
         String strLocation = "" + location.getLatitude() + "," + location.getLongitude();
         try {
