@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel;
 import com.example.go4lunch.models.Autocomplete;
 import com.example.go4lunch.repository.GooglePlacesApiRepository;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 import retrofit2.Call;
@@ -21,6 +22,7 @@ public class MainViewModel extends ViewModel {
 
     private GooglePlacesApiRepository googlePlacesApiRepository;
     private final MutableLiveData<Autocomplete> autocompleteData = new MutableLiveData<Autocomplete>();
+
     private final MutableLiveData<String> error = new MutableLiveData<String>();
 
     public MainViewModel(GooglePlacesApiRepository googlePlacesApiRepository) {
@@ -33,6 +35,10 @@ public class MainViewModel extends ViewModel {
         return this.error;
     }
 
+    /**
+     * loadAutocompleteData
+     * @param location
+     */
     public void loadAutocompleteData(Location location){
         Log.d(TAG, "MainViewModel.loadAutocompleteData() called with: location = [" + location + "]");
 
@@ -44,9 +50,12 @@ public class MainViewModel extends ViewModel {
                 Log.d(TAG, "MainViewModel.loadAutocompleteData.onResponse() called with: call = [" + call + "], response = [" + response + "]");
                 if (response.isSuccessful()){
                     Log.d(TAG, "MainViewModel.loadAutocompleteData.onResponse() isSuccessful=true");
+                    //Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     Gson gson = new Gson();
                     String json = gson.toJson(response.body());
-                    Log.d(TAG, "onResponse() json = [" + json + "]");
+                    //Log.d(TAG, "onResponse() json = [" + json + "]");
+
+
                 } else {
                     Log.d(TAG, "MainViewModel.loadAutocompleteData.onResponse() isSuccessful=false");
                 }
@@ -55,6 +64,33 @@ public class MainViewModel extends ViewModel {
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
                 Log.d(TAG, "MainViewModel.loadAutocompleteData.onFailure() " + t.getMessage());
+            }
+        });
+    }
+
+    /**
+     * loadRestaurantAround
+     * @param location
+     */
+    public void loadRestaurantAround(Location location){
+        Call<JsonObject> call = googlePlacesApiRepository.getTextsearch("restaurant", location);
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                Log.d(TAG, "MainViewModel.loadRestaurantAround.onResponse() called with: call = [" + call + "], response = [" + response + "]");
+                if (response.isSuccessful()){
+                    Log.d(TAG, "MainViewModel.loadRestaurantAround.onResponse() isSuccessful=true");
+                    Gson gson = new Gson();
+                    String json = gson.toJson(response.body());
+                    Log.d(TAG, "onResponse() json = [" + json + "]");
+                } else {
+                    Log.d(TAG, "MainViewModel.loadRestaurantAround.onResponse() isSuccessful=false");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Log.d(TAG, "MainViewModel.loadRestaurantAround.onFailure() " + t.getMessage());
             }
         });
     }

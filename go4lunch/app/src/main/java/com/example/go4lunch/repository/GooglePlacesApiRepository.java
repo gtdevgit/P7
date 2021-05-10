@@ -15,6 +15,10 @@ public class GooglePlacesApiRepository {
     private GooglePlacesApiInterface api;
     private String apiKey;
 
+    /**
+     *
+     * @param apiKey
+     */
     public GooglePlacesApiRepository(String apiKey) {
         Log.d(TAG, "GooglePlacesApiRepository() called with: apiKey = [" + apiKey + "]");
         this.apiKey = apiKey;
@@ -25,15 +29,41 @@ public class GooglePlacesApiRepository {
         return this.apiKey;
     }
 
+    private String getDefaultRadius(){
+        return "1000";
+    }
+
+    private String getDefaultOpeningHours(){
+        return "true";
+    }
+
+    /**
+     * The Place Autocomplete service is a web service that returns place predictions
+     *
+     * @param location
+     * @return
+     */
     public Call<JsonObject> getAutocomplete(Location location) {
         Log.d(TAG, "GooglePlacesApiRepository.getAutocomplete() called with: location = [" + location + "]");
         String strLocation = "" + location.getLatitude() + "," + location.getLongitude();
         Log.d(TAG, "GooglePlacesApiRepository.getAutocomplete() strLocation = [" + strLocation + "]");
         try {
-            return api.getAutocomplete("restaurant", strLocation,  "100", getApiKey());
+            return api.getAutocomplete("restaurant", strLocation,  getDefaultRadius(), getApiKey());
         } catch (Exception e) {
             Log.d(TAG, "GooglePlacesApiRepository.getAutocomplete() Exception e = [" + e.getMessage() + "]");
             return null;
         }
     }
+
+    public Call<JsonObject> getTextsearch(String query, Location location) {
+        Log.d(TAG, "GooglePlacesApiRepository.getTextsearch() called with: location = [" + location + "]");
+        String strLocation = "" + location.getLatitude() + "," + location.getLongitude();
+        try {
+            return api.getTextsearch(query, strLocation, getDefaultRadius(), getApiKey());
+        } catch (Exception e) {
+            Log.d(TAG, "GooglePlacesApiRepository.getTextsearch() called with: location = [" + location + "]");
+            return null;
+        }
+    }
+
 }

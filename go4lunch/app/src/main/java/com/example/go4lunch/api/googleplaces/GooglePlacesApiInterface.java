@@ -27,4 +27,10 @@ public interface GooglePlacesApiInterface {
             @Query("radius") String radius,
             @Query("key") String key);
 
+    @GET("textsearch/json")
+    Call<JsonObject>getTextsearch(
+            @Query("query") String query,
+            @Query("location") String location,
+            @Query("radius") String radius,
+            @Query("key") String key);
 }

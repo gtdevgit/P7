@@ -98,6 +98,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         //findAroundMe();
         // demande maj des points de proximités avec API web
         mainViewModel.loadAutocompleteData(location);
+        mainViewModel.loadRestaurantAround(location);
     }
 
     @Override
