@@ -1,4 +1,4 @@
-package com.example.go4lunch.api;
+package com.example.go4lunch.api.googleplaces;
 
 import com.example.go4lunch.models.Autocomplete;
 import com.google.gson.JsonObject;

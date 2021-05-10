@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         Log.d(TAG, "onCreateOptionsMenu() called with: menu = [" + menu + "]");
         getMenuInflater().inflate(R.menu.main, menu);
-        menuItemSearch = toolbar.getMenu().findItem(R.id.menu_item_toolbar_search);
+        menuItemSearch = toolbar.getMenu().findItem(R.id.menu_item_toolbar_searchview);
         return true;
     }
 

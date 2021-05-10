@@ -13,22 +13,19 @@ import android.widget.Button;
 
 import com.example.go4lunch.MainActivity;
 import com.example.go4lunch.R;
-import com.example.go4lunch.api.UserHelper;
+import com.example.go4lunch.api.firestore.UserHelper;
 import com.example.go4lunch.tag.Tag;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.FirebaseUiException;
 import com.firebase.ui.auth.IdpResponse;
-import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
-import java.util.logging.LogManager;
 
 public class LoginActivity extends AppCompatActivity {
 

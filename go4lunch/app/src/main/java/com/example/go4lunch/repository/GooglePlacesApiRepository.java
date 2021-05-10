@@ -3,10 +3,8 @@ package com.example.go4lunch.repository;
 import android.location.Location;
 import android.util.Log;
 
-import com.example.go4lunch.R;
-import com.example.go4lunch.api.GooglePlacesApiClient;
-import com.example.go4lunch.api.GooglePlacesApiInterface;
-import com.example.go4lunch.models.Autocomplete;
+import com.example.go4lunch.api.googleplaces.GooglePlacesApiClient;
+import com.example.go4lunch.api.googleplaces.GooglePlacesApiInterface;
 import com.google.gson.JsonObject;
 
 import retrofit2.Call;
@@ -32,7 +30,7 @@ public class GooglePlacesApiRepository {
         String strLocation = "" + location.getLatitude() + "," + location.getLongitude();
         Log.d(TAG, "GooglePlacesApiRepository.getAutocomplete() strLocation = [" + strLocation + "]");
         try {
-            return api.getAutocomplete("restaurant", strLocation,  "1000", getApiKey());
+            return api.getAutocomplete("restaurant", strLocation,  "100", getApiKey());
         } catch (Exception e) {
             Log.d(TAG, "GooglePlacesApiRepository.getAutocomplete() Exception e = [" + e.getMessage() + "]");
             return null;

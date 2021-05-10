@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.go4lunch.api.UserHelper;
+import com.example.go4lunch.api.firestore.UserHelper;
 import com.example.go4lunch.models.User;
 import com.example.go4lunch.tag.Tag;
 import com.google.android.gms.tasks.OnCompleteListener;

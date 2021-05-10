@@ -1,7 +1,8 @@
-package com.example.go4lunch.api;
+package com.example.go4lunch.api.googleplaces;
 
 import android.util.Log;
 
+import com.example.go4lunch.api.googleplaces.GooglePlacesApiInterface;
 import com.example.go4lunch.tag.Tag;
 
 import retrofit2.Retrofit;

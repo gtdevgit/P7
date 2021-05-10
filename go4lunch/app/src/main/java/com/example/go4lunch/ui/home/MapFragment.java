@@ -94,7 +94,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             mMap.addMarker(new MarkerOptions().position(latlng).title("You position"));
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, 14));
         }
-        // demande maj des points de proximités
+        // points de proximités avec SDK findAutocompletePredictions
+        //findAroundMe();
+        // demande maj des points de proximités avec API web
         mainViewModel.loadAutocompleteData(location);
     }
 
@@ -164,6 +166,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     void findAroundMe() {
+        // ne fonctionne pas renvoie tjs autocompletePredictions=[]
         Log.d(TAG, "findAroundMe() called");
         // Create a new token for the autocomplete session. Pass this to FindAutocompletePredictionsRequest,
         // and once again when the user makes a selection (for example when calling fetchPlace()).
@@ -173,8 +176,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         // Create a RectangularBounds object.
         RectangularBounds bounds = GeographicHelper.createRectangularBounds(origine, 500);
-
-
 
         // Use the builder to create a FindAutocompletePredictionsRequest.
         FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
