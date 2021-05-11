@@ -12,10 +12,10 @@ import com.example.go4lunch.R;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link ListViewFragment#newInstance} factory method to
+ * Use the {@link ListViewRestaurantFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ListViewFragment extends Fragment {
+public class ListViewRestaurantFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -26,7 +26,7 @@ public class ListViewFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public ListViewFragment() {
+    public ListViewRestaurantFragment() {
         // Required empty public constructor
     }
 
@@ -39,8 +39,8 @@ public class ListViewFragment extends Fragment {
      * @return A new instance of fragment ListViewFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ListViewFragment newInstance(String param1, String param2) {
-        ListViewFragment fragment = new ListViewFragment();
+    public static ListViewRestaurantFragment newInstance(String param1, String param2) {
+        ListViewRestaurantFragment fragment = new ListViewRestaurantFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);

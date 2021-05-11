@@ -11,9 +11,6 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
@@ -93,7 +90,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void loadFragmentListView(){
-        loadFragment(new ListViewFragment());
+        loadFragment(new ListViewRestaurantFragment());
     }
 
     private void loadFragmentWorkmates(){

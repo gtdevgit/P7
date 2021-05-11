@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:id="@+id/row_restaurant_picture"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:contentDescription="@string/profile_picture_description"
+        android:src="@drawable/ic_baseline_restaurant_24"
+        app:srcCompat="@drawable/ic_baseline_restaurant_24"
+        android:layout_margin="@dimen/default_margin"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="@+id/row_restaurant_name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/row_restaurant_hours"
+        />
+
+    <TextView
+        android:id="@+id/row_restaurant_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/default_margin"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="name"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/row_restaurant_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/default_margin"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="style et adresse"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        app:layout_constraintTop_toBottomOf="@+id/row_restaurant_name"
+
+        />
+
+    <TextView
+        android:id="@+id/row_restaurant_hours"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/default_margin"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="hours"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        app:layout_constraintTop_toBottomOf="@+id/row_restaurant_info"/>
+
+    <TextView
+        android:id="@+id/row_restaurant_distance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/default_margin"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="120m"
+        android:textAlignment="textEnd"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/row_restaurant_picture"
+        />
+
+    <TextView
+        android:id="@+id/row_restaurant_workmate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/default_margin"
+        android:layout_marginRight="@dimen/default_margin"
+        android:layout_marginBottom="@dimen/default_margin"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="(2)"
+        android:textAlignment="textEnd"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        app:layout_constraintBottom_toBottomOf="@+id/row_restaurant_workmate_picture"
+        app:layout_constraintRight_toLeftOf="@+id/row_restaurant_picture"
+        app:layout_constraintTop_toTopOf="@+id/row_restaurant_workmate_picture" />
+
+    <ImageView
+        android:id="@+id/row_restaurant_workmate_picture"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:contentDescription="@string/profile_picture_description"
+        android:src="@drawable/ic_baseline_perm_identity_24"
+        app:srcCompat="@drawable/ic_baseline_perm_identity_24"
+        android:layout_marginTop="@dimen/default_margin"
+        android:layout_marginLeft="@dimen/default_margin"
+        android:layout_marginBottom="@dimen/default_margin"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="@+id/row_restaurant_info"
+        app:layout_constraintBottom_toBottomOf="@+id/row_restaurant_info"
+        app:layout_constraintRight_toLeftOf="@+id/row_restaurant_workmate"/>
+
+    <ImageView
+        android:id="@+id/row_restaurant_rating3"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:contentDescription="@string/profile_picture_description"
+        android:src="@drawable/ic_baseline_star_24"
+        app:srcCompat="@drawable/ic_baseline_star_24"
+        android:layout_marginTop="@dimen/default_margin"
+        android:layout_marginLeft="@dimen/default_margin"
+        android:layout_marginBottom="@dimen/default_margin"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="@+id/row_restaurant_hours"
+        app:layout_constraintBottom_toBottomOf="@+id/row_restaurant_hours"
+        app:layout_constraintRight_toLeftOf="@+id/row_restaurant_picture"/>
+    <ImageView
+        android:id="@+id/row_restaurant_rating2"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:contentDescription="@string/profile_picture_description"
+        android:src="@drawable/ic_baseline_star_24"
+        app:srcCompat="@drawable/ic_baseline_star_24"
+        android:layout_marginTop="@dimen/default_margin"
+        android:layout_marginLeft="@dimen/default_margin"
+        android:layout_marginBottom="@dimen/default_margin"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="@+id/row_restaurant_hours"
+        app:layout_constraintBottom_toBottomOf="@+id/row_restaurant_hours"
+        app:layout_constraintRight_toLeftOf="@+id/row_restaurant_rating3"/>
+
+    <ImageView
+        android:id="@+id/row_restaurant_rating1"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginTop="@dimen/default_margin"
+        android:layout_marginBottom="@dimen/default_margin"
+        android:backgroundTint="#FFEB3B"
+        android:contentDescription="@string/profile_picture_description"
+        android:gravity="center"
+        android:src="@drawable/ic_baseline_star_24"
+        app:layout_constraintBottom_toBottomOf="@+id/row_restaurant_hours"
+        app:layout_constraintRight_toLeftOf="@+id/row_restaurant_rating2"
+        app:layout_constraintTop_toTopOf="@+id/row_restaurant_hours"
+        app:srcCompat="@drawable/ic_baseline_star_24" />
+</androidx.constraintlayout.widget.ConstraintLayout>
