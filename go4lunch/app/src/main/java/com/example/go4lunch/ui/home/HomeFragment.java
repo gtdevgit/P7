@@ -1,6 +1,7 @@
 package com.example.go4lunch.ui.home;
 
 import android.content.Context;
+import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.go4lunch.MainActivity;
@@ -28,19 +30,13 @@ import static android.widget.Toast.LENGTH_SHORT;
 public class HomeFragment extends Fragment {
 
     private static final String TAG = Tag.TAG;
-    private HomeViewModel homeViewModel;
     private BottomNavigationView bottomNavigationView;
 
-    // GPS
-    LocationManager locationManager;
-    GPS gps;
-
+    private GPS gps;
     private MainViewModel mainViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
-
         View root = inflater.inflate(R.layout.fragment_home, container, false);
 
         bottomNavigationView = root.findViewById(R.id.fragement_home_bottom_navigation_view);
@@ -51,9 +47,9 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        //load map
-        initGPS();
         initViewModel();
+        initGPS();
+        //load map
         loadFragmentMap();
         return root;
     }
@@ -83,14 +79,13 @@ public class HomeFragment extends Fragment {
     }
 
     private void loadFragmentMap(){
-        Log.d(TAG, "loadFragmentMap() called");
-        gps.stopLocalization();
-        MapFragment mapFragment = new MapFragment(gps, mainViewModel);
+        Log.d(TAG, "HomeFragment.loadFragmentMap() called");
+        MapFragment mapFragment = new MapFragment(this.mainViewModel);
         loadFragment(mapFragment);
     }
 
     private void loadFragmentListView(){
-        loadFragment(new ListViewRestaurantFragment());
+        loadFragment(new ListViewRestaurantFragment(mainViewModel));
     }
 
     private void loadFragmentWorkmates(){
@@ -105,13 +100,35 @@ public class HomeFragment extends Fragment {
         ft.commit();
     }
 
-    public void initGPS(){
-        Log.d(TAG, "initGPS() called");
-        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        gps = new GPS(locationManager);
+    public void initViewModel(){
+        Log.d(TAG, "HomeFragment.initViewModel() called");
+        this.mainViewModel = new MainViewModel(
+                new GooglePlacesApiRepository(getString(R.string.google_api_key)));
     }
 
-    public void initViewModel(){
-        mainViewModel = new MainViewModel(new GooglePlacesApiRepository(getString(R.string.google_api_key)));
+    public void initGPS(){
+        Log.d(TAG, "HomeFragment.initGPS() called");
+        this.gps = new GPS((LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE));
+        this.gps.getLocationMutableLiveData().observe(getViewLifecycleOwner(), new Observer<Location>() {
+            @Override
+            public void onChanged(Location location) {
+                Log.d(TAG, "HomeFragment.initGPS.onChanged() called with: location = [" + location + "]");
+                mainViewModel.setLocation(location);
+            }
+        });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "HomeFragment.onResume() called");
+        gps.startLocalization();
+    }
+
+    @Override
+    public void onPause() {
+        Log.d(TAG, "HomeFragment.onPause() called");
+        gps.stopLocalization();
+        super.onPause();
     }
 }

@@ -62,54 +62,103 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private ProgressBar progressBar;
     private FloatingActionButton floatingActionButton;
 
-    private GPS gps;
     private Location location;
+    private List<Restaurant> restaurants;
 
-    PlacesClient placesClient;
     private MainViewModel mainViewModel;
-    private Observer<Autocomplete> autocompleteDataObserver;
-    private Observer<List<Restaurant>> restaurantsObserver;
 
-    public MapFragment(GPS gps, MainViewModel mainViewModel) {
+    public MapFragment(MainViewModel mainViewModel) {
         // Required empty public constructor
-        Log.d(TAG, "MapFragment() called with: gps = [" + gps + "], mainViewModel = [" + mainViewModel + "]");
-        this.gps = gps;
+        Log.d(TAG, "MapFragment() called with: mainViewModel = [" + mainViewModel + "]");
         this.mainViewModel = mainViewModel;
-
-        autocompleteDataObserver = new Observer<Autocomplete>() {
-            @Override
-            public void onChanged(Autocomplete autocomplete) {
-                setAutoCompleteData(autocomplete);
-            }
-        };
-        mainViewModel.getAutocompleteData().observe(this, autocompleteDataObserver);
-
-        restaurantsObserver = new Observer<List<Restaurant>>() {
-            @Override
-            public void onChanged(List<Restaurant> restaurants) {
-                setRestaurants(restaurants);
-            }
-        };
-        mainViewModel.getListRestaurant().observe(this, restaurantsObserver);
     }
 
-    public void setAutoCompleteData(Autocomplete autocomplete){
-        // maj de la carte avec les points de proximités
-        Log.d(TAG, "setAutoCompleteData() called with: data = [" + autocomplete.getData() + "]");
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        Log.d(TAG, "MapFragment.onCreateView() called with: inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_map, container, false);
+
+        // GPS location observer
+        this.mainViewModel.getLocationMutableLiveData().observe(getViewLifecycleOwner(), new Observer<Location>() {
+            @Override
+            public void onChanged(Location location) {
+                Log.d(TAG, "MapFragment.onChanged(location) called with: location = [" + location + "]");
+                setLocation(location);
+            }
+        });
+
+        mainViewModel.getListRestaurant().observe(getViewLifecycleOwner(), new Observer<List<Restaurant>>() {
+            @Override
+            public void onChanged(List<Restaurant> restaurants) {
+                Log.d(TAG, "MapFragment.onChanged(restaurants) called with: restaurants = [" + restaurants + "]");
+                setRestaurants(restaurants);
+            }
+        });
+
+        return view;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        Log.d(TAG, "MapFragment.onMapReady() called with: googleMap = [" + googleMap + "]");
+        mMap = googleMap;
+        // cycle de vie. Navigation list->map
+        if (this.location != null) {
+            this.setLocation(this.location);
+        }
+        if (this.restaurants != null) {
+            this.setRestaurants(restaurants);
+        }
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        Log.d(TAG, "MapFragment.onViewCreated() called");
+
+        progressBar = view.findViewById(R.id.fragment_map_progress_bar);
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    public void setLocation(Location location) {
+        Log.d(TAG, "MapFragment.setLocation() called with: mMap = [" + mMap + "]. location = [" + location + "]");
+        progressBar.setVisibility(View.VISIBLE);
+        this.location = location;
+        if(mMap!=null) {
+            progressBar.setVisibility(View.INVISIBLE);
+            LatLng latlng = new LatLng(location.getLatitude(), location.getLongitude());
+            mMap.addMarker(new MarkerOptions().position(latlng).title("You position"));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, 14));
+        }
+        //mainViewModel.setLocation(location);
+        progressBar.setVisibility(View.INVISIBLE);
     }
 
     public void setRestaurants(List<Restaurant> restaurants){
+        Log.d(TAG, "MapFragment.setRestaurants() called with: mMap = [" + mMap + "]. restaurants = [" + restaurants + "]");
+        this.restaurants = restaurants;
         if(mMap!=null) {
             progressBar.setVisibility(View.VISIBLE);
-
             for (Restaurant restaurant : restaurants){
 //                Drawable drawable = getResources().getDrawable(R.drawable.ic_baseline_restaurant_24);
 //                BitmapDescriptor icon = getMarkerIconFromDrawable(drawable);
 
                 LatLng latlng = new LatLng(restaurant.getLatitude(), restaurant.getLongitude());
                 mMap.addMarker(new MarkerOptions()
-                        .position(latlng)
-                        .title(restaurant.getName())
+                                .position(latlng)
+                                .title(restaurant.getName())
 //                        .icon(icon)
                 );
             }
@@ -127,149 +176,23 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
-    public void setLocation(Location location) {
-        Log.d(TAG, "setLocation() called with: location = [" + location + "]");
-
-        this.location = location;
-
-        if(mMap!=null) {
-            progressBar.setVisibility(View.INVISIBLE);
-            LatLng latlng = new LatLng(location.getLatitude(), location.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(latlng).title("You position"));
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, 14));
-        }
-        // points de proximités avec SDK findAutocompletePredictions
-        //findAroundMe();
-        // demande maj des points de proximités avec API web
-        mainViewModel.loadAutocompleteData(location);
-        mainViewModel.loadRestaurantAround(location);
+    @Override
+    public void onPause() {
+        Log.d(TAG, "MapFragment.onPause() called");
+        super.onPause();
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "MapFragment.onResume() called");
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-
-        View view = inflater.inflate(R.layout.fragment_map, container, false);
-        floatingActionButton = view.findViewById(R.id.fragment_map_floatingActionButton);
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                findAroundMe();
-            }
-        });
-
-        return view;
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-/*        // Add a marker in Tours and move the camera
-        LatLng tours = new LatLng(47.3833, 0.6833);
-        mMap.addMarker(new MarkerOptions().position(tours).title("Marker in Tours"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tours, 14));*/
-        gps.startLocalization();
-        if (this.location!=null){
-            this.setLocation(this.location);
-        }
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        Log.d(TAG, "onViewCreated() called");
-
-        progressBar = view.findViewById(R.id.fragment_map_progress_bar);
-        progressBar.setVisibility(View.VISIBLE);
-
-        // GPS location observer
-        try {
-            gps.getLivelocation().observe(getViewLifecycleOwner(), new Observer<Location>() {
-                @Override
-                public void onChanged(Location location) {
-                    setLocation(location);
-                }
-            });
-        }
-        catch (Exception e) {
-            Log.d(TAG, "gps exception = [" + e.getMessage() + "]");
-        }
-
+    public void onStart() {
+        super.onStart();
+        Log.d(TAG, "MapFragment.onStart() called");
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
-
-    void findAroundMe() {
-        // ne fonctionne pas renvoie tjs autocompletePredictions=[]
-        Log.d(TAG, "findAroundMe() called");
-        // Create a new token for the autocomplete session. Pass this to FindAutocompletePredictionsRequest,
-        // and once again when the user makes a selection (for example when calling fetchPlace()).
-        AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
-
-        LatLng origine = new LatLng(location.getLatitude(), location.getLongitude());
-
-        // Create a RectangularBounds object.
-        RectangularBounds bounds = GeographicHelper.createRectangularBounds(origine, 500);
-
-        // Use the builder to create a FindAutocompletePredictionsRequest.
-        FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
-                // Call either setLocationBias() OR setLocationRestriction().
-                //.setLocationBias(bounds)
-                .setLocationRestriction(bounds)
-                .setOrigin(origine)
-                //.setCountries("FR")
-                .setTypeFilter(TypeFilter.ESTABLISHMENT)
-                .setSessionToken(token)
-                //.setQuery("restaurants")
-                .build();
-
-        MyPlace.getInstance().getPlaceClient().findAutocompletePredictions(request)
-                .addOnSuccessListener(new OnSuccessListener<FindAutocompletePredictionsResponse>() {
-                    @Override
-                    public void onSuccess(FindAutocompletePredictionsResponse findAutocompletePredictionsResponse) {
-                        Log.d(TAG, "onSuccess() called with: findAutocompletePredictionsResponse = [" + findAutocompletePredictionsResponse + "]");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "onFailure() called with: e = [" + e + "]");
-                    }
-                })
-                .addOnCompleteListener(new OnCompleteListener<FindAutocompletePredictionsResponse>() {
-                    @Override
-                    public void onComplete(@NonNull Task<FindAutocompletePredictionsResponse> task) {
-                        Log.d(TAG, "onComplete() called with: task = [" + task + "]");
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "onComplete() called with: task.isSuccessful = true");
-                            FindAutocompletePredictionsResponse predictionsResponse = task.getResult();
-                            Log.d(TAG, "onComplete() called with: predictionsResponse = [" + predictionsResponse + "]");
-                            List<AutocompletePrediction> predictionList = predictionsResponse.getAutocompletePredictions();
-                            List<String> suggestionsList = new ArrayList<>();
-                            for (int i = 0; i < predictionList.size(); i++) {
-                                Log.d(TAG, "onComplete() called with: predictionList");
-                                AutocompletePrediction prediction = predictionList.get(i);
-                                suggestionsList.add(prediction.getFullText(null).toString());
-                            }
-
-
-                        } else {
-                            Log.d(TAG, "onComplete() called with: task.isSuccessful = false");
-                        }
-                    }
-                });
-    }
-
-
 }

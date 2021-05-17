@@ -12,7 +12,7 @@ public class GooglePlacesApiClient {
 
 
     public static GooglePlacesApiInterface getClient() {
-        Log.d(Tag.TAG, "getClient() called");
+        Log.d(Tag.TAG, "GooglePlacesApiClient.getClient() called");
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://maps.googleapis.com/maps/api/place/")

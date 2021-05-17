@@ -53,13 +53,13 @@ public class ListViewRestaurantAdapter extends RecyclerView.Adapter<ListViewRest
             Glide.with(holder.imageViewRestaurant.getContext())
                     .load("")
                     .placeholder(R.drawable.ic_baseline_restaurant_24)
-                    .apply(RequestOptions.circleCropTransform())
+                    .apply(RequestOptions.fitCenterTransform())
                     .into(holder.imageViewRestaurant);
         } else {
             //load restaurant picture
             Glide.with(holder.imageViewRestaurant.getContext())
                     .load(restaurant.getUrlPicture())
-                    .apply(RequestOptions.circleCropTransform())
+                    .apply(RequestOptions.fitCenterTransform())
                     .into(holder.imageViewRestaurant);
         }
     }

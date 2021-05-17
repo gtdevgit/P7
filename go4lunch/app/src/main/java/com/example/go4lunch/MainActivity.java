@@ -69,9 +69,6 @@ public class MainActivity extends AppCompatActivity {
             textViewUserName = headView.findViewById(R.id.navigation_header_user_name);
             textViewUserEmail = headView.findViewById(R.id.navigation_header_user_email);
         }
-
-        // Initialize Place and PlaceClient
-        MyPlace.getInstance().initialize(getApplicationContext(), getString(R.string.google_api_key));
     }
 
     public MenuItem getMenuItemSearch(){
