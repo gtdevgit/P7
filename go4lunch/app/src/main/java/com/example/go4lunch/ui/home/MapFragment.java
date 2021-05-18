@@ -85,8 +85,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_map, container, false);
 
-        // GPS location observer
-        this.mainViewModel.getLocationMutableLiveData().observe(getViewLifecycleOwner(), new Observer<Location>() {
+        // location observer
+        this.mainViewModel.getLocationLiveData().observe(getViewLifecycleOwner(), new Observer<Location>() {
             @Override
             public void onChanged(Location location) {
                 Log.d(TAG, "MapFragment.onChanged(location) called with: location = [" + location + "]");
@@ -94,7 +94,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
-        mainViewModel.getListRestaurant().observe(getViewLifecycleOwner(), new Observer<List<Restaurant>>() {
+        // restaurants observer
+        mainViewModel.getRestaurantsLiveData().observe(getViewLifecycleOwner(), new Observer<List<Restaurant>>() {
             @Override
             public void onChanged(List<Restaurant> restaurants) {
                 Log.d(TAG, "MapFragment.onChanged(restaurants) called with: restaurants = [" + restaurants + "]");

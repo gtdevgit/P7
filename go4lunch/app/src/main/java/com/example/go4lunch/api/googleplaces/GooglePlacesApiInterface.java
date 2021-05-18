@@ -4,6 +4,8 @@ import com.example.go4lunch.models.Autocomplete;
 import com.example.go4lunch.models.googleplaces.Textsearch;
 import com.google.gson.JsonObject;
 
+import org.json.JSONArray;
+
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
@@ -33,5 +35,17 @@ public interface GooglePlacesApiInterface {
             @Query("query") String query,
             @Query("location") String location,
             @Query("radius") String radius,
+            @Query("key") String key);
+
+    @GET("details/json")
+    Call<JsonObject>getDetails(
+            @Query("place_id") String placeId,
+            @Query("key") String key);
+
+    @GET("nearbysearch/json")
+    Call<Textsearch>getNearbysearch(
+            @Query("location") String location,
+            @Query("radius") String radius,
+            @Query("type") String type,
             @Query("key") String key);
 }

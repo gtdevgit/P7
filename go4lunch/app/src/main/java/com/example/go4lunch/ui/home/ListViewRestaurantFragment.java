@@ -24,12 +24,8 @@ import com.example.go4lunch.viewmodel.MainViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.LogManager;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ListViewRestaurantFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ListViewRestaurantFragment extends Fragment {
 
     private static final String TAG = Tag.TAG;
@@ -68,25 +64,19 @@ public class ListViewRestaurantFragment extends Fragment {
                 DividerItemDecoration.VERTICAL);
         recyclerView.addItemDecoration(dividerItemDecoration);
 
-        mainViewModel.getListRestaurant().observe(getViewLifecycleOwner(), new Observer<List<Restaurant>>() {
+        mainViewModel.getRestaurantsLiveData().observe(getViewLifecycleOwner(), new Observer<List<Restaurant>>() {
             @Override
             public void onChanged(List<Restaurant> restaurants) {
+                Log.d(TAG, "ListViewRestaurantFragment.onCreateView.getRestaurantsLiveData.onChanged() called with: restaurants = [" + restaurants + "]");
                 setRestaurants(restaurants);
             }
         });
 
-        mainViewModel.getLocationMutableLiveData().observe(getViewLifecycleOwner(), new Observer<Location>() {
-            @Override
-            public void onChanged(Location location) {
-
-            }
-        });
-
-        setRestaurants(mainViewModel.getLastRestaurants());
         return root;
     }
 
     public void setRestaurants(List<Restaurant> restaurants){
+        Log.d(TAG, "ListViewRestaurantFragment.setRestaurants() called with: restaurants = [" + restaurants + "]");
         progressBar.setVisibility(View.VISIBLE);
 
         this.restaurantsList.clear();

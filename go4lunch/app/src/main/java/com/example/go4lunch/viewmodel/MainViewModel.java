@@ -28,30 +28,55 @@ public class MainViewModel extends ViewModel {
 
     private static final String TAG = "go4lunchdebug";
 
-    List<Restaurant> lastRestaurants;
+    List<Restaurant> restaurantsCache;
 
+    /**
+     * GooglePlacesApiRepository
+     */
     private GooglePlacesApiRepository googlePlacesApiRepository;
-    private final MutableLiveData<Autocomplete> autocompleteData = new MutableLiveData<Autocomplete>();
-    private final MutableLiveData<String> error = new MutableLiveData<String>();
-    private final MutableLiveData<List<Restaurant>> listRestaurant = new MutableLiveData<List<Restaurant>>();
+    private final MutableLiveData<Autocomplete> autocompleteMutableLiveData = new MutableLiveData<Autocomplete>();
+    private final MutableLiveData<String> errorMutableLiveData = new MutableLiveData<String>();
+    private final MutableLiveData<List<Restaurant>> restaurantsMutableLiveData = new MutableLiveData<List<Restaurant>>();
     private final MutableLiveData<Location> locationMutableLiveData = new MutableLiveData<Location>();
 
     public MainViewModel(GooglePlacesApiRepository googlePlacesApiRepository) {
         Log.d(TAG, "MainViewModel() called with: googlePlacesApiRepository = [" + googlePlacesApiRepository + "]");
         this.googlePlacesApiRepository = googlePlacesApiRepository;
-        lastRestaurants = new ArrayList<Restaurant>();
+        restaurantsCache = new ArrayList<Restaurant>();
     }
 
-    public MutableLiveData<Autocomplete> getAutocompleteData(){ return autocompleteData; }
-    public MutableLiveData<String> getError(){
-        return this.error;
-    }
-    public MutableLiveData<List<Restaurant>> getListRestaurant() {return  this.listRestaurant; }
+    /**
+     * autocompleteMutableLiveData property is exposed as livedata to prevent external modifications
+     * @return
+     */
+    public LiveData<Autocomplete> getAutocomplete(){ return autocompleteMutableLiveData; }
 
-    public MutableLiveData<Location> getLocationMutableLiveData() {
+    /**
+     * errorMutableLiveData property is exposed as livedata to prevent external modifications
+     * @return
+     */
+    public LiveData<String> getErrorLiveData(){
+        return this.errorMutableLiveData;
+    }
+
+    /**
+     * locationMutableLiveData property is exposed as livedata to prevent external modifications
+     * @return
+     */
+    public LiveData<List<Restaurant>> getRestaurantsLiveData() {return  this.restaurantsMutableLiveData; }
+
+    /**
+     * locationMutableLiveData property is exposed as livedata to prevent external modifications
+     * @return
+     */
+    public LiveData<Location> getLocationLiveData() {
         return locationMutableLiveData;
     }
 
+    /**
+     * setLocation notify the view model that the location has changed
+     * @param location
+     */
     public void setLocation(Location location){
         Log.d(TAG, "MainViewModel.setLocation() called with: location = [" + location + "]");
         this.locationMutableLiveData.postValue(location);
@@ -60,8 +85,11 @@ public class MainViewModel extends ViewModel {
         Log.d(TAG, "MainViewModel.setLocation() 3 called with: location = [" + location + "]");
     }
 
-    public List<Restaurant> getLastRestaurants() {
-        return lastRestaurants;
+    /**
+     * this data is kept in cache
+     */
+    public List<Restaurant> getRestaurantsCache() {
+        return restaurantsCache;
     }
 
     /**
@@ -71,7 +99,8 @@ public class MainViewModel extends ViewModel {
     private void loadRestaurantAround(Location location){
         Log.d(TAG, "MainViewModel.loadRestaurantAround() called with: location = [" + location + "]");
         Log.d(TAG, "MainViewModel.loadRestaurantAround() called with: googlePlacesApiRepository = [" + googlePlacesApiRepository + "]");
-        Call<Textsearch> call = googlePlacesApiRepository.getTextsearch("restaurant", location);
+        //Call<Textsearch> call = googlePlacesApiRepository.getTextsearch("restaurant", location);
+        Call<Textsearch> call = googlePlacesApiRepository.getNearbysearch(location);
         Log.d(TAG, "loadRestaurantAround() 2 called with: location = [" + location + "]");
         call.enqueue(new Callback<Textsearch>() {
             @Override
@@ -80,7 +109,6 @@ public class MainViewModel extends ViewModel {
                 if (response.isSuccessful()){
                     Log.d(TAG, "MainViewModel.loadRestaurantAround.onResponse() isSuccessful=true");
                     Textsearch textsearch = response.body();
-                    Log.d(TAG, "textsearch = [" + textsearch + "]");
                     List<Result> lstResult = textsearch.getResults();
                     List<Restaurant> restaurants = new ArrayList<Restaurant>();
                     for (Result result : lstResult) {
@@ -90,23 +118,39 @@ public class MainViewModel extends ViewModel {
                         //Log.d(TAG, "latitude=" + latitude);
                         double longitude = result.getGeometry().getLocation().getLng();
                         Restaurant restaurant = new Restaurant(name, latitude, longitude);
-                        String formatedAddress = result.getFormattedAddress();
-                        if ((formatedAddress != null) &&
-                                (formatedAddress.length() > 0) &&
-                                (formatedAddress.indexOf(',') >= 0)) {
-                            formatedAddress = formatedAddress.split(",")[0];
-                        } else
-                            formatedAddress = "";
 
-                        restaurant.setInfo(formatedAddress);
+                        // compatibility with getTextsearch and getNearbysearch
+                        // extract address from getTextsearch (formatedAddress) or getNearbysearch (vivinity)
+                        String address = "";
+                        if (result.getFormattedAddress() != null) {
+                            address = result.getFormattedAddress();
+                        } else {
+                            if (result.getVicinity() != null)
+                                address = result.getVicinity();
+                        }
+                        if ((address != null) && (address.trim().length() > 0) && (address.indexOf(',') >= 0)) {
+                            address = address.split(",")[0];
+                        }
+                        restaurant.setInfo(address);
+
                         //restaurant.setHours(result.getPriceLevel().toString());
-                        restaurant.setUrlPicture(result.getIcon());
+                        if ((result.getPhotos() != null) && (result.getPhotos().size() >= 1)) {
+                            Log.d(TAG, "getPhotoReference() = " + result.getPhotos().get(0).getPhotoReference());
+                            restaurant.setUrlPicture(googlePlacesApiRepository.getUrlPlacePhoto(result.getPhotos().get(0).getPhotoReference()));
+                        } else {
+                            if (result.getIcon() != null) {
+                                Log.d(TAG, "getIcon() = " + result.getIcon());
+                                restaurant.setUrlPicture(result.getIcon());
+                            }
+                        }
+
                         restaurants.add(restaurant);
                     }
-                    listRestaurant.postValue(restaurants);
                     // Memorize last restaurants
-                    lastRestaurants.clear();
-                    lastRestaurants.addAll(restaurants);
+                    restaurantsCache.clear();
+                    restaurantsCache.addAll(restaurants);
+                    // live data
+                    restaurantsMutableLiveData.postValue(restaurants);
                 } else {
                     Log.d(TAG, "MainViewModel.loadRestaurantAround.onResponse() isSuccessful=false");
                 }
@@ -115,6 +159,7 @@ public class MainViewModel extends ViewModel {
             @Override
             public void onFailure(Call<Textsearch> call, Throwable t) {
                 Log.d(TAG, "MainViewModel.loadRestaurantAround.onFailure() " + t.getMessage());
+                errorMutableLiveData.postValue(t.getMessage());
             }
         });
 

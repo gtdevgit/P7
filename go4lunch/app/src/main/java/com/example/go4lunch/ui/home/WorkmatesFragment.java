@@ -25,11 +25,6 @@ import com.example.go4lunch.ui.logout.LogoutViewModel;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link WorkmatesFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class WorkmatesFragment extends Fragment {
     private static final String TAG = Tag.TAG;
 

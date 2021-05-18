@@ -15,6 +15,9 @@ public class Result implements Serializable
     @SerializedName("formatted_address")
     @Expose
     private String formattedAddress;
+    @SerializedName("vicinity")
+    @Expose
+    private String vicinity;
     @SerializedName("geometry")
     @Expose
     private Geometry geometry;
@@ -81,10 +84,11 @@ public class Result implements Serializable
      * @param geometry
      * @param openingHours
      */
-    public Result(String businessStatus, String formattedAddress, Geometry geometry, String icon, String name, OpeningHours openingHours, List<Photo> photos, String placeId, PlusCode plusCode, Integer priceLevel, Double rating, String reference, List<String> types, Integer userRatingsTotal, Boolean permanentlyClosed) {
+    public Result(String businessStatus, String formattedAddress, String vicinity, Geometry geometry, String icon, String name, OpeningHours openingHours, List<Photo> photos, String placeId, PlusCode plusCode, Integer priceLevel, Double rating, String reference, List<String> types, Integer userRatingsTotal, Boolean permanentlyClosed) {
         super();
         this.businessStatus = businessStatus;
         this.formattedAddress = formattedAddress;
+        this.vicinity = vicinity;
         this.geometry = geometry;
         this.icon = icon;
         this.name = name;
@@ -123,6 +127,19 @@ public class Result implements Serializable
 
     public Result withFormattedAddress(String formattedAddress) {
         this.formattedAddress = formattedAddress;
+        return this;
+    }
+
+    public String getVicinity() {
+        return vicinity;
+    }
+
+    public void setVicinity(String vicinity) {
+        this.vicinity = vicinity;
+    }
+
+    public Result withVicinity(String vicinity) {
+        this.vicinity = vicinity;
         return this;
     }
 
