@@ -105,7 +105,7 @@ public class GooglePlacesApiRepository {
      */
     public String getUrlPlacePhoto(String photoreference) {
         final String url = "https://maps.googleapis.com/maps/api/place/photo";
-        final int size = 200;
+        final int size = 400;
         return  String.format("%s?maxwidth=%d&photoreference=%s&key=%s", url, size, photoreference, getApiKey());
     }
 

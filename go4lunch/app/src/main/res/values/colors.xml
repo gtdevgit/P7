@@ -19,4 +19,5 @@
     <color name="secondaryLightColor">#9e47ff</color>
     <color name="secondaryDarkColor">#0400ba</color>
     <color name="secondaryTextColor">#ffffff</color>
+    <color name="yellow">#FFEB3B</color>
 </resources>

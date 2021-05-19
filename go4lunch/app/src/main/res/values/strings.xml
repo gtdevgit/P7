@@ -76,6 +76,13 @@
     <string name="localisation_not_allowed">Localization permission is not allowed for this app</string>
     <string name="permission_denied_message">Permission Denied. The app can not be used.</string>
     <string name="permission_granted_message">Permission Granted</string>
+    <string name="title_activity_detail_restaurant">ScrollingActivity</string>
+
+    <string name="activity_detail_restaurant_floating_action_button_description">Choose this restaurant</string>
+    <string name="activity_detail_restaurant_bottom_navigation_call">Call</string>
+    <string name="activity_detail_restaurant_bottom_navigation_like">Like</string>
+    <string name="activity_detail_restaurant_bottom_navigation_website">Website</string>
+
 
 
 </resources>
