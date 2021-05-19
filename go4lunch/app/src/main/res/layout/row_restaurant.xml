@@ -21,14 +21,16 @@
 
     <TextView
         android:id="@+id/row_restaurant_name"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/default_margin"
         android:ellipsize="end"
         android:maxLines="1"
         android:text="name"
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/row_restaurant_distance"/>
 
     <TextView
         android:id="@+id/row_restaurant_info"

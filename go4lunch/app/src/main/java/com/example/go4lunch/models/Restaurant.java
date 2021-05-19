@@ -4,9 +4,9 @@ public class Restaurant {
     private String name;
     private double latitude;
     private double longitude;
+    private float distance;
     private String info;
     private String hours;
-    private String distance;
     private String workmate;
     private String rating;
     private String urlPicture;
@@ -17,13 +17,13 @@ public class Restaurant {
         this.longitude = longitude;
     }
 
-    public Restaurant(String name, double latitude, double longitude, String info, String hours, String distance, String workmate, String rating) {
+    public Restaurant(String name, double latitude, double longitude, float distance, String info, String hours, String workmate, String rating) {
         this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.distance = distance;
         this.info = info;
         this.hours = hours;
-        this.distance = distance;
         this.workmate = workmate;
         this.rating = rating;
     }
@@ -52,6 +52,14 @@ public class Restaurant {
         this.longitude = longitude;
     }
 
+    public float getDistance() {
+        return distance;
+    }
+
+    public void setDistance(float distance) {
+        this.distance = distance;
+    }
+
     public String getInfo() {
         return info;
     }
@@ -66,14 +74,6 @@ public class Restaurant {
 
     public void setHours(String hours) {
         this.hours = hours;
-    }
-
-    public String getDistance() {
-        return distance;
-    }
-
-    public void setDistance(String distance) {
-        this.distance = distance;
     }
 
     public String getWorkmate() {

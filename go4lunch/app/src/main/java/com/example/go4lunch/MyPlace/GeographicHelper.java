@@ -1,7 +1,5 @@
 package com.example.go4lunch.MyPlace;
 
-import android.location.Location;
-
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.model.RectangularBounds;
 
@@ -14,6 +12,7 @@ public class GeographicHelper {
         // Create a RectangularBounds object.
         return  RectangularBounds.newInstance(southWest, northEast);
     }
+
     /**
      * Create a new LatLng which lies toNorth meters north and toEast meters
      * east of startLL

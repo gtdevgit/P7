@@ -13,6 +13,7 @@ import com.example.go4lunch.models.Restaurant;
 import com.example.go4lunch.models.googleplaces.Result;
 import com.example.go4lunch.models.googleplaces.Textsearch;
 import com.example.go4lunch.repository.GooglePlacesApiRepository;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -118,6 +119,11 @@ public class MainViewModel extends ViewModel {
                         //Log.d(TAG, "latitude=" + latitude);
                         double longitude = result.getGeometry().getLocation().getLng();
                         Restaurant restaurant = new Restaurant(name, latitude, longitude);
+
+                        Location restaurantLocation = new Location("");
+                        restaurantLocation.setLatitude(latitude);
+                        restaurantLocation.setLongitude(longitude);
+                        restaurant.setDistance(location.distanceTo(restaurantLocation));
 
                         // compatibility with getTextsearch and getNearbysearch
                         // extract address from getTextsearch (formatedAddress) or getNearbysearch (vivinity)

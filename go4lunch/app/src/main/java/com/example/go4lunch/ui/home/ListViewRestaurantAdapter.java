@@ -13,6 +13,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.R;
 import com.example.go4lunch.models.Restaurant;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class ListViewRestaurantAdapter extends RecyclerView.Adapter<ListViewRestaurantViewHolder> {
@@ -37,7 +38,12 @@ public class ListViewRestaurantAdapter extends RecyclerView.Adapter<ListViewRest
         holder.textViewRestaurantName.setText(restaurant.getName());
         holder.textViewRestaurantInfo.setText(restaurant.getInfo());
         holder.textViewRestaurantHours.setText(restaurant.getHours());
-        holder.textViewRestaurantDistance.setText(restaurant.getDistance());
+
+        // roundedDistance in meter
+        DecimalFormat df = new DecimalFormat("#");
+        String roundedDistance = String.format("%s m", df.format(restaurant.getDistance()));
+        holder.textViewRestaurantDistance.setText(roundedDistance);
+
         holder.textViewRestaurantWorkmate.setText("(" + restaurant.getWorkmate() + ")");
 
         /*
