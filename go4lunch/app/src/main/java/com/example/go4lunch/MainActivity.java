@@ -115,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        Log.d(TAG, "MainActivity.onStart() called");
 
         FirebaseAuth mAuth;
         mAuth = FirebaseAuth.getInstance();
@@ -139,5 +140,29 @@ public class MainActivity extends AppCompatActivity {
                 textViewUserEmail.setText(email);
             }
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG, "MainActivityonResume() called");
+    }
+
+    @Override
+    protected void onPause() {
+        Log.d(TAG, "MainActivity.onPause() called");
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        Log.d(TAG, "MainActivity.onStop() called");
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d(TAG, "MainActivity.onDestroy() called");
+        super.onDestroy();
     }
 }

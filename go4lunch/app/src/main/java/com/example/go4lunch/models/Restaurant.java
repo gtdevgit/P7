@@ -1,6 +1,9 @@
 package com.example.go4lunch.models;
 
+import java.text.DecimalFormat;
+
 public class Restaurant {
+    private String placeId;
     private String name;
     private double latitude;
     private double longitude;
@@ -11,13 +14,8 @@ public class Restaurant {
     private String rating;
     private String urlPicture;
 
-    public Restaurant(String name, double latitude, double longitude) {
-        this.name = name;
-        this.latitude = latitude;
-        this.longitude = longitude;
-    }
-
-    public Restaurant(String name, double latitude, double longitude, float distance, String info, String hours, String workmate, String rating) {
+    public Restaurant(String placeId, String name, double latitude, double longitude, float distance, String info, String hours, String workmate, String rating, String urlPicture) {
+        this.placeId = placeId;
         this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -26,6 +24,15 @@ public class Restaurant {
         this.hours = hours;
         this.workmate = workmate;
         this.rating = rating;
+        this.urlPicture = urlPicture;
+    }
+
+    public String getPlaceId() {
+        return placeId;
+    }
+
+    public void setPlaceId(String placeId) {
+        this.placeId = placeId;
     }
 
     public String getName() {
@@ -98,5 +105,15 @@ public class Restaurant {
 
     public void setUrlPicture(String urlPicture) {
         this.urlPicture = urlPicture;
+    }
+
+    /**
+     *
+     * @return roundedDistance in meter
+     */
+    public String getFormatedDistance(){
+        // roundedDistance in meter
+        DecimalFormat df = new DecimalFormat("#");
+        return String.format("%s m", df.format(this.getDistance()));
     }
 }

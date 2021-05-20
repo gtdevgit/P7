@@ -15,7 +15,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Go4lunch">
-        <activity android:name=".ui.DetailRestaurantActivity"></activity>
+        <activity
+            android:name=".ui.detailrestaurant.DetailRestaurantActivity"
+            android:label="@string/title_activity_detail_restaurant"
+            android:theme="@style/Theme.Go4lunch.NoActionBar"></activity>
         <activity android:name=".PermissionActivity" />
 
         <meta-data

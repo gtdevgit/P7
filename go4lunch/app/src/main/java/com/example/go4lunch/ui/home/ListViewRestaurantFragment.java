@@ -1,5 +1,6 @@
 package com.example.go4lunch.ui.home;
 
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 
@@ -16,15 +17,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.models.Restaurant;
 import com.example.go4lunch.tag.Tag;
+import com.example.go4lunch.ui.detailrestaurant.DetailRestaurantActivity;
 import com.example.go4lunch.viewmodel.MainViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.LogManager;
 
 public class ListViewRestaurantFragment extends Fragment {
 
@@ -36,6 +38,7 @@ public class ListViewRestaurantFragment extends Fragment {
 
     private MainViewModel mainViewModel;
 
+    private Location location;
     private List<Restaurant> restaurantsList;
     ListViewRestaurantAdapter listViewRestaurantAdapter;
 
@@ -57,12 +60,25 @@ public class ListViewRestaurantFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
 
         restaurantsList = new ArrayList<>();
-        listViewRestaurantAdapter = new ListViewRestaurantAdapter(restaurantsList);
+        listViewRestaurantAdapter = new ListViewRestaurantAdapter(restaurantsList, new OnClickListenerRestaurant() {
+            @Override
+            public void onCLickRestaurant(int position) {
+                showDetailRestaurant(position);
+            }
+        });
         recyclerView.setAdapter(listViewRestaurantAdapter);
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
                 DividerItemDecoration.VERTICAL);
         recyclerView.addItemDecoration(dividerItemDecoration);
+
+        this.mainViewModel.getLocationLiveData().observe(getViewLifecycleOwner(), new Observer<Location>() {
+            @Override
+            public void onChanged(Location location) {
+                Log.d(TAG, "MapFragment.onChanged(location) called with: location = [" + location + "]");
+                setLocation(location);
+            }
+        });
 
         mainViewModel.getRestaurantsLiveData().observe(getViewLifecycleOwner(), new Observer<List<Restaurant>>() {
             @Override
@@ -71,11 +87,14 @@ public class ListViewRestaurantFragment extends Fragment {
                 setRestaurants(restaurants);
             }
         });
-
         return root;
     }
 
-    public void setRestaurants(List<Restaurant> restaurants){
+    private void setLocation(Location location) {
+        this.location = location;
+    }
+
+    private void setRestaurants(List<Restaurant> restaurants){
         Log.d(TAG, "ListViewRestaurantFragment.setRestaurants() called with: restaurants = [" + restaurants + "]");
         progressBar.setVisibility(View.VISIBLE);
 
@@ -89,5 +108,50 @@ public class ListViewRestaurantFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Log.d(TAG, "ListViewRestaurantFragment.onViewCreated() called");
+    }
+
+    private void showDetailRestaurant(int position){
+        String name = restaurantsList.get(position).getName();
+        String placeId = restaurantsList.get(position).getPlaceId();
+        Toast.makeText(this.getContext(), String.format("%s %s", name, placeId), Toast.LENGTH_SHORT).show();
+        Intent intent;
+        intent = new Intent(this.getActivity(), DetailRestaurantActivity.class);
+        Bundle bundle = new Bundle();
+
+        bundle.putString("name", name);
+        bundle.putString("placeid", placeId);
+
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d(TAG, "ListViewRestaurantFragment.onStart() called");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "ListViewRestaurantFragment.onResume() called");
+    }
+
+    @Override
+    public void onPause() {
+        Log.d(TAG, "ListViewRestaurantFragment.onPause() called");
+        super.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        Log.d(TAG, "ListViewRestaurantFragment.onStop() called");
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d(TAG, "ListViewRestaurantFragment.onDestroy() called");
+        super.onDestroy();
     }
 }

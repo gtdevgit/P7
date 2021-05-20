@@ -5,7 +5,8 @@ import android.util.Log;
 
 import com.example.go4lunch.api.googleplaces.GooglePlacesApiClient;
 import com.example.go4lunch.api.googleplaces.GooglePlacesApiInterface;
-import com.example.go4lunch.models.googleplaces.Textsearch;
+import com.example.go4lunch.models.googleplaces.palcesdetails.PlaceDetails;
+import com.example.go4lunch.models.googleplaces.placesearch.PlaceSearch;
 import com.google.gson.JsonObject;
 
 import retrofit2.Call;
@@ -65,7 +66,7 @@ public class GooglePlacesApiRepository {
         }
     }
 
-    public Call<Textsearch> getTextsearch(String query, Location location) {
+    public Call<PlaceSearch> getTextsearch(String query, Location location) {
         Log.d(TAG, "GooglePlacesApiRepository.getTextsearch() called with: location = [" + location + "]");
         String strLocation = "" + location.getLatitude() + "," + location.getLongitude();
         try {
@@ -76,7 +77,7 @@ public class GooglePlacesApiRepository {
         }
     }
 
-    public Call<JsonObject> getDetails(String placeId){
+    public Call<PlaceDetails> getDetails(String placeId){
         Log.d(TAG, "getDetails() called with: placeId = [" + placeId + "]");
         try {
             return api.getDetails(placeId, getApiKey());
@@ -86,7 +87,7 @@ public class GooglePlacesApiRepository {
         }
     }
 
-    public Call<Textsearch> getNearbysearch(Location location){
+    public Call<PlaceSearch> getNearbysearch(Location location){
         Log.d(TAG, "GooglePlacesApiRepository.getNearbysearch() called with: location = [" + location + "]");
         String strLocation = "" + location.getLatitude() + "," + location.getLongitude();
         try {
@@ -105,7 +106,7 @@ public class GooglePlacesApiRepository {
      */
     public String getUrlPlacePhoto(String photoreference) {
         final String url = "https://maps.googleapis.com/maps/api/place/photo";
-        final int size = 400;
+        final int size = 200;
         return  String.format("%s?maxwidth=%d&photoreference=%s&key=%s", url, size, photoreference, getApiKey());
     }
 

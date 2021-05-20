@@ -7,16 +7,11 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.go4lunch.GPS.GPS;
 import com.example.go4lunch.models.Autocomplete;
 import com.example.go4lunch.models.Restaurant;
-import com.example.go4lunch.models.googleplaces.Result;
-import com.example.go4lunch.models.googleplaces.Textsearch;
+import com.example.go4lunch.models.googleplaces.placesearch.Result;
+import com.example.go4lunch.models.googleplaces.placesearch.PlaceSearch;
 import com.example.go4lunch.repository.GooglePlacesApiRepository;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,9 +76,7 @@ public class MainViewModel extends ViewModel {
     public void setLocation(Location location){
         Log.d(TAG, "MainViewModel.setLocation() called with: location = [" + location + "]");
         this.locationMutableLiveData.postValue(location);
-        Log.d(TAG, "MainViewModel.setLocation() 2 called with: location = [" + location + "]");
         this.loadRestaurantAround(location);
-        Log.d(TAG, "MainViewModel.setLocation() 3 called with: location = [" + location + "]");
     }
 
     /**
@@ -94,6 +87,57 @@ public class MainViewModel extends ViewModel {
     }
 
     /**
+     * calculates the distance between a location and a point which is defined by latitute and longitude
+     * @param latitude
+     * @param longitude
+     * @param location
+     * @return
+     */
+    private float calculateDistance(double latitude, double longitude, Location location) {
+        Location destinationLocation = new Location("");
+        destinationLocation.setLatitude(latitude);
+        destinationLocation.setLongitude(longitude);
+        return location.distanceTo(destinationLocation);
+    }
+
+    /**
+     * Compatibility with getTextsearch and getNearbysearch:
+     * returns the first part of the address found in formatedAddress or vicinity
+     * @param formattedAddress
+     * @param vicinity
+     * @return
+     */
+    private String findAddress(String formattedAddress, String vicinity){
+        String address = "";
+        if (formattedAddress != null) {
+            address = formattedAddress;
+        } else {
+            if (vicinity != null)
+                address = vicinity;
+        }
+
+        if ((address != null) && (address.trim().length() > 0) && (address.indexOf(',') >= 0)) {
+            address = address.split(",")[0];
+        }
+        return address;
+    }
+
+    /**
+     * the photo can be in photorefrence or in the icon
+     * @param result
+     * @return
+     */
+    private String findUrlPicture(Result result){
+        String url;
+        if ((result.getPhotos() != null) && (result.getPhotos().size() >= 1)) {
+            url = googlePlacesApiRepository.getUrlPlacePhoto(result.getPhotos().get(0).getPhotoReference());
+        } else {
+            url = result.getIcon();
+        }
+        return url;
+    }
+
+    /**
      * loadRestaurantAround
      * @param location
      */
@@ -101,55 +145,37 @@ public class MainViewModel extends ViewModel {
         Log.d(TAG, "MainViewModel.loadRestaurantAround() called with: location = [" + location + "]");
         Log.d(TAG, "MainViewModel.loadRestaurantAround() called with: googlePlacesApiRepository = [" + googlePlacesApiRepository + "]");
         //Call<Textsearch> call = googlePlacesApiRepository.getTextsearch("restaurant", location);
-        Call<Textsearch> call = googlePlacesApiRepository.getNearbysearch(location);
-        Log.d(TAG, "loadRestaurantAround() 2 called with: location = [" + location + "]");
-        call.enqueue(new Callback<Textsearch>() {
+        Call<PlaceSearch> call = googlePlacesApiRepository.getNearbysearch(location);
+        call.enqueue(new Callback<PlaceSearch>() {
             @Override
-            public void onResponse(Call<Textsearch> call, Response<Textsearch> response) {
+            public void onResponse(Call<PlaceSearch> call, Response<PlaceSearch> response) {
                 Log.d(TAG, "MainViewModel.loadRestaurantAround.onResponse() called with: call = [" + call + "], response = [" + response + "]");
                 if (response.isSuccessful()){
                     Log.d(TAG, "MainViewModel.loadRestaurantAround.onResponse() isSuccessful=true");
-                    Textsearch textsearch = response.body();
-                    List<Result> lstResult = textsearch.getResults();
+                    PlaceSearch placeSearch = response.body();
+                    List<Result> lstResult = placeSearch.getResults();
                     List<Restaurant> restaurants = new ArrayList<Restaurant>();
                     for (Result result : lstResult) {
                         String name = result.getName();
-                        //Log.d(TAG, "name=" + name);
                         double latitude = result.getGeometry().getLocation().getLat();
-                        //Log.d(TAG, "latitude=" + latitude);
                         double longitude = result.getGeometry().getLocation().getLng();
-                        Restaurant restaurant = new Restaurant(name, latitude, longitude);
+                        float distance = calculateDistance(latitude, longitude, location);
+                        String info = findAddress(result.getFormattedAddress(), result.getVicinity());
+                        String hours = "";
+                        String workmates = "";
+                        String rating = result.getRating().toString();
+                        String urlPicture = findUrlPicture(result);
 
-                        Location restaurantLocation = new Location("");
-                        restaurantLocation.setLatitude(latitude);
-                        restaurantLocation.setLongitude(longitude);
-                        restaurant.setDistance(location.distanceTo(restaurantLocation));
-
-                        // compatibility with getTextsearch and getNearbysearch
-                        // extract address from getTextsearch (formatedAddress) or getNearbysearch (vivinity)
-                        String address = "";
-                        if (result.getFormattedAddress() != null) {
-                            address = result.getFormattedAddress();
-                        } else {
-                            if (result.getVicinity() != null)
-                                address = result.getVicinity();
-                        }
-                        if ((address != null) && (address.trim().length() > 0) && (address.indexOf(',') >= 0)) {
-                            address = address.split(",")[0];
-                        }
-                        restaurant.setInfo(address);
-
-                        //restaurant.setHours(result.getPriceLevel().toString());
-                        if ((result.getPhotos() != null) && (result.getPhotos().size() >= 1)) {
-                            Log.d(TAG, "getPhotoReference() = " + result.getPhotos().get(0).getPhotoReference());
-                            restaurant.setUrlPicture(googlePlacesApiRepository.getUrlPlacePhoto(result.getPhotos().get(0).getPhotoReference()));
-                        } else {
-                            if (result.getIcon() != null) {
-                                Log.d(TAG, "getIcon() = " + result.getIcon());
-                                restaurant.setUrlPicture(result.getIcon());
-                            }
-                        }
-
+                        Restaurant restaurant = new Restaurant(result.getPlaceId(),
+                                name,
+                                latitude,
+                                longitude,
+                                distance,
+                                info,
+                                hours,
+                                workmates,
+                                rating,
+                                urlPicture);
                         restaurants.add(restaurant);
                     }
                     // Memorize last restaurants
@@ -163,7 +189,7 @@ public class MainViewModel extends ViewModel {
             }
 
             @Override
-            public void onFailure(Call<Textsearch> call, Throwable t) {
+            public void onFailure(Call<PlaceSearch> call, Throwable t) {
                 Log.d(TAG, "MainViewModel.loadRestaurantAround.onFailure() " + t.getMessage());
                 errorMutableLiveData.postValue(t.getMessage());
             }

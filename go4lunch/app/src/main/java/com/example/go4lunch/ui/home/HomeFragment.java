@@ -119,6 +119,12 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        Log.d(TAG, "HomeFragment.onStart() called");
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         Log.d(TAG, "HomeFragment.onResume() called");
@@ -130,5 +136,17 @@ public class HomeFragment extends Fragment {
         Log.d(TAG, "HomeFragment.onPause() called");
         gps.stopLocalization();
         super.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        Log.d(TAG, "HomeFragment.onStop() called");
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d(TAG, "HomeFragment.onDestroy() called");
+        super.onDestroy();
     }
 }

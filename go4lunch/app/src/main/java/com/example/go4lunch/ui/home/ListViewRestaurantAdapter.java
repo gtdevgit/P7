@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,9 +20,11 @@ import java.util.List;
 public class ListViewRestaurantAdapter extends RecyclerView.Adapter<ListViewRestaurantViewHolder> {
 
     private List<Restaurant> restaurants;
+    private OnClickListenerRestaurant onClickListenerRestaurant;
 
-    public ListViewRestaurantAdapter(List<Restaurant> restaurants) {
+    public ListViewRestaurantAdapter(List<Restaurant> restaurants, OnClickListenerRestaurant onClickListenerRestaurant) {
         this.restaurants = restaurants;
+        this.onClickListenerRestaurant = onClickListenerRestaurant;
     }
 
     @NonNull
@@ -29,6 +32,14 @@ public class ListViewRestaurantAdapter extends RecyclerView.Adapter<ListViewRest
     public ListViewRestaurantViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_restaurant, parent, false);
         ListViewRestaurantViewHolder listViewRestaurantViewHolder = new ListViewRestaurantViewHolder(view);
+
+        listViewRestaurantViewHolder.cardViewRestaurant.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int position = listViewRestaurantViewHolder.getAdapterPosition();
+                onClickListenerRestaurant.onCLickRestaurant(position);
+            }
+        });
         return listViewRestaurantViewHolder;
     }
 
@@ -38,12 +49,7 @@ public class ListViewRestaurantAdapter extends RecyclerView.Adapter<ListViewRest
         holder.textViewRestaurantName.setText(restaurant.getName());
         holder.textViewRestaurantInfo.setText(restaurant.getInfo());
         holder.textViewRestaurantHours.setText(restaurant.getHours());
-
-        // roundedDistance in meter
-        DecimalFormat df = new DecimalFormat("#");
-        String roundedDistance = String.format("%s m", df.format(restaurant.getDistance()));
-        holder.textViewRestaurantDistance.setText(roundedDistance);
-
+        holder.textViewRestaurantDistance.setText(restaurant.getFormatedDistance());
         holder.textViewRestaurantWorkmate.setText("(" + restaurant.getWorkmate() + ")");
 
         /*
@@ -74,4 +80,5 @@ public class ListViewRestaurantAdapter extends RecyclerView.Adapter<ListViewRest
     public int getItemCount() {
         return restaurants.size();
     }
+
 }

@@ -1,4 +1,4 @@
-package com.example.go4lunch.models.googleplaces;
+package com.example.go4lunch.models.googleplaces.placesearch;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 import java.util.List;
 
-public class Textsearch implements Serializable
+public class PlaceSearch implements Serializable
 {
 
     @SerializedName("html_attributions")
@@ -27,7 +27,7 @@ public class Textsearch implements Serializable
      * No args constructor for use in serialization
      *
      */
-    public Textsearch() {
+    public PlaceSearch() {
     }
 
     /**
@@ -37,7 +37,7 @@ public class Textsearch implements Serializable
      * @param results
      * @param status
      */
-    public Textsearch(List<Object> htmlAttributions, String nextPageToken, List<Result> results, String status) {
+    public PlaceSearch(List<Object> htmlAttributions, String nextPageToken, List<Result> results, String status) {
         super();
         this.htmlAttributions = htmlAttributions;
         this.nextPageToken = nextPageToken;
@@ -53,7 +53,7 @@ public class Textsearch implements Serializable
         this.htmlAttributions = htmlAttributions;
     }
 
-    public Textsearch withHtmlAttributions(List<Object> htmlAttributions) {
+    public PlaceSearch withHtmlAttributions(List<Object> htmlAttributions) {
         this.htmlAttributions = htmlAttributions;
         return this;
     }
@@ -66,7 +66,7 @@ public class Textsearch implements Serializable
         this.nextPageToken = nextPageToken;
     }
 
-    public Textsearch withNextPageToken(String nextPageToken) {
+    public PlaceSearch withNextPageToken(String nextPageToken) {
         this.nextPageToken = nextPageToken;
         return this;
     }
@@ -79,7 +79,7 @@ public class Textsearch implements Serializable
         this.results = results;
     }
 
-    public Textsearch withResults(List<Result> results) {
+    public PlaceSearch withResults(List<Result> results) {
         this.results = results;
         return this;
     }
@@ -92,7 +92,7 @@ public class Textsearch implements Serializable
         this.status = status;
     }
 
-    public Textsearch withStatus(String status) {
+    public PlaceSearch withStatus(String status) {
         this.status = status;
         return this;
     }
@@ -112,10 +112,10 @@ public class Textsearch implements Serializable
         if (other == this) {
             return true;
         }
-        if ((other instanceof Textsearch) == false) {
+        if ((other instanceof PlaceSearch) == false) {
             return false;
         }
-        Textsearch rhs = ((Textsearch) other);
+        PlaceSearch rhs = ((PlaceSearch) other);
         return (((((this.results == rhs.results)||((this.results!= null)&&this.results.equals(rhs.results)))&&((this.htmlAttributions == rhs.htmlAttributions)||((this.htmlAttributions!= null)&&this.htmlAttributions.equals(rhs.htmlAttributions))))&&((this.nextPageToken == rhs.nextPageToken)||((this.nextPageToken!= null)&&this.nextPageToken.equals(rhs.nextPageToken))))&&((this.status == rhs.status)||((this.status!= null)&&this.status.equals(rhs.status))));
     }
 
