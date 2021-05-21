@@ -116,10 +116,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         Log.d(TAG, "MapFragment.onMapReady() called with: googleMap = [" + googleMap + "]");
         mMap = googleMap;
         // cycle de vie. Navigation list->map
+        Log.d(TAG, "onMapReady() 1.1 " + this.location);
         if (this.location != null) {
+            Log.d(TAG, "onMapReady() 1.2 " + this.location);
             this.setLocation(this.location);
         }
+        Log.d(TAG, "onMapReady() 2 " + this.restaurants);
         if (this.restaurants != null) {
+            Log.d(TAG, "onMapReady() 3");
             this.setRestaurants(restaurants);
         }
     }
@@ -134,9 +138,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void setLocation(Location location) {
+        try{
         Log.d(TAG, "MapFragment.setLocation() called with: mMap = [" + mMap + "]. location = [" + location + "]");
         progressBar.setVisibility(View.VISIBLE);
         this.location = location;
+        Log.d(TAG, "MapFragment.setLocation() called with: mMap = [" + mMap + "]");
         if(mMap!=null) {
             progressBar.setVisibility(View.INVISIBLE);
             LatLng latlng = new LatLng(location.getLatitude(), location.getLongitude());
@@ -145,6 +151,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
         //mainViewModel.setLocation(location);
         progressBar.setVisibility(View.INVISIBLE);
+        }
+        catch (Exception e) {
+            Log.d(TAG, "setLocation() called with: Exception = [" + e.getMessage() + "]");
+        }
     }
 
     public void setRestaurants(List<Restaurant> restaurants){

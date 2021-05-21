@@ -95,8 +95,8 @@
             app:itemIconTint="@color/primaryColor"
             app:itemTextColor="@color/primaryColor"
             app:layout_constraintTop_toBottomOf="@+id/activity_detail_restaurant_cardviewName"
-            app:menu="@menu/activity_detail_restaurant_bottom_navogation_menu" >
-        </com.google.android.material.bottomnavigation.BottomNavigationView>
+            app:menu="@menu/activity_detail_restaurant_bottom_navogation_menu"
+            />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/activity_detail_restaurant_recyclerview_workmates"

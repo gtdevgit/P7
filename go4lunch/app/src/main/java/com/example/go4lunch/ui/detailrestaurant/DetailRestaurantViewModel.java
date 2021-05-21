@@ -79,9 +79,11 @@ public class DetailRestaurantViewModel extends ViewModel {
                     String phoneNumber = placeDetails.getResult().getInternationalPhoneNumber();
                     String website = placeDetails.getResult().getWebsite();
                     List<String> urlPhotos = new ArrayList<>();
-                    for (Photo photo : placeDetails.getResult().getPhotos()){
-                        if ((photo.getPhotoReference() != null) && (photo.getPhotoReference().trim().length() > 0)) {
-                            urlPhotos.add(googlePlacesApiRepository.getUrlPlacePhoto(photo.getPhotoReference()));
+                    if (placeDetails.getResult().getPhotos() != null) {
+                        for (Photo photo : placeDetails.getResult().getPhotos()){
+                            if ((photo.getPhotoReference() != null) && (photo.getPhotoReference().trim().length() > 0)) {
+                                urlPhotos.add(googlePlacesApiRepository.getUrlPlacePhoto(photo.getPhotoReference()));
+                            }
                         }
                     }
                     String urlPicture = (urlPhotos.size() > 0) ? urlPhotos.get(0) : null;
@@ -90,7 +92,8 @@ public class DetailRestaurantViewModel extends ViewModel {
                     boolean haveStar2 = false;
                     boolean haveStar3 = false;
                     boolean isLiked = false;
-                    boolean isOpen = placeDetails.getResult().getOpeningHours().getOpenNow();
+
+                    boolean isOpen = (placeDetails.getResult().getOpeningHours() == null) ? false : placeDetails.getResult().getOpeningHours().getOpenNow();
                     List<String> workmates = null;
                     DetailRestaurant detailRestaurant = new DetailRestaurant(placeId,
                             name,

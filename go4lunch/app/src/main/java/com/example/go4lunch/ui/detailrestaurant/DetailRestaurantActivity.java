@@ -1,5 +1,8 @@
 package com.example.go4lunch.ui.detailrestaurant;
 
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 
 import com.bumptech.glide.Glide;
@@ -18,6 +21,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
 
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -35,6 +39,7 @@ public class DetailRestaurantActivity extends AppCompatActivity {
     private String placeId;
     private String phoneNumber;
     private String website;
+    private boolean telephonySupported;
 
     private ImageView imageView;
     private TextView textViewName;
@@ -89,6 +94,9 @@ public class DetailRestaurantActivity extends AppCompatActivity {
             }
         });
         this.loadDetailRestaurant(this.placeId);
+
+        PackageManager packageManager = getPackageManager();
+        telephonySupported = packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY);
     }
 
     private void loadDetailRestaurant(String placeId){
@@ -98,31 +106,39 @@ public class DetailRestaurantActivity extends AppCompatActivity {
 
     private void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
-        // todo enable/disable phone
-        menuItemCall.setEnabled(this.phoneNumber != null);
+        menuItemCall.setVisible((telephonySupported) && (phoneNumber != null));
     }
 
     private void setWebsite(String website) {
         this.website = website;
-        // todo enable/disable website
-        menuItemWebsite.setEnabled(this.website != null);
+        menuItemWebsite.setVisible(website != null);
     }
 
     private boolean navigate(@NonNull MenuItem item) {
-//        MenuItem menuItemSearch = ((MainActivity) getActivity()).getMenuItemSearch();
-
         switch (item.getItemId()) {
             case R.id.activity_detail_restaurant_menu_item_call:
-                Toast.makeText(this, "call", LENGTH_SHORT).show();
-                return true;
+                call();
             case R.id.activity_detail_restaurant_menu_item_like:
                 Toast.makeText(this, "like", LENGTH_SHORT).show();
                 return true;
             case R.id.activity_detail_restaurant_menu_item_website:
-                Toast.makeText(this, "website", LENGTH_SHORT).show();
-                return true;
+                openWebsite();
         }
         return false;
+    }
+
+    private void call(){
+        if ((telephonySupported) && (phoneNumber != null)) {
+            Intent intent = new Intent(Intent.ACTION_DIAL);
+            intent.setData(Uri.parse(String.format("tel:%s", this.phoneNumber)));
+            startActivity(intent);
+        }
+    }
+
+    private void openWebsite(){
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(website));
+        startActivity(intent);
     }
 
     @Override

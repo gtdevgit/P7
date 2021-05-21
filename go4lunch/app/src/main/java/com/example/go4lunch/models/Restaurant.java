@@ -11,10 +11,10 @@ public class Restaurant {
     private String info;
     private String hours;
     private String workmate;
-    private String rating;
+    private double rating;
     private String urlPicture;
 
-    public Restaurant(String placeId, String name, double latitude, double longitude, float distance, String info, String hours, String workmate, String rating, String urlPicture) {
+    public Restaurant(String placeId, String name, double latitude, double longitude, float distance, String info, String hours, String workmate, double rating, String urlPicture) {
         this.placeId = placeId;
         this.name = name;
         this.latitude = latitude;
@@ -91,11 +91,11 @@ public class Restaurant {
         this.workmate = workmate;
     }
 
-    public String getRating() {
+    public double getRating() {
         return rating;
     }
 
-    public void setRating(String rating) {
+    public void setRating(double rating) {
         this.rating = rating;
     }
 

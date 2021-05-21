@@ -26,7 +26,6 @@ public class GPS {
             public void onLocationChanged(@NonNull Location location) {
                 Log.d(TAG, "GPS.onLocationChanged() called with: location = [" + location + "]");
                 locationMutableLiveData.setValue(location);
-                Log.d(TAG, "GPS.onLocationChanged() 2 called with: location = [" + location + "]");
             }
 
             @Override
