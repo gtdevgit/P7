@@ -2,6 +2,7 @@ package com.example.go4lunch.ui.detailrestaurant;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -10,13 +11,22 @@ import com.example.go4lunch.api.firestore.ChoosenHelper;
 import com.example.go4lunch.api.firestore.ChoosenHelperListener;
 import com.example.go4lunch.api.firestore.LikeHelper;
 import com.example.go4lunch.api.firestore.LikeHelperListener;
+import com.example.go4lunch.api.firestore.UserHelper;
+import com.example.go4lunch.api.firestore.UserHelperListener;
 import com.example.go4lunch.models.DetailRestaurant;
+import com.example.go4lunch.models.User;
+import com.example.go4lunch.models.UserRestaurantAssociation;
 import com.example.go4lunch.models.googleplaces.Photo;
 import com.example.go4lunch.models.googleplaces.palcesdetails.PlaceDetails;
 import com.example.go4lunch.models.googleplaces.placesearch.Result;
 import com.example.go4lunch.repository.GooglePlacesApiRepository;
 import com.example.go4lunch.tag.Tag;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.gson.JsonObject;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,12 +44,54 @@ public class DetailRestaurantViewModel extends ViewModel {
     private final MutableLiveData<String> errorMutableLiveData = new MutableLiveData<String>();
     private final MutableLiveData<Boolean> likedMutableLiveData = new MutableLiveData<Boolean>();
     private final MutableLiveData<Boolean> choosenMutableLiveData = new MutableLiveData<Boolean>();
+    private final MutableLiveData<List<User>> workmatesMutableLiveData = new MutableLiveData<>();
+
+    private final ChoosenHelperListener choosenHelperListener;
+    private final UserHelperListener userHelperListener;
 
     public DetailRestaurantViewModel(GooglePlacesApiRepository googlePlacesApiRepository) {
         this.googlePlacesApiRepository = googlePlacesApiRepository;
+        // listener for user
+        this.userHelperListener = new UserHelperListener() {
+            @Override
+            public void onGetUser(User user) {
+
+            }
+
+            @Override
+            public void onGetUsersByList(List<User> users) {
+                workmatesMutableLiveData.postValue(users);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                errorMutableLiveData.postValue(e.getMessage());
+            }
+        };
+
+        // listener for liked and choosen restaurants
+        this.choosenHelperListener = new ChoosenHelperListener() {
+            @Override
+            public void onGetChoosen(boolean isChoosen) {
+                choosenMutableLiveData.postValue(Boolean.valueOf(isChoosen));
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                errorMutableLiveData.postValue(e.getMessage());
+            }
+
+            @Override
+            public void onGetUsersWhoChoseThisRestaurant(List<UserRestaurantAssociation> userRestaurantAssociationList) {
+                Log.d(Tag.TAG, "DetailRestaurantViewModel.onGetUsersWhoChoseThisRestaurant() called with: userRestaurantAssociationList = [" + userRestaurantAssociationList + "]");
+                List<String> uidList = userRestaurantAssociationListToUidList(userRestaurantAssociationList);
+
+                UserHelper.getUsersByList(uidList, userHelperListener);
+            }
+        };
     }
 
-    public LiveData<DetailRestaurant> getDetailRestaurantMutableLiveData() {
+    public LiveData<DetailRestaurant> getDetailRestaurantLiveData() {
         return detailRestaurantMutableLiveData;
     }
 
@@ -50,8 +102,26 @@ public class DetailRestaurantViewModel extends ViewModel {
     public LiveData<Boolean> getLikedLiveData() {
         return likedMutableLiveData;
     }
+
     public LiveData<Boolean> getChoosenLiveData() {
         return choosenMutableLiveData;
+    }
+
+    public LiveData<List<User>> getWorkmatesLiveData() {
+        return workmatesMutableLiveData;
+    }
+
+    /**
+     * transforms one List<UserRestaurantAssociation> to one List<String> containing each uid
+     * @param userRestaurantAssociationList
+     * @return
+     */
+    private List<String> userRestaurantAssociationListToUidList(List<UserRestaurantAssociation> userRestaurantAssociationList){
+        List<String> uidList = new ArrayList<>();
+        for (UserRestaurantAssociation userRestaurantAssociation : userRestaurantAssociationList) {
+            uidList.add(userRestaurantAssociation.getUserUid());
+        }
+        return uidList;
     }
 
     /**
@@ -134,6 +204,7 @@ public class DetailRestaurantViewModel extends ViewModel {
         });
     }
 
+
     public void loadIsLiked(String uid, String placeId){
         LikeHelper.isLiked(uid, placeId, new LikeHelperListener() {
             @Override
@@ -161,31 +232,35 @@ public class DetailRestaurantViewModel extends ViewModel {
         });
     }
 
+    /**
+     * is restaurant choose
+     * @param uid
+     * @param placeId
+     */
     public void loadIsChoosen(String uid, String placeId){
-        ChoosenHelper.isChoosenRestaurant(uid, placeId, new ChoosenHelperListener() {
-            @Override
-            public void onGetChoosen(boolean isChoosen) {
-                choosenMutableLiveData.postValue(Boolean.valueOf(isChoosen));
-            }
-        });
+        ChoosenHelper.isChoosenRestaurant(uid, placeId, this.choosenHelperListener);
     }
 
+    /**
+     * user choose restaurant
+     * @param uid
+     * @param placeId
+     */
     public void choose(String uid, String placeId){
-        ChoosenHelper.createChoosenRestaurant(uid, placeId, new ChoosenHelperListener() {
-            @Override
-            public void onGetChoosen(boolean isChoosen) {
-                choosenMutableLiveData.postValue(Boolean.valueOf(isChoosen));
-            }
-        });
+        ChoosenHelper.createChoosenRestaurant(uid, placeId, this.choosenHelperListener);
     }
 
+    /**
+     * user unchoose restaurant
+     * @param uid
+     * @param placeId
+     */
     public void unchoose(String uid, String placeId) {
-        ChoosenHelper.deleteChoosenRestaurant(uid, placeId, new ChoosenHelperListener() {
-            @Override
-            public void onGetChoosen(boolean isChoosen) {
-                choosenMutableLiveData.postValue(Boolean.valueOf(isChoosen));
-            }
-        });
+        ChoosenHelper.deleteChoosenRestaurant(uid, placeId, this.choosenHelperListener);
+    }
+
+    public void loadWorkmates(String placeId){
+        ChoosenHelper.getUsersWhoChoseThisRestaurant(placeId, this.choosenHelperListener);
     }
 
 }

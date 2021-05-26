@@ -10,16 +10,20 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
 import com.example.go4lunch.api.firestore.ChoosenHelper;
-import com.example.go4lunch.api.firestore.ChoosenHelperListener;
 import com.example.go4lunch.models.DetailRestaurant;
+import com.example.go4lunch.models.User;
 import com.example.go4lunch.repository.GooglePlacesApiRepository;
 import com.example.go4lunch.tag.Tag;
+import com.example.go4lunch.ui.home.WorkmatesAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.lifecycle.Observer;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.MenuItem;
@@ -31,6 +35,9 @@ import com.example.go4lunch.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class DetailRestaurantActivity extends AppCompatActivity {
@@ -48,6 +55,7 @@ public class DetailRestaurantActivity extends AppCompatActivity {
     private boolean telephonySupported;
     private boolean liked;
     private boolean choosen;
+    private List<User> usersList;
 
     private ImageView imageView;
     private TextView textViewName;
@@ -57,6 +65,9 @@ public class DetailRestaurantActivity extends AppCompatActivity {
     private MenuItem menuItemLike;
     private MenuItem menuItemWebsite;
     private FloatingActionButton floatingActionButton;
+    private RecyclerView recyclerView;
+    private RecyclerView.LayoutManager layoutManager;
+    private WorkmatesAdapter workmatesAdapter;
 
     private DetailRestaurantViewModel detailRestaurantViewModel;
 
@@ -96,7 +107,7 @@ public class DetailRestaurantActivity extends AppCompatActivity {
         });
 
         this.detailRestaurantViewModel = new DetailRestaurantViewModel(new GooglePlacesApiRepository(getString(R.string.google_api_key)));
-        this.detailRestaurantViewModel.getDetailRestaurantMutableLiveData().observe(this, new Observer<DetailRestaurant>() {
+        this.detailRestaurantViewModel.getDetailRestaurantLiveData().observe(this, new Observer<DetailRestaurant>() {
             @Override
             public void onChanged(DetailRestaurant detailRestaurant) {
                 textViewName.setText(detailRestaurant.getName());
@@ -130,10 +141,34 @@ public class DetailRestaurantActivity extends AppCompatActivity {
                 setChoosen(aBoolean.booleanValue());
             }
         });
+        Log.d(TAG, "this.detailRestaurantViewModel.loadIsChoosen = [" + uid + "] " + "[" + placeId + "]");
         this.detailRestaurantViewModel.loadIsChoosen(uid, placeId);
 
         PackageManager packageManager = getPackageManager();
         telephonySupported = packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY);
+
+        recyclerView = findViewById(R.id.activity_detail_restaurant_recyclerview_workmates);
+        layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+
+        usersList = new ArrayList<>();
+        workmatesAdapter = new WorkmatesAdapter(usersList);
+        recyclerView.setAdapter(workmatesAdapter);
+
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+                DividerItemDecoration.VERTICAL);
+        recyclerView.addItemDecoration(dividerItemDecoration);
+
+        // workmates who chose this restaurant
+        this.detailRestaurantViewModel.getWorkmatesLiveData().observe(this, new Observer<List<User>>() {
+            @Override
+            public void onChanged(List<User> users) {
+                setWorkmates(users);
+            }
+        });
+        this.detailRestaurantViewModel.loadWorkmates(this.placeId);
+
+
     }
 
     private void loadDetailRestaurant(String placeId){
@@ -204,10 +239,12 @@ public class DetailRestaurantActivity extends AppCompatActivity {
         } else {
             this.detailRestaurantViewModel.choose(this.uid, this.placeId);
         }
+        this.detailRestaurantViewModel.loadWorkmates(this.placeId);
     }
 
     // state choosen and UI update
     private void setChoosen(boolean isChoosen){
+        Log.d(TAG, "setChoosen() called with: isChoosen = [" + isChoosen + "]");
         this.choosen = isChoosen;
         if (this.choosen) {
             this.floatingActionButton.setImageResource(R.drawable.ic_baseline_check_24);
@@ -222,6 +259,12 @@ public class DetailRestaurantActivity extends AppCompatActivity {
             intent.setData(Uri.parse(website));
             startActivity(intent);
         }
+    }
+
+    private void setWorkmates(List<User> users){
+        this.usersList.clear();
+        this.usersList.addAll(users);
+        workmatesAdapter.notifyDataSetChanged();
     }
 
     @Override
