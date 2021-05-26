@@ -53,6 +53,9 @@ public class ListViewRestaurantAdapter extends RecyclerView.Adapter<ListViewRest
         holder.textViewRestaurantWorkmate.setText("(" + restaurant.getWorkmate() + ")");
 
         /*
+        //todo : liste des restaurants : charger les étoiles
+        //todo : liste des restaurants : charger le nombre de workmate
+        //todo : liste des restaurants : charger les horaires ou open/close
         holder.imageViewRestaurantRating1.setBackgroundTintList(
             holder.imageViewRestaurantRating1.getContext().getResources().getColorStateList(R.color.colorAccent));
         holder.imageViewRestaurantRating2.setBackgroundTintList(

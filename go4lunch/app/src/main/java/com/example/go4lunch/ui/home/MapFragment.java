@@ -56,6 +56,7 @@ import java.util.List;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
+    //todo : MAP : click sur une position doit ouvrir le détail du restaurant
     private static final String TAG = Tag.TAG;
 
     private GoogleMap mMap;

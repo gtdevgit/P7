@@ -163,7 +163,7 @@ public class MainViewModel extends ViewModel {
                         String info = findAddress(result.getFormattedAddress(), result.getVicinity());
                         String hours = "";
                         String workmates = "";
-                        double rating = (result.getRating() == null) ? 0 : result.getRating();
+                        double rating = result.getRating();
                         String urlPicture = findUrlPicture(result);
 
                         Restaurant restaurant = new Restaurant(result.getPlaceId(),

@@ -2,51 +2,61 @@ package com.example.go4lunch.ui.detailrestaurant;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Bundle;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.go4lunch.MainActivity;
+
+import com.example.go4lunch.api.firestore.ChoosenHelper;
+import com.example.go4lunch.api.firestore.ChoosenHelperListener;
 import com.example.go4lunch.models.DetailRestaurant;
 import com.example.go4lunch.repository.GooglePlacesApiRepository;
 import com.example.go4lunch.tag.Tag;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+
 import androidx.lifecycle.Observer;
 
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.go4lunch.R;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
-import static android.widget.Toast.LENGTH_SHORT;
 
 public class DetailRestaurantActivity extends AppCompatActivity {
 
+    // todo : Detail d'un restaurant gérer le like => data ok, manque retour visuel
+    // todo : Detail d'un restaurant gérer la selection du restaurant
+    // todo : Detail d'un restaurant charger la liste des workmates.
+    // todo : Detail d'un restaurant ajouter toutes les photo. => optionel
+
     private static final String TAG = Tag.TAG;
-    private String name;
+    private String uid;
     private String placeId;
     private String phoneNumber;
     private String website;
     private boolean telephonySupported;
+    private boolean liked;
+    private boolean choosen;
 
     private ImageView imageView;
     private TextView textViewName;
     private TextView textViewInfo;
     private BottomNavigationView bottomNavigationView;
     private MenuItem menuItemCall;
+    private MenuItem menuItemLike;
     private MenuItem menuItemWebsite;
+    private FloatingActionButton floatingActionButton;
 
     private DetailRestaurantViewModel detailRestaurantViewModel;
 
@@ -56,11 +66,11 @@ public class DetailRestaurantActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail_restaurant);
 
         Bundle bundle = getIntent().getExtras();
-        name = bundle.getString("name", "");
         placeId = bundle.getString("placeid", "");
-
-        Log.d(TAG, "DetailRestaurantActivity.onCreate() called with: name = [" + name + "]");
         Log.d(TAG, "DetailRestaurantActivity.onCreate() called with: placeid = [" + placeId + "]");
+
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        this.uid = currentUser.getUid();
 
         textViewName = findViewById(R.id.activity_detail_restaurant_name);
         textViewInfo = findViewById(R.id.activity_detail_restaurant_info);
@@ -74,7 +84,16 @@ public class DetailRestaurantActivity extends AppCompatActivity {
             }
         });
         menuItemCall = bottomNavigationView.getMenu().findItem(R.id.activity_detail_restaurant_menu_item_call);
+        menuItemLike = bottomNavigationView.getMenu().findItem(R.id.activity_detail_restaurant_menu_item_like);
         menuItemWebsite = bottomNavigationView.getMenu().findItem(R.id.activity_detail_restaurant_menu_item_website);
+
+        floatingActionButton = findViewById(R.id.activity_detail_restaurant_floating_action_button_select);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeChoose();
+            }
+        });
 
         this.detailRestaurantViewModel = new DetailRestaurantViewModel(new GooglePlacesApiRepository(getString(R.string.google_api_key)));
         this.detailRestaurantViewModel.getDetailRestaurantMutableLiveData().observe(this, new Observer<DetailRestaurant>() {
@@ -94,6 +113,24 @@ public class DetailRestaurantActivity extends AppCompatActivity {
             }
         });
         this.loadDetailRestaurant(this.placeId);
+
+        // liked restaurant observer
+        this.detailRestaurantViewModel.getLikedLiveData().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                setLiked(aBoolean.booleanValue());
+            }
+        });
+        this.detailRestaurantViewModel.loadIsLiked(uid, this.placeId);
+
+        // choosen observer
+        this.detailRestaurantViewModel.getChoosenLiveData().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                setChoosen(aBoolean.booleanValue());
+            }
+        });
+        this.detailRestaurantViewModel.loadIsChoosen(uid, placeId);
 
         PackageManager packageManager = getPackageManager();
         telephonySupported = packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY);
@@ -119,12 +156,12 @@ public class DetailRestaurantActivity extends AppCompatActivity {
             case R.id.activity_detail_restaurant_menu_item_call:
                 call();
             case R.id.activity_detail_restaurant_menu_item_like:
-                Toast.makeText(this, "like", LENGTH_SHORT).show();
+                changeLike();
                 return true;
             case R.id.activity_detail_restaurant_menu_item_website:
                 openWebsite();
         }
-        return false;
+        return true;
     }
 
     private void call(){
@@ -135,10 +172,56 @@ public class DetailRestaurantActivity extends AppCompatActivity {
         }
     }
 
+    private void changeLike(){
+        if (this.liked) {
+            // remove like
+            Log.d(TAG, "delete like");
+            this.detailRestaurantViewModel.unlike(this.uid, this.placeId);
+        } else {
+            // like
+            Log.d(TAG, "create like");
+            this.detailRestaurantViewModel.like(this.uid, this.placeId);
+        }
+    }
+
+    // state liked and UI update
+    private void setLiked(boolean isliked){
+        Log.d(TAG, "setLiked() called with: isliked = [" + isliked + "]");
+        this.liked = isliked;
+        menuItemLike.setChecked(isliked);
+
+        if (this.liked){
+            menuItemLike.setIcon(R.drawable.ic_baseline_check_24);
+        } else {
+            menuItemLike.setIcon(R.drawable.ic_baseline_star_24);
+        }
+    }
+
+    private void changeChoose(){
+        if (this.choosen) {
+            //remove choise
+            this.detailRestaurantViewModel.unchoose(this.uid, this.placeId);
+        } else {
+            this.detailRestaurantViewModel.choose(this.uid, this.placeId);
+        }
+    }
+
+    // state choosen and UI update
+    private void setChoosen(boolean isChoosen){
+        this.choosen = isChoosen;
+        if (this.choosen) {
+            this.floatingActionButton.setImageResource(R.drawable.ic_baseline_check_24);
+        } else {
+            this.floatingActionButton.setImageResource(R.drawable.ic_baseline_star_24);
+        }
+    }
+
     private void openWebsite(){
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(website));
-        startActivity(intent);
+        if ((website != null) && (website.trim().length() > 0)) {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(website));
+            startActivity(intent);
+        }
     }
 
     @Override

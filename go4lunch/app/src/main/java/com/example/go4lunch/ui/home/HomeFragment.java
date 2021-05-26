@@ -59,18 +59,15 @@ public class HomeFragment extends Fragment {
 
         switch (item.getItemId()) {
             case R.id.menu_item_map_view:
-                Toast.makeText(this.getContext(), "map view", LENGTH_SHORT).show();
                 loadFragmentMap();
                 // toto add text edit search
                 menuItemSearch.setVisible(true);
                 return true;
             case R.id.menu_item_list_view:
-                Toast.makeText(this.getContext(), "list view", LENGTH_SHORT).show();
                 loadFragmentListView();
                 menuItemSearch.setVisible(true);
                 return true;
             case R.id.menu_item_workmates:
-                Toast.makeText(this.getContext(), "workmates view", LENGTH_SHORT).show();
                 loadFragmentWorkmates();
                 menuItemSearch.setVisible(false);
                 return true;

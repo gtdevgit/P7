@@ -48,7 +48,7 @@ public class Result implements Serializable
     private Integer priceLevel;
     @SerializedName("rating")
     @Expose
-    private Double rating;
+    private double rating;
     @SerializedName("reference")
     @Expose
     private String reference;
@@ -88,7 +88,7 @@ public class Result implements Serializable
      * @param geometry
      * @param openingHours
      */
-    public Result(String businessStatus, String formattedAddress, String vicinity, Geometry geometry, String icon, String name, OpeningHours openingHours, List<Photo> photos, String placeId, PlusCode plusCode, Integer priceLevel, Double rating, String reference, List<String> types, Integer userRatingsTotal, Boolean permanentlyClosed) {
+    public Result(String businessStatus, String formattedAddress, String vicinity, Geometry geometry, String icon, String name, OpeningHours openingHours, List<Photo> photos, String placeId, PlusCode plusCode, Integer priceLevel, double rating, String reference, List<String> types, Integer userRatingsTotal, Boolean permanentlyClosed) {
         super();
         this.businessStatus = businessStatus;
         this.formattedAddress = formattedAddress;
@@ -251,15 +251,15 @@ public class Result implements Serializable
         return this;
     }
 
-    public Double getRating() {
+    public double getRating() {
         return rating;
     }
 
-    public void setRating(Double rating) {
+    public void setRating(double rating) {
         this.rating = rating;
     }
 
-    public Result withRating(Double rating) {
+    public Result withRating(double rating) {
         this.rating = rating;
         return this;
     }
@@ -323,7 +323,7 @@ public class Result implements Serializable
         result = ((result* 31)+((this.plusCode == null)? 0 :this.plusCode.hashCode()));
         result = ((result* 31)+((this.icon == null)? 0 :this.icon.hashCode()));
         result = ((result* 31)+((this.placeId == null)? 0 :this.placeId.hashCode()));
-        result = ((result* 31)+((this.rating == null)? 0 :this.rating.hashCode()));
+        result = ((result* 31)+((int)(Double.doubleToLongBits(this.rating)^(Double.doubleToLongBits(this.rating)>>> 32))));
         result = ((result* 31)+((this.userRatingsTotal == null)? 0 :this.userRatingsTotal.hashCode()));
         result = ((result* 31)+((this.businessStatus == null)? 0 :this.businessStatus.hashCode()));
         result = ((result* 31)+((this.priceLevel == null)? 0 :this.priceLevel.hashCode()));
@@ -336,17 +336,4 @@ public class Result implements Serializable
         result = ((result* 31)+((this.openingHours == null)? 0 :this.openingHours.hashCode()));
         return result;
     }
-
-    @Override
-    public boolean equals(Object other) {
-        if (other == this) {
-            return true;
-        }
-        if ((other instanceof Result) == false) {
-            return false;
-        }
-        Result rhs = ((Result) other);
-        return ((((((((((((((((this.types == rhs.types)||((this.types!= null)&&this.types.equals(rhs.types)))&&((this.plusCode == rhs.plusCode)||((this.plusCode!= null)&&this.plusCode.equals(rhs.plusCode))))&&((this.icon == rhs.icon)||((this.icon!= null)&&this.icon.equals(rhs.icon))))&&((this.placeId == rhs.placeId)||((this.placeId!= null)&&this.placeId.equals(rhs.placeId))))&&((this.rating == rhs.rating)||((this.rating!= null)&&this.rating.equals(rhs.rating))))&&((this.userRatingsTotal == rhs.userRatingsTotal)||((this.userRatingsTotal!= null)&&this.userRatingsTotal.equals(rhs.userRatingsTotal))))&&((this.businessStatus == rhs.businessStatus)||((this.businessStatus!= null)&&this.businessStatus.equals(rhs.businessStatus))))&&((this.priceLevel == rhs.priceLevel)||((this.priceLevel!= null)&&this.priceLevel.equals(rhs.priceLevel))))&&((this.photos == rhs.photos)||((this.photos!= null)&&this.photos.equals(rhs.photos))))&&((this.reference == rhs.reference)||((this.reference!= null)&&this.reference.equals(rhs.reference))))&&((this.formattedAddress == rhs.formattedAddress)||((this.formattedAddress!= null)&&this.formattedAddress.equals(rhs.formattedAddress))))&&((this.permanentlyClosed == rhs.permanentlyClosed)||((this.permanentlyClosed!= null)&&this.permanentlyClosed.equals(rhs.permanentlyClosed))))&&((this.name == rhs.name)||((this.name!= null)&&this.name.equals(rhs.name))))&&((this.geometry == rhs.geometry)||((this.geometry!= null)&&this.geometry.equals(rhs.geometry))))&&((this.openingHours == rhs.openingHours)||((this.openingHours!= null)&&this.openingHours.equals(rhs.openingHours))));
-    }
-
 }

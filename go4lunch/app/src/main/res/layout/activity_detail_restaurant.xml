@@ -25,7 +25,7 @@
             tools:srcCompat="@drawable/image_floue" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/floatingActionButtonFavorite"
+            android:id="@+id/activity_detail_restaurant_floating_action_button_select"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
@@ -95,8 +95,7 @@
             app:itemIconTint="@color/primaryColor"
             app:itemTextColor="@color/primaryColor"
             app:layout_constraintTop_toBottomOf="@+id/activity_detail_restaurant_cardviewName"
-            app:menu="@menu/activity_detail_restaurant_bottom_navogation_menu"
-            />
+            app:menu="@menu/activity_detail_restaurant_bottom_navigation_menu" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/activity_detail_restaurant_recyclerview_workmates"

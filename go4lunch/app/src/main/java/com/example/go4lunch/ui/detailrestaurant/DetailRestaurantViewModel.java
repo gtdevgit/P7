@@ -6,6 +6,10 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.go4lunch.api.firestore.ChoosenHelper;
+import com.example.go4lunch.api.firestore.ChoosenHelperListener;
+import com.example.go4lunch.api.firestore.LikeHelper;
+import com.example.go4lunch.api.firestore.LikeHelperListener;
 import com.example.go4lunch.models.DetailRestaurant;
 import com.example.go4lunch.models.googleplaces.Photo;
 import com.example.go4lunch.models.googleplaces.palcesdetails.PlaceDetails;
@@ -28,6 +32,8 @@ public class DetailRestaurantViewModel extends ViewModel {
 
     private final MutableLiveData<DetailRestaurant> detailRestaurantMutableLiveData = new MutableLiveData<>();
     private final MutableLiveData<String> errorMutableLiveData = new MutableLiveData<String>();
+    private final MutableLiveData<Boolean> likedMutableLiveData = new MutableLiveData<Boolean>();
+    private final MutableLiveData<Boolean> choosenMutableLiveData = new MutableLiveData<Boolean>();
 
     public DetailRestaurantViewModel(GooglePlacesApiRepository googlePlacesApiRepository) {
         this.googlePlacesApiRepository = googlePlacesApiRepository;
@@ -39,6 +45,13 @@ public class DetailRestaurantViewModel extends ViewModel {
 
     public LiveData<String> getErrorLiveData(){
         return this.errorMutableLiveData;
+    }
+
+    public LiveData<Boolean> getLikedLiveData() {
+        return likedMutableLiveData;
+    }
+    public LiveData<Boolean> getChoosenLiveData() {
+        return choosenMutableLiveData;
     }
 
     /**
@@ -87,12 +100,12 @@ public class DetailRestaurantViewModel extends ViewModel {
                         }
                     }
                     String urlPicture = (urlPhotos.size() > 0) ? urlPhotos.get(0) : null;
+
                     double rating = placeDetails.getResult().getRating();
                     boolean haveStar1 = false;
                     boolean haveStar2 = false;
                     boolean haveStar3 = false;
                     boolean isLiked = false;
-
                     boolean isOpen = (placeDetails.getResult().getOpeningHours() == null) ? false : placeDetails.getResult().getOpeningHours().getOpenNow();
                     List<String> workmates = null;
                     DetailRestaurant detailRestaurant = new DetailRestaurant(placeId,
@@ -119,6 +132,60 @@ public class DetailRestaurantViewModel extends ViewModel {
                 errorMutableLiveData.postValue(t.getMessage());
             }
         });
-
     }
+
+    public void loadIsLiked(String uid, String placeId){
+        LikeHelper.isLiked(uid, placeId, new LikeHelperListener() {
+            @Override
+            public void onGetLike(boolean isLiked) {
+                likedMutableLiveData.postValue(Boolean.valueOf(isLiked));
+            }
+        });
+    }
+
+    public void like(String uid, String placeId){
+        LikeHelper.createLike(uid, placeId, new LikeHelperListener() {
+            @Override
+            public void onGetLike(boolean isLiked) {
+                likedMutableLiveData.postValue(Boolean.valueOf(isLiked));
+            }
+        });
+    }
+
+    public void unlike(String uid, String placeId) {
+        LikeHelper.deleteLike(uid, placeId, new LikeHelperListener() {
+            @Override
+            public void onGetLike(boolean isLiked) {
+                likedMutableLiveData.postValue(Boolean.valueOf(isLiked));
+            }
+        });
+    }
+
+    public void loadIsChoosen(String uid, String placeId){
+        ChoosenHelper.isChoosenRestaurant(uid, placeId, new ChoosenHelperListener() {
+            @Override
+            public void onGetChoosen(boolean isChoosen) {
+                choosenMutableLiveData.postValue(Boolean.valueOf(isChoosen));
+            }
+        });
+    }
+
+    public void choose(String uid, String placeId){
+        ChoosenHelper.createChoosenRestaurant(uid, placeId, new ChoosenHelperListener() {
+            @Override
+            public void onGetChoosen(boolean isChoosen) {
+                choosenMutableLiveData.postValue(Boolean.valueOf(isChoosen));
+            }
+        });
+    }
+
+    public void unchoose(String uid, String placeId) {
+        ChoosenHelper.deleteChoosenRestaurant(uid, placeId, new ChoosenHelperListener() {
+            @Override
+            public void onGetChoosen(boolean isChoosen) {
+                choosenMutableLiveData.postValue(Boolean.valueOf(isChoosen));
+            }
+        });
+    }
+
 }

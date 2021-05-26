@@ -97,7 +97,6 @@ public class ListViewRestaurantFragment extends Fragment {
     private void setRestaurants(List<Restaurant> restaurants){
         Log.d(TAG, "ListViewRestaurantFragment.setRestaurants() called with: restaurants = [" + restaurants + "]");
         progressBar.setVisibility(View.VISIBLE);
-
         this.restaurantsList.clear();
         this.restaurantsList.addAll(restaurants);
         progressBar.setVisibility(View.INVISIBLE);
@@ -111,16 +110,11 @@ public class ListViewRestaurantFragment extends Fragment {
     }
 
     private void showDetailRestaurant(int position){
-        String name = restaurantsList.get(position).getName();
         String placeId = restaurantsList.get(position).getPlaceId();
-        Toast.makeText(this.getContext(), String.format("%s %s", name, placeId), Toast.LENGTH_SHORT).show();
         Intent intent;
         intent = new Intent(this.getActivity(), DetailRestaurantActivity.class);
         Bundle bundle = new Bundle();
-
-        bundle.putString("name", name);
         bundle.putString("placeid", placeId);
-
         intent.putExtras(bundle);
         startActivity(intent);
     }

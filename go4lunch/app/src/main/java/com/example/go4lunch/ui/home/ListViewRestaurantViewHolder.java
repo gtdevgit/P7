@@ -37,6 +37,5 @@ public class ListViewRestaurantViewHolder extends RecyclerView.ViewHolder {
         imageViewRestaurantRating3 = itemView.findViewById(R.id.row_restaurant_rating3);
 
         imageViewRestaurant = itemView.findViewById(R.id.row_restaurant_picture);
-        getAdapterPosition();
     }
 }

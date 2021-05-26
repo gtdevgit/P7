@@ -34,6 +34,10 @@ import java.util.Observer;
 
 //implements OnMapReadyCallback
 public class MainActivity extends AppCompatActivity {
+    // todo : Main : supprimer l'ancienne activité de setting
+    // todo : Main : gérer les notifications
+    // todo : Main vérifier les permisions internet + call
+
     private static final String TAG = "MainActivity";
 
     private AppBarConfiguration mAppBarConfiguration;

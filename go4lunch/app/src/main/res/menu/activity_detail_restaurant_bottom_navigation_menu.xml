@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
         <item
             android:id="@+id/activity_detail_restaurant_menu_item_call"
@@ -10,7 +11,8 @@
             android:id="@+id/activity_detail_restaurant_menu_item_like"
             android:enabled="true"
             android:icon="@drawable/ic_baseline_star_24"
-            android:title="@string/activity_detail_restaurant_bottom_navigation_like"/>
+            android:title="@string/activity_detail_restaurant_bottom_navigation_like"
+            android:checkable="true"/>
         <item
             android:id="@+id/activity_detail_restaurant_menu_item_website"
             android:enabled="true"
