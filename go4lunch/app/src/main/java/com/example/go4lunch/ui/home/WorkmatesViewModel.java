@@ -26,10 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WorkmatesViewModel extends ViewModel {
-    private static final String TAG = Tag.TAG;
-    private static final MutableLiveData<String> errorMutableLiveData = new MutableLiveData<String>();
-    private static final MutableLiveData<List<User>> workmatesMutableLiveData = new MutableLiveData<>();
-    private static ListenerRegistration registrationUsers;
+    private final MutableLiveData<String> errorMutableLiveData = new MutableLiveData<String>();
+    private final MutableLiveData<List<User>> workmatesMutableLiveData = new MutableLiveData<>();
+    private ListenerRegistration registrationUsers;
 
     public WorkmatesViewModel() {
     }
@@ -42,42 +41,45 @@ public class WorkmatesViewModel extends ViewModel {
         return this.errorMutableLiveData;
     }
 
-    public void loadUsers(){
+    public void loadWorkmates(){
         List<User> users = new ArrayList<>();
         UserHelper.getUsers()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        Log.d(TAG, "WorkmatesViewModel.getWorkmates().onComplete() called with: task = [" + task + "]");
+                        Log.d(Tag.TAG, "WorkmatesViewModel.getWorkmates().onComplete() called with: task = [" + task + "]");
                         if (task.isSuccessful()){
-                            Log.d(TAG, "WorkmatesViewModel.getWorkmates().onComplete(). isSuccesful called with: task = [" + task + "]");
+                            Log.d(Tag.TAG, "WorkmatesViewModel.getWorkmates().onComplete(). isSuccesful called with: task = [" + task + "]");
                             for (QueryDocumentSnapshot user : task.getResult()) {
                                 //Log.d(TAG, "" + user);
                                 users.add(user.toObject(User.class));
                             }
-                            Log.d(TAG, "WorkmatesViewModel.getWorkmates().onComplete(). users.size = " + users.size());
+                            Log.d(Tag.TAG, "WorkmatesViewModel.getWorkmates().onComplete(). users.size = " + users.size());
                             workmatesMutableLiveData.postValue(users);
                         } else {
-                            Log.d(TAG, "WorkmatesViewModel.getWorkmates().onComplete(). Error getting users list: ", task.getException());
+                            Log.d(Tag.TAG, "WorkmatesViewModel.getWorkmates().onComplete(). Error getting users list: ", task.getException());
                         }
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "WorkmatesViewModel.getWorkmates().onFailure() called with: e = [" + e + "]");
+                        Log.d(Tag.TAG, "WorkmatesViewModel.getWorkmates().onFailure() called with: e = [" + e + "]");
                     }
                 })
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        Log.d(TAG, "WorkmatesViewModel.getWorkmates().onSuccess() called with: queryDocumentSnapshots = [" + queryDocumentSnapshots + "]");
+                        Log.d(Tag.TAG, "WorkmatesViewModel.getWorkmates().onSuccess() called with: queryDocumentSnapshots = [" + queryDocumentSnapshots + "]");
                     }
                 });
     }
 
-    public static void activateUsersListener(){
-        Log.d(TAG, "activateUsersListener() called");
+    /**
+     * to get real time change in users list
+     */
+    public void activateWorkmatesListener(){
+        Log.d(Tag.TAG, "WorkmatesViewModel.activateUsersListener() called");
         registrationUsers = UserHelper.getUsersCollection().addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
@@ -98,9 +100,9 @@ public class WorkmatesViewModel extends ViewModel {
         });
     }
 
-    public static void removeUsersListener(){
+    public void removeWorkmatesListener(){
         if (registrationUsers != null) {
-            Log.d(TAG, "removeUsersListener() called");
+            Log.d(Tag.TAG, "WorkmatesViewModel.removeUsersListener() called");
             registrationUsers.remove();
         }
     }

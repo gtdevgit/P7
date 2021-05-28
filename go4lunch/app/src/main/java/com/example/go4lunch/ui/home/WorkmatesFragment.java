@@ -79,14 +79,14 @@ public class WorkmatesFragment extends Fragment {
         workmateProgressBar = root.findViewById(R.id.fragment_workmates_progress_bar);
         workmateProgressBar.setVisibility(View.VISIBLE);
 
-        workmatesViewModel.loadUsers();
+        workmatesViewModel.loadWorkmates();
         return root;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        workmatesViewModel.activateUsersListener();
+        workmatesViewModel.activateWorkmatesListener();
         Log.d(TAG, "WorkmatesFragment.onResume() called");
 
     }
@@ -94,7 +94,7 @@ public class WorkmatesFragment extends Fragment {
     @Override
     public void onPause() {
         Log.d(TAG, "WorkmatesFragment.onPause() called");
-        workmatesViewModel.removeUsersListener();
+        workmatesViewModel.removeWorkmatesListener();
         super.onPause();
     }
 }
