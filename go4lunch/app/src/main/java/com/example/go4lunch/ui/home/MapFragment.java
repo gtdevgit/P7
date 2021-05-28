@@ -1,8 +1,10 @@
 package com.example.go4lunch.ui.home;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
@@ -24,8 +26,10 @@ import com.example.go4lunch.MyPlace.GeographicHelper;
 import com.example.go4lunch.MyPlace.MyPlace;
 import com.example.go4lunch.R;
 import com.example.go4lunch.models.Autocomplete;
+import com.example.go4lunch.models.DetailRestaurant;
 import com.example.go4lunch.models.Restaurant;
 import com.example.go4lunch.tag.Tag;
+import com.example.go4lunch.ui.detailrestaurant.DetailRestaurantActivity;
 import com.example.go4lunch.viewmodel.MainViewModel;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -35,6 +39,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -54,7 +59,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MapFragment extends Fragment implements OnMapReadyCallback {
+public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     //todo : MAP : click sur une position doit ouvrir le détail du restaurant
     private static final String TAG = Tag.TAG;
@@ -158,21 +163,58 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
+    private void openDetailRestaurantActivity(String placeId){
+        Intent intent = new Intent(getContext(), DetailRestaurantActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("placeid", placeId);
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        String placeId = (String) marker.getTag();
+        openDetailRestaurantActivity(placeId);
+        return false;
+    }
+
+    public static Bitmap drawableToBitmap (Drawable drawable) {
+        Bitmap bitmap = null;
+
+        if (drawable instanceof BitmapDrawable) {
+            BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
+            if(bitmapDrawable.getBitmap() != null) {
+                return bitmapDrawable.getBitmap();
+            }
+        }
+
+        if(drawable.getIntrinsicWidth() <= 0 || drawable.getIntrinsicHeight() <= 0) {
+            bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888); // Single color bitmap will be created of 1x1 pixel
+        } else {
+            bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        }
+
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+        return bitmap;
+    }
+
     public void setRestaurants(List<Restaurant> restaurants){
         Log.d(TAG, "MapFragment.setRestaurants() called with: mMap = [" + mMap + "]. restaurants = [" + restaurants + "]");
         this.restaurants = restaurants;
         if(mMap!=null) {
             progressBar.setVisibility(View.VISIBLE);
+            Bitmap bitmap = drawableToBitmap(getResources().getDrawable(R.drawable.ic_baseline_restaurant_24_primary_color, getContext().getTheme()));
             for (Restaurant restaurant : restaurants){
-//                Drawable drawable = getResources().getDrawable(R.drawable.ic_baseline_restaurant_24);
-//                BitmapDescriptor icon = getMarkerIconFromDrawable(drawable);
-
                 LatLng latlng = new LatLng(restaurant.getLatitude(), restaurant.getLongitude());
-                mMap.addMarker(new MarkerOptions()
+                Marker marker = mMap.addMarker(new MarkerOptions()
                                 .position(latlng)
                                 .title(restaurant.getName())
-//                        .icon(icon)
+                                .icon(BitmapDescriptorFactory.fromBitmap(bitmap))
                 );
+                marker.setTag(restaurant.getPlaceId());
+                mMap.setOnMarkerClickListener(this::onMarkerClick);
             }
             //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, 14));
             progressBar.setVisibility(View.INVISIBLE);
