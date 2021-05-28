@@ -34,7 +34,7 @@ public class ChoosenHelper {
      * Selected collection
      * @return
      */
-    private static CollectionReference getChoosenCollection() {
+    public static CollectionReference getChoosenCollection() {
         return FirebaseFirestore.getInstance().collection(COLLECTION_NAME_CHOSEN);
     }
 

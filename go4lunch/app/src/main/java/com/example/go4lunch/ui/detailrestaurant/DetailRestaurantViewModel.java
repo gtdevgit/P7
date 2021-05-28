@@ -3,6 +3,7 @@ package com.example.go4lunch.ui.detailrestaurant;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -24,6 +25,11 @@ import com.example.go4lunch.tag.Tag;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.gson.JsonObject;
 
 import org.jetbrains.annotations.NotNull;
@@ -45,6 +51,8 @@ public class DetailRestaurantViewModel extends ViewModel {
     private final MutableLiveData<Boolean> likedMutableLiveData = new MutableLiveData<Boolean>();
     private final MutableLiveData<Boolean> choosenMutableLiveData = new MutableLiveData<Boolean>();
     private final MutableLiveData<List<User>> workmatesMutableLiveData = new MutableLiveData<>();
+
+    private ListenerRegistration registrationUsers;
 
     private final ChoosenHelperListener choosenHelperListener;
     private final UserHelperListener userHelperListener;
@@ -113,12 +121,12 @@ public class DetailRestaurantViewModel extends ViewModel {
 
     /**
      * transforms one List<UserRestaurantAssociation> to one List<String> containing each uid
-     * @param userRestaurantAssociationList
+     * @param userRestaurantAssociations
      * @return
      */
-    private List<String> userRestaurantAssociationListToUidList(List<UserRestaurantAssociation> userRestaurantAssociationList){
+    private List<String> userRestaurantAssociationListToUidList(List<UserRestaurantAssociation> userRestaurantAssociations){
         List<String> uidList = new ArrayList<>();
-        for (UserRestaurantAssociation userRestaurantAssociation : userRestaurantAssociationList) {
+        for (UserRestaurantAssociation userRestaurantAssociation : userRestaurantAssociations) {
             uidList.add(userRestaurantAssociation.getUserUid());
         }
         return uidList;
@@ -259,8 +267,41 @@ public class DetailRestaurantViewModel extends ViewModel {
         ChoosenHelper.deleteChoosenRestaurant(uid, placeId, this.choosenHelperListener);
     }
 
-    public void loadWorkmates(String placeId){
+    public void loadWorkmatesByPlace(String placeId){
         ChoosenHelper.getUsersWhoChoseThisRestaurant(placeId, this.choosenHelperListener);
     }
+
+    public void activateWormatesByPlaceListener(String placeId){
+        Log.d(Tag.TAG, "DetailRestaurantViewModel.activateUsersListener() called");
+        registrationUsers = ChoosenHelper.getChoosenCollection()
+            .whereEqualTo("placeId", placeId)
+            .addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value,
+                                @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
+                if (error != null){
+                    errorMutableLiveData.postValue(error.getMessage());
+                    return;
+                }
+
+                List<UserRestaurantAssociation> userRestaurantAssociations = new ArrayList<>();
+                for (QueryDocumentSnapshot document : value) {
+                    if (document.exists()) {
+                        UserRestaurantAssociation userRestaurantAssociation = document.toObject(UserRestaurantAssociation.class);
+                        userRestaurantAssociations.add(userRestaurantAssociation);
+                    }
+                }
+                List<String> uidList = userRestaurantAssociationListToUidList(userRestaurantAssociations);
+                UserHelper.getUsersByList(uidList, userHelperListener);
+            }
+        });
+    };
+
+    public void removeWormatesByPlaceListener(){
+        if (registrationUsers != null) {
+            Log.d(Tag.TAG, "DetailRestaurantViewModel.removeUsersListener() called");
+            registrationUsers.remove();
+        }
+    };
 
 }

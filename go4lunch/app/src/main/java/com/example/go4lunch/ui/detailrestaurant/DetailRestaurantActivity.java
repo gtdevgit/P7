@@ -166,7 +166,7 @@ public class DetailRestaurantActivity extends AppCompatActivity {
                 setWorkmates(users);
             }
         });
-        this.detailRestaurantViewModel.loadWorkmates(this.placeId);
+        this.detailRestaurantViewModel.loadWorkmatesByPlace(this.placeId);
 
 
     }
@@ -239,7 +239,7 @@ public class DetailRestaurantActivity extends AppCompatActivity {
         } else {
             this.detailRestaurantViewModel.choose(this.uid, this.placeId);
         }
-        this.detailRestaurantViewModel.loadWorkmates(this.placeId);
+        this.detailRestaurantViewModel.loadWorkmatesByPlace(this.placeId);
     }
 
     // state choosen and UI update
@@ -276,12 +276,14 @@ public class DetailRestaurantActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        detailRestaurantViewModel.activateWormatesByPlaceListener(this.placeId);
         Log.d(TAG, "DetailRestaurantActivity.onResume() called");
     }
 
     @Override
     protected void onPause() {
         Log.d(TAG, "DetailRestaurantActivity.onPause() called");
+        detailRestaurantViewModel.removeWormatesByPlaceListener();
         super.onPause();
     }
 
