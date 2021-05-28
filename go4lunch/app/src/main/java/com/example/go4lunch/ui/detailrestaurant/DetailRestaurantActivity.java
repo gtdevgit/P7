@@ -113,11 +113,17 @@ public class DetailRestaurantActivity extends AppCompatActivity {
                 textViewName.setText(detailRestaurant.getName());
                 textViewInfo.setText(detailRestaurant.getInfo());
 
-                if (detailRestaurant.getUrlPicture() != null) {
+                if (detailRestaurant.getUrlPicture() == null) {
+                    Glide.with(imageView.getContext())
+                            .load(R.drawable.image_floue)
+                            .apply(RequestOptions.fitCenterTransform())
+                            .into(imageView);
+                } else {
                     Glide.with(imageView.getContext())
                             .load(detailRestaurant.getUrlPicture())
                             .apply(RequestOptions.fitCenterTransform())
                             .into(imageView);
+
                 }
                 setPhoneNumber(detailRestaurant.getPhoneNumber());
                 setWebsite(detailRestaurant.getWebsite());
