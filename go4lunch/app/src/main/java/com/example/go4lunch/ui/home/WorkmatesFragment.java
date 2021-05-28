@@ -63,7 +63,7 @@ public class WorkmatesFragment extends Fragment {
                 DividerItemDecoration.VERTICAL);
         recyclerView.addItemDecoration(dividerItemDecoration);
 
-        workmatesViewModel.getWorkmates().observe(getViewLifecycleOwner(), new Observer<List<User>>() {
+        workmatesViewModel.getWorkmatesLiveData().observe(getViewLifecycleOwner(), new Observer<List<User>>() {
             @Override
             public void onChanged(List<User> users) {
                 Log.d(TAG, "WorkmatesFragment: onChanged() called with: users = [" + users + "]");
@@ -79,7 +79,22 @@ public class WorkmatesFragment extends Fragment {
         workmateProgressBar = root.findViewById(R.id.fragment_workmates_progress_bar);
         workmateProgressBar.setVisibility(View.VISIBLE);
 
-        workmatesViewModel.loadData();
+        workmatesViewModel.loadUsers();
         return root;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        workmatesViewModel.activateUsersListener();
+        Log.d(TAG, "WorkmatesFragment.onResume() called");
+
+    }
+
+    @Override
+    public void onPause() {
+        Log.d(TAG, "WorkmatesFragment.onPause() called");
+        workmatesViewModel.removeUsersListener();
+        super.onPause();
     }
 }

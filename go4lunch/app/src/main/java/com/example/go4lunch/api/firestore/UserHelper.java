@@ -3,6 +3,7 @@ package com.example.go4lunch.api.firestore;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.example.go4lunch.models.User;
 import com.example.go4lunch.tag.Tag;
@@ -10,8 +11,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -42,17 +46,22 @@ public class UserHelper {
                     public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()){
                             DocumentSnapshot documentSnapshot = task.getResult();
-                            User user = documentSnapshot.toObject(User.class);
-                            userHelperListener.onGetUser(user);
+                            if (documentSnapshot.exists()) {
+                                User user = documentSnapshot.toObject(User.class);
+                                userHelperListener.onGetUser(user);
+                            } else
+                            {
+                                userHelperListener.onErrorMessage("No such user document");
+                            }
                         } else {
-                            userHelperListener.onFailure(task.getException());
+                            userHelperListener.onErrorMessage(task.getException().getMessage());
                         }
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull @NotNull Exception e) {
-                        userHelperListener.onFailure(e);
+                        userHelperListener.onErrorMessage(e.getMessage());
                     }
                 });
     }
@@ -69,7 +78,6 @@ public class UserHelper {
                         public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
                             if (task.isSuccessful()){
                                 for (QueryDocumentSnapshot document : task.getResult()) {
-
                                     User user = document.toObject(User.class);
                                     Log.d(TAG, "UserHelper.getUsersByList() user = " + user.getUserEmail());
                                     users.add(user);
@@ -77,14 +85,14 @@ public class UserHelper {
                                 Log.d(TAG, "WorkmatesViewModel.getWorkmates().onComplete(). userList.size = " + users.size());
                                 userHelperListener.onGetUsersByList(users);
                             } else {
-                                userHelperListener.onFailure(task.getException());
+                                userHelperListener.onErrorMessage(task.getException().getMessage());
                             }
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                             public void onFailure(@NonNull @NotNull Exception e) {
-                                userHelperListener.onFailure(e);
+                                userHelperListener.onErrorMessage(e.getMessage());
                             }
                     });
         } else {
@@ -106,6 +114,30 @@ public class UserHelper {
 
     public static Task<QuerySnapshot> getUsers() {
         return UserHelper.getUsersCollection().get();
+    }
+
+    public static void test(){
+
+        CollectionReference colRef = UserHelper.getUsersCollection();
+        colRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
+                if (error != null){
+                    Log.e(TAG, "onEvent: " + error.getMessage() );
+                    return;
+                }
+                List<User> users = new ArrayList<>();
+                for (QueryDocumentSnapshot document : value) {
+                    if (document.exists()) {
+                        User user = document.toObject(User.class);
+                        users.add(user);
+                    }
+                }
+
+            }
+        });
+
+
     }
 
 }

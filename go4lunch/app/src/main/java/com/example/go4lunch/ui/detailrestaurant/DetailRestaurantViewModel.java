@@ -64,8 +64,8 @@ public class DetailRestaurantViewModel extends ViewModel {
             }
 
             @Override
-            public void onFailure(Exception e) {
-                errorMutableLiveData.postValue(e.getMessage());
+            public void onErrorMessage(String message) {
+                errorMutableLiveData.postValue(message);
             }
         };
 

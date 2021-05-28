@@ -3,6 +3,8 @@ package com.example.go4lunch.ui.home;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -13,6 +15,10 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -21,23 +27,23 @@ import java.util.List;
 
 public class WorkmatesViewModel extends ViewModel {
     private static final String TAG = Tag.TAG;
-    private MutableLiveData<List<User>> workmates;
+    private static final MutableLiveData<String> errorMutableLiveData = new MutableLiveData<String>();
+    private static final MutableLiveData<List<User>> workmatesMutableLiveData = new MutableLiveData<>();
+    private static ListenerRegistration registrationUsers;
 
     public WorkmatesViewModel() {
-        this.workmates = new MutableLiveData<List<User>>();
     }
 
-    public MutableLiveData<List<User>> getWorkmates() {
-        loadUsers();
-        return workmates;
+    public LiveData<List<User>> getWorkmatesLiveData() {
+        return workmatesMutableLiveData;
     }
 
-    public void loadData(){
-        loadUsers();
+    public LiveData<String> getErrorLiveData(){
+        return this.errorMutableLiveData;
     }
 
-    private void loadUsers(){
-        List<User> userList = new ArrayList<>();
+    public void loadUsers(){
+        List<User> users = new ArrayList<>();
         UserHelper.getUsers()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -47,10 +53,10 @@ public class WorkmatesViewModel extends ViewModel {
                             Log.d(TAG, "WorkmatesViewModel.getWorkmates().onComplete(). isSuccesful called with: task = [" + task + "]");
                             for (QueryDocumentSnapshot user : task.getResult()) {
                                 //Log.d(TAG, "" + user);
-                                userList.add(user.toObject(User.class));
+                                users.add(user.toObject(User.class));
                             }
-                            Log.d(TAG, "WorkmatesViewModel.getWorkmates().onComplete(). userList.size = " + userList.size());
-                            workmates.postValue(userList);
+                            Log.d(TAG, "WorkmatesViewModel.getWorkmates().onComplete(). users.size = " + users.size());
+                            workmatesMutableLiveData.postValue(users);
                         } else {
                             Log.d(TAG, "WorkmatesViewModel.getWorkmates().onComplete(). Error getting users list: ", task.getException());
                         }
@@ -68,5 +74,34 @@ public class WorkmatesViewModel extends ViewModel {
                         Log.d(TAG, "WorkmatesViewModel.getWorkmates().onSuccess() called with: queryDocumentSnapshots = [" + queryDocumentSnapshots + "]");
                     }
                 });
+    }
+
+    public static void activateUsersListener(){
+        Log.d(TAG, "activateUsersListener() called");
+        registrationUsers = UserHelper.getUsersCollection().addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
+                if (error != null){
+                    errorMutableLiveData.postValue(error.getMessage());
+                    return;
+                }
+
+                List<User> users = new ArrayList<>();
+                for (QueryDocumentSnapshot document : value) {
+                    if (document.exists()) {
+                        User user = document.toObject(User.class);
+                        users.add(user);
+                    }
+                }
+                workmatesMutableLiveData.postValue(users);
+            }
+        });
+    }
+
+    public static void removeUsersListener(){
+        if (registrationUsers != null) {
+            Log.d(TAG, "removeUsersListener() called");
+            registrationUsers.remove();
+        }
     }
 }

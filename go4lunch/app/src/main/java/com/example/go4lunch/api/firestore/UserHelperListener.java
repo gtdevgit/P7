@@ -7,5 +7,5 @@ import java.util.List;
 public interface UserHelperListener {
     public void onGetUser(User user);
     public void onGetUsersByList(List<User> users);
-    public void onFailure(Exception e);
+    public void onErrorMessage(String message);
 }
