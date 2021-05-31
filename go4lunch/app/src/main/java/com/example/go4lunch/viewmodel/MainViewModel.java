@@ -7,8 +7,11 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.go4lunch.api.firestore.ChoosenHelper;
+import com.example.go4lunch.api.firestore.ChoosenHelperListener;
 import com.example.go4lunch.models.Autocomplete;
 import com.example.go4lunch.models.Restaurant;
+import com.example.go4lunch.models.UserRestaurantAssociation;
 import com.example.go4lunch.models.googleplaces.placesearch.Result;
 import com.example.go4lunch.models.googleplaces.placesearch.PlaceSearch;
 import com.example.go4lunch.repository.GooglePlacesApiRepository;
@@ -24,7 +27,7 @@ public class MainViewModel extends ViewModel {
 
     private static final String TAG = "go4lunchdebug";
 
-    List<Restaurant> restaurantsCache;
+    LoadRestaurantListener loadRestaurantListener;
 
     /**
      * GooglePlacesApiRepository
@@ -38,7 +41,13 @@ public class MainViewModel extends ViewModel {
     public MainViewModel(GooglePlacesApiRepository googlePlacesApiRepository) {
         Log.d(TAG, "MainViewModel() called with: googlePlacesApiRepository = [" + googlePlacesApiRepository + "]");
         this.googlePlacesApiRepository = googlePlacesApiRepository;
-        restaurantsCache = new ArrayList<Restaurant>();
+
+        loadRestaurantListener = new LoadRestaurantListener() {
+            @Override
+            public void onLoadCompleted(List<Restaurant> restaurants) {
+                restaurantsMutableLiveData.postValue(restaurants);
+            }
+        };
     }
 
     /**
@@ -70,20 +79,14 @@ public class MainViewModel extends ViewModel {
     }
 
     /**
-     * setLocation notify the view model that the location has changed
+     * setLocation notify the view model that the GPS location has changed
      * @param location
      */
     public void setLocation(Location location){
         Log.d(TAG, "MainViewModel.setLocation() called with: location = [" + location + "]");
         this.locationMutableLiveData.postValue(location);
+        // reload restaurants
         this.loadRestaurantAround(location);
-    }
-
-    /**
-     * this data is kept in cache
-     */
-    public List<Restaurant> getRestaurantsCache() {
-        return restaurantsCache;
     }
 
     /**
@@ -162,27 +165,42 @@ public class MainViewModel extends ViewModel {
                         float distance = calculateDistance(latitude, longitude, location);
                         String info = findAddress(result.getFormattedAddress(), result.getVicinity());
                         String hours = "";
-                        String workmates = "";
                         double rating = result.getRating();
                         String urlPicture = findUrlPicture(result);
 
-                        Restaurant restaurant = new Restaurant(result.getPlaceId(),
-                                name,
-                                latitude,
-                                longitude,
-                                distance,
-                                info,
-                                hours,
-                                workmates,
-                                rating,
-                                urlPicture);
-                        restaurants.add(restaurant);
+                        // todo : get in frirestore the wormates who have chosen this restaurant.
+                        String workmates = "";
+
+                        ChoosenHelper.getUsersWhoChoseThisRestaurant(result.getPlaceId(), new ChoosenHelperListener() {
+                            @Override
+                            public void onGetChoosen(boolean isChoosen) {
+
+                            }
+
+                            @Override
+                            public void onFailure(Exception e) {
+
+                            }
+
+                            @Override
+                            public void onGetUsersWhoChoseThisRestaurant(List<UserRestaurantAssociation> userRestaurantAssociationList) {
+                                // create an add restaurant where count workmates is completed
+                                int workmatesCount = userRestaurantAssociationList.size();
+                                Restaurant restaurant = new Restaurant(result.getPlaceId(),
+                                        name,
+                                        latitude,
+                                        longitude,
+                                        distance,
+                                        info,
+                                        hours,
+                                        workmatesCount,
+                                        rating,
+                                        urlPicture);
+                                restaurants.add(restaurant);
+                            }
+                        });
                     }
-                    // Memorize last restaurants
-                    restaurantsCache.clear();
-                    restaurantsCache.addAll(restaurants);
-                    // live data
-                    restaurantsMutableLiveData.postValue(restaurants);
+                    loadRestaurantListener.onLoadCompleted(restaurants);
                 } else {
                     Log.d(TAG, "MainViewModel.loadRestaurantAround.onResponse() isSuccessful=false");
                 }
@@ -195,5 +213,13 @@ public class MainViewModel extends ViewModel {
             }
         });
 
+    }
+
+    /**
+     * /////////////////////// interface ///////////////////////
+     * callback loadRestaurants
+     */
+    private interface LoadRestaurantListener{
+        public void onLoadCompleted(List<Restaurant> restaurants);
     }
 }

@@ -42,10 +42,8 @@ import java.util.List;
 
 public class DetailRestaurantActivity extends AppCompatActivity {
 
-    // todo : Detail d'un restaurant gérer le like => data ok, manque retour visuel
-    // todo : Detail d'un restaurant gérer la selection du restaurant
-    // todo : Detail d'un restaurant charger la liste des workmates.
     // todo : Detail d'un restaurant ajouter toutes les photo. => optionel
+    // todo : Detail d'un restaurant. Remplacer le bottom navigation par 3 images
 
     private static final String TAG = Tag.TAG;
     private String uid;

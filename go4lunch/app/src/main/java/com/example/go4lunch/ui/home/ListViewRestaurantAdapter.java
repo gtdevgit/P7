@@ -50,7 +50,7 @@ public class ListViewRestaurantAdapter extends RecyclerView.Adapter<ListViewRest
         holder.textViewRestaurantInfo.setText(restaurant.getInfo());
         holder.textViewRestaurantHours.setText(restaurant.getHours());
         holder.textViewRestaurantDistance.setText(restaurant.getFormatedDistance());
-        holder.textViewRestaurantWorkmate.setText("(" + restaurant.getWorkmate() + ")");
+        holder.textViewRestaurantWorkmate.setText(String.format("(%d)",  restaurant.getWorkmatesCount()));
 
         /*
         //todo : liste des restaurants : charger les étoiles

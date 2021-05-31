@@ -36,7 +36,11 @@ import java.util.Observer;
 public class MainActivity extends AppCompatActivity {
     // todo : Main : supprimer l'ancienne activité de setting
     // todo : Main : gérer les notifications
-    // todo : Main vérifier les permisions internet + call
+    // todo : Main gérer les recherches
+    // todo : Test unitaires
+    // todo : test intrumentalisés
+    // todo : réorganiser un peu l'architecture. centraliser les view model / créer un factory + injection
+    // Todo : optionnel : MAP : Tracer le chemin vers le restaurant choisi.
 
     private static final String TAG = "MainActivity";
 
