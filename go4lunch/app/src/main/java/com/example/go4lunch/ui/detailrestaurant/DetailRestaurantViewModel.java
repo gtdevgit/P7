@@ -96,6 +96,11 @@ public class DetailRestaurantViewModel extends ViewModel {
 
                 UserHelper.getUsersByList(uidList, userHelperListener);
             }
+
+            @Override
+            public void onGetChoosenRestaurants(List<UserRestaurantAssociation> userRestaurantAssociations) {
+
+            }
         };
     }
 

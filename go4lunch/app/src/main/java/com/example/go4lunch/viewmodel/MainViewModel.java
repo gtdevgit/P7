@@ -3,18 +3,32 @@ package com.example.go4lunch.viewmodel;
 import android.location.Location;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.go4lunch.api.firestore.ChoosenHelper;
 import com.example.go4lunch.api.firestore.ChoosenHelperListener;
+import com.example.go4lunch.api.firestore.UserHelper;
 import com.example.go4lunch.models.Autocomplete;
 import com.example.go4lunch.models.Restaurant;
+import com.example.go4lunch.models.User;
 import com.example.go4lunch.models.UserRestaurantAssociation;
 import com.example.go4lunch.models.googleplaces.placesearch.Result;
 import com.example.go4lunch.models.googleplaces.placesearch.PlaceSearch;
 import com.example.go4lunch.repository.GooglePlacesApiRepository;
+import com.example.go4lunch.tag.Tag;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +41,17 @@ public class MainViewModel extends ViewModel {
 
     private static final String TAG = "go4lunchdebug";
 
-    LoadRestaurantListener loadRestaurantListener;
+    /**
+     * /////////////////////// nested interface ///////////////////////
+     * callback loadRestaurants
+     */
+    private interface LoadRestaurantListener{
+        void onLoadCompleted(List<Restaurant> restaurants);
+    }
+
+    private LoadRestaurantListener loadRestaurantListener;
+
+    private ListenerRegistration registrationChoosenRestaurant;
 
     /**
      * GooglePlacesApiRepository
@@ -140,52 +164,68 @@ public class MainViewModel extends ViewModel {
         return url;
     }
 
+
+
+    /**
+     * count workmates who chose placeId
+      * @param placeId
+     * @param userRestaurantAssociations
+     * @return
+     */
+    private int countWorkmates(String placeId, List<UserRestaurantAssociation> userRestaurantAssociations){
+        int result = 0;
+        for (UserRestaurantAssociation userRestaurantAssociation : userRestaurantAssociations){
+            if (userRestaurantAssociation.getPlaceId().equals(placeId)) {
+                result++;
+            }
+        }
+        return result;
+    }
+
     /**
      * loadRestaurantAround
      * @param location
      */
     private void loadRestaurantAround(Location location){
         Log.d(TAG, "MainViewModel.loadRestaurantAround() called with: location = [" + location + "]");
-        Log.d(TAG, "MainViewModel.loadRestaurantAround() called with: googlePlacesApiRepository = [" + googlePlacesApiRepository + "]");
-        //Call<Textsearch> call = googlePlacesApiRepository.getTextsearch("restaurant", location);
-        Call<PlaceSearch> call = googlePlacesApiRepository.getNearbysearch(location);
-        call.enqueue(new Callback<PlaceSearch>() {
+        ChoosenHelperListener choosenHelperListener = new ChoosenHelperListener() {
             @Override
-            public void onResponse(Call<PlaceSearch> call, Response<PlaceSearch> response) {
-                Log.d(TAG, "MainViewModel.loadRestaurantAround.onResponse() called with: call = [" + call + "], response = [" + response + "]");
-                if (response.isSuccessful()){
-                    Log.d(TAG, "MainViewModel.loadRestaurantAround.onResponse() isSuccessful=true");
-                    PlaceSearch placeSearch = response.body();
-                    List<Result> lstResult = placeSearch.getResults();
-                    List<Restaurant> restaurants = new ArrayList<Restaurant>();
-                    for (Result result : lstResult) {
-                        String name = result.getName();
-                        double latitude = result.getGeometry().getLocation().getLat();
-                        double longitude = result.getGeometry().getLocation().getLng();
-                        float distance = calculateDistance(latitude, longitude, location);
-                        String info = findAddress(result.getFormattedAddress(), result.getVicinity());
-                        String hours = "";
-                        double rating = result.getRating();
-                        String urlPicture = findUrlPicture(result);
+            public void onGetChoosen(boolean isChoosen) {
 
-                        // todo : get in frirestore the wormates who have chosen this restaurant.
-                        String workmates = "";
+            }
 
-                        ChoosenHelper.getUsersWhoChoseThisRestaurant(result.getPlaceId(), new ChoosenHelperListener() {
-                            @Override
-                            public void onGetChoosen(boolean isChoosen) {
+            @Override
+            public void onFailure(Exception e) {
 
-                            }
+            }
 
-                            @Override
-                            public void onFailure(Exception e) {
+            @Override
+            public void onGetUsersWhoChoseThisRestaurant(List<UserRestaurantAssociation> userRestaurantAssociationList) {
 
-                            }
+            }
 
-                            @Override
-                            public void onGetUsersWhoChoseThisRestaurant(List<UserRestaurantAssociation> userRestaurantAssociationList) {
-                                // create an add restaurant where count workmates is completed
-                                int workmatesCount = userRestaurantAssociationList.size();
+            @Override
+            public void onGetChoosenRestaurants(List<UserRestaurantAssociation> userRestaurantAssociations) {
+                Call<PlaceSearch> call = googlePlacesApiRepository.getNearbysearch(location);
+                call.enqueue(new Callback<PlaceSearch>() {
+                    @Override
+                    public void onResponse(Call<PlaceSearch> call, Response<PlaceSearch> response) {
+                        Log.d(TAG, "MainViewModel.loadRestaurantAround.onResponse() called with: call = [" + call + "], response = [" + response + "]");
+                        if (response.isSuccessful()) {
+                            Log.d(TAG, "MainViewModel.loadRestaurantAround.onResponse() isSuccessful=true");
+                            PlaceSearch placeSearch = response.body();
+                            List<Result> lstResult = placeSearch.getResults();
+                            List<Restaurant> restaurants = new ArrayList<Restaurant>();
+                            for (Result result : lstResult) {
+                                String name = result.getName();
+                                double latitude = result.getGeometry().getLocation().getLat();
+                                double longitude = result.getGeometry().getLocation().getLng();
+                                float distance = calculateDistance(latitude, longitude, location);
+                                String info = findAddress(result.getFormattedAddress(), result.getVicinity());
+                                String hours = "";
+                                double rating = result.getRating();
+                                String urlPicture = findUrlPicture(result);
+                                int workmates = countWorkmates(result.getPlaceId(), userRestaurantAssociations);
                                 Restaurant restaurant = new Restaurant(result.getPlaceId(),
                                         name,
                                         latitude,
@@ -193,33 +233,54 @@ public class MainViewModel extends ViewModel {
                                         distance,
                                         info,
                                         hours,
-                                        workmatesCount,
+                                        workmates,
                                         rating,
                                         urlPicture);
                                 restaurants.add(restaurant);
                             }
-                        });
+                            restaurantsMutableLiveData.postValue(restaurants);
+
+                        } else {
+                            Log.d(TAG, "MainViewModel.loadRestaurantAround.onResponse() isSuccessful=false");
+                        }
                     }
-                    loadRestaurantListener.onLoadCompleted(restaurants);
-                } else {
-                    Log.d(TAG, "MainViewModel.loadRestaurantAround.onResponse() isSuccessful=false");
-                }
-            }
 
-            @Override
-            public void onFailure(Call<PlaceSearch> call, Throwable t) {
-                Log.d(TAG, "MainViewModel.loadRestaurantAround.onFailure() " + t.getMessage());
-                errorMutableLiveData.postValue(t.getMessage());
+                    @Override
+                    public void onFailure(Call<PlaceSearch> call, Throwable t) {
+                        Log.d(TAG, "MainViewModel.loadRestaurantAround.onFailure() " + t.getMessage());
+                        errorMutableLiveData.postValue(t.getMessage());
+                    }
+                });
             }
-        });
-
+        };
+        // get choosen collection before.
+        // restaurants detail is getting in callback onGetChoosenRestaurants
+        ChoosenHelper.getChoosenRestaurants(choosenHelperListener);
     }
+
 
     /**
-     * /////////////////////// interface ///////////////////////
-     * callback loadRestaurants
+     * to get real time change workmates count by restaurant
      */
-    private interface LoadRestaurantListener{
-        public void onLoadCompleted(List<Restaurant> restaurants);
+    public void activateChoosenRestaurantListener(){
+        Log.d(Tag.TAG, "WorkmatesViewModel.activateUsersListener() called");
+        registrationChoosenRestaurant = ChoosenHelper.getChoosenCollection().addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
+                if (error != null){
+                    errorMutableLiveData.postValue(error.getMessage());
+                    return;
+                }
+                loadRestaurantAround(getLocationLiveData().getValue());
+            }
+        });
     }
+
+    public void removerChoosenRestaurantListener(){
+        if (registrationChoosenRestaurant != null) {
+            Log.d(Tag.TAG, "WorkmatesViewModel.removeUsersListener() called");
+            registrationChoosenRestaurant.remove();
+        }
+    }
+
 }

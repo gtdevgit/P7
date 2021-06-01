@@ -8,4 +8,5 @@ public interface ChoosenHelperListener {
     public void onGetChoosen(boolean isChoosen);
     public void onFailure(Exception e);
     public void onGetUsersWhoChoseThisRestaurant(List<UserRestaurantAssociation> userRestaurantAssociationList);
+    public void onGetChoosenRestaurants(List<UserRestaurantAssociation> userRestaurantAssociations);
 }

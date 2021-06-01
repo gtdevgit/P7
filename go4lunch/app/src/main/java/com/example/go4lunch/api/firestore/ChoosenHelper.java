@@ -143,4 +143,31 @@ public class ChoosenHelper {
                     }
                 });
     }
+
+    public static void getChoosenRestaurants(ChoosenHelperListener choosenHelperListener) {
+        List<UserRestaurantAssociation> userRestaurantAssociationList = new ArrayList<>();
+        Log.d(TAG, "getChoosenRestaurants: ");
+        getChoosenCollection()
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()){
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                UserRestaurantAssociation userRestaurantAssociation = document.toObject(UserRestaurantAssociation.class);
+                                userRestaurantAssociationList.add(document.toObject(UserRestaurantAssociation.class));
+                            }
+                            choosenHelperListener.onGetChoosenRestaurants(userRestaurantAssociationList);
+                        } else {
+                            choosenHelperListener.onFailure(task.getException());
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull @NotNull Exception e) {
+                        choosenHelperListener.onFailure(e);
+                    }
+                });
+    }
 }

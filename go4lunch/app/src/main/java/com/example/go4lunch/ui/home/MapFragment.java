@@ -147,7 +147,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         Log.d(TAG, "MapFragment.setLocation() called with: mMap = [" + mMap + "]. location = [" + location + "]");
         progressBar.setVisibility(View.VISIBLE);
         this.location = location;
-        Log.d(TAG, "MapFragment.setLocation() called with: mMap = [" + mMap + "]");
         if(mMap!=null) {
             progressBar.setVisibility(View.INVISIBLE);
             LatLng latlng = new LatLng(location.getLatitude(), location.getLongitude());

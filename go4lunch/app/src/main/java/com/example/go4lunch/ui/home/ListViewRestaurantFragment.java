@@ -72,21 +72,6 @@ public class ListViewRestaurantFragment extends Fragment {
                 DividerItemDecoration.VERTICAL);
         recyclerView.addItemDecoration(dividerItemDecoration);
 
-        this.mainViewModel.getLocationLiveData().observe(getViewLifecycleOwner(), new Observer<Location>() {
-            @Override
-            public void onChanged(Location location) {
-                Log.d(TAG, "MapFragment.onChanged(location) called with: location = [" + location + "]");
-                setLocation(location);
-            }
-        });
-
-        mainViewModel.getRestaurantsLiveData().observe(getViewLifecycleOwner(), new Observer<List<Restaurant>>() {
-            @Override
-            public void onChanged(List<Restaurant> restaurants) {
-                Log.d(TAG, "ListViewRestaurantFragment.onCreateView.getRestaurantsLiveData.onChanged() called with: restaurants = [" + restaurants + "]");
-                setRestaurants(restaurants);
-            }
-        });
         return root;
     }
 
@@ -123,17 +108,37 @@ public class ListViewRestaurantFragment extends Fragment {
     public void onStart() {
         super.onStart();
         Log.d(TAG, "ListViewRestaurantFragment.onStart() called");
+        mainViewModel.getLocationLiveData().observe(getViewLifecycleOwner(), new Observer<Location>() {
+            @Override
+            public void onChanged(Location location) {
+                Log.d(TAG, "ListViewRestaurantFragment: getLocationLiveData.onChanged(location) called with: location = [" + location + "]");
+                setLocation(location);
+            }
+        });
+
+        mainViewModel.getRestaurantsLiveData().observe(getViewLifecycleOwner(), new Observer<List<Restaurant>>() {
+            @Override
+            public void onChanged(List<Restaurant> restaurants) {
+                Log.d(TAG, "ListViewRestaurantFragment: getRestaurantsLiveData.onChanged() called with: restaurants = [" + restaurants + "]");
+                setRestaurants(restaurants);
+            }
+        });
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        // blanck screen !
+        this.mainViewModel.activateChoosenRestaurantListener();
+
         Log.d(TAG, "ListViewRestaurantFragment.onResume() called");
     }
 
     @Override
     public void onPause() {
         Log.d(TAG, "ListViewRestaurantFragment.onPause() called");
+        this.mainViewModel.removerChoosenRestaurantListener();
         super.onPause();
     }
 
