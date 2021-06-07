@@ -14,7 +14,7 @@ import com.example.go4lunch.api.firestore.FailureListener;
 import com.example.go4lunch.api.firestore.LikeHelper;
 import com.example.go4lunch.api.firestore.LikeHelperListener;
 import com.example.go4lunch.api.firestore.UserHelper;
-import com.example.go4lunch.api.firestore.UserHelperListener;
+import com.example.go4lunch.api.firestore.UserListListener;
 import com.example.go4lunch.api.firestore.UserRestaurantAssociationListListener;
 import com.example.go4lunch.models.DetailRestaurant;
 import com.example.go4lunch.models.User;
@@ -59,27 +59,10 @@ public class DetailRestaurantViewModel extends ViewModel {
     private final ChoosenListener choosenListener;
     private final FailureListener failureListener;
     private final UserRestaurantAssociationListListener userRestaurantAssociationListListener;
-    private final UserHelperListener userHelperListener;
+    private final UserListListener userListListener;
 
     public DetailRestaurantViewModel(GooglePlacesApiRepository googlePlacesApiRepository) {
         this.googlePlacesApiRepository = googlePlacesApiRepository;
-        // listener for user
-        this.userHelperListener = new UserHelperListener() {
-            @Override
-            public void onGetUser(User user) {
-
-            }
-
-            @Override
-            public void onGetUsersByList(List<User> users) {
-                workmatesMutableLiveData.postValue(users);
-            }
-
-            @Override
-            public void onErrorMessage(String message) {
-                errorMutableLiveData.postValue(message);
-            }
-        };
 
         this.choosenListener = new ChoosenListener() {
             @Override
@@ -95,13 +78,20 @@ public class DetailRestaurantViewModel extends ViewModel {
             }
         };
 
+        this.userListListener = new UserListListener() {
+            @Override
+            public void onGetUsers(List<User> users) {
+                workmatesMutableLiveData.postValue(users);
+            }
+        };
+
         this.userRestaurantAssociationListListener = new UserRestaurantAssociationListListener() {
             @Override
             public void onGetUserRestaurantAssociationList(List<UserRestaurantAssociation> userRestaurantAssociations) {
                 Log.d(Tag.TAG, "DetailRestaurantViewModel.onGetUsersWhoChoseThisRestaurant() called with: userRestaurantAssociations = [" + userRestaurantAssociations + "]");
                 List<String> uidList = userRestaurantAssociationListToUidList(userRestaurantAssociations);
 
-                UserHelper.getUsersByList(uidList, userHelperListener);
+                UserHelper.getUsersByList(uidList, userListListener, failureListener);
             }
         };
     }
@@ -299,7 +289,7 @@ public class DetailRestaurantViewModel extends ViewModel {
                     }
                 }
                 List<String> uidList = userRestaurantAssociationListToUidList(userRestaurantAssociations);
-                UserHelper.getUsersByList(uidList, userHelperListener);
+                UserHelper.getUsersByList(uidList, userListListener, failureListener);
             }
         });
     };

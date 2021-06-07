@@ -38,7 +38,7 @@ public class UserHelper {
         return UserHelper.getUsersCollection().document(uid).set(userToCreate);
     }
 
-    public static void getUser(String uid, UserHelperListener userHelperListener){
+    public static void getUser(String uid, UserListener userListener, FailureListener failureListener){
         UserHelper.getUsersCollection().document(uid)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -48,27 +48,24 @@ public class UserHelper {
                             DocumentSnapshot documentSnapshot = task.getResult();
                             if (documentSnapshot.exists()) {
                                 User user = documentSnapshot.toObject(User.class);
-                                userHelperListener.onGetUser(user);
-                            } else
-                            {
-                                userHelperListener.onErrorMessage("No such user document");
+                                userListener.onGetUser(user);
                             }
                         } else {
-                            userHelperListener.onErrorMessage(task.getException().getMessage());
+                            failureListener.onFailure(task.getException());
                         }
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull @NotNull Exception e) {
-                        userHelperListener.onErrorMessage(e.getMessage());
+                        failureListener.onFailure(e);
                     }
                 });
     }
 
-    public static void getUsersByList(List<String> uidList, UserHelperListener userHelperListener){
+    public static void getUsersByList(List<String> uidList, UserListListener userListListener, FailureListener failureListener){
         List<User> users = new ArrayList<>();
-        Log.d(TAG, "UserHelper.getUsersByList() called with: uidList = [" + uidList + "], userHelperListener = [" + userHelperListener + "]");
+        Log.d(TAG, "UserHelper.getUsersByList() called with: uidList.size()=" + uidList.size());
         if ((uidList != null) && (uidList.size() > 0)){
             UserHelper.getUsersCollection()
                     .whereIn("uid", uidList)
@@ -83,20 +80,20 @@ public class UserHelper {
                                     users.add(user);
                                 }
                                 Log.d(TAG, "WorkmatesViewModel.getWorkmates().onComplete(). userList.size = " + users.size());
-                                userHelperListener.onGetUsersByList(users);
+                                userListListener.onGetUsers(users);
                             } else {
-                                userHelperListener.onErrorMessage(task.getException().getMessage());
+                                failureListener.onFailure(task.getException());
                             }
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                             public void onFailure(@NonNull @NotNull Exception e) {
-                                userHelperListener.onErrorMessage(e.getMessage());
+                                failureListener.onFailure(e);
                             }
                     });
         } else {
-            userHelperListener.onGetUsersByList(users);
+            userListListener.onGetUsers(users);
         }
     }
 

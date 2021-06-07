@@ -40,8 +40,6 @@ import retrofit2.Response;
 
 public class MainViewModel extends ViewModel {
 
-    private static final String TAG = "go4lunchdebug";
-
     /**
      * /////////////////////// nested interface ///////////////////////
      * callback loadRestaurants
@@ -64,7 +62,7 @@ public class MainViewModel extends ViewModel {
     private final MutableLiveData<Location> locationMutableLiveData = new MutableLiveData<Location>();
 
     public MainViewModel(GooglePlacesApiRepository googlePlacesApiRepository) {
-        Log.d(TAG, "MainViewModel() called with: googlePlacesApiRepository = [" + googlePlacesApiRepository + "]");
+        Log.d(Tag.TAG, "MainViewModel() called with: googlePlacesApiRepository = [" + googlePlacesApiRepository + "]");
         this.googlePlacesApiRepository = googlePlacesApiRepository;
 
         loadRestaurantListener = new LoadRestaurantListener() {
@@ -108,7 +106,7 @@ public class MainViewModel extends ViewModel {
      * @param location
      */
     public void setLocation(Location location){
-        Log.d(TAG, "MainViewModel.setLocation(location) " + location.getLatitude() + ", " + location.getLongitude());
+        Log.d(Tag.TAG, "MainViewModel.setLocation(location) " + location.getLatitude() + ", " + location.getLongitude());
         this.locationMutableLiveData.postValue(location);
         // reload restaurants
         this.loadRestaurantAround(location);
@@ -165,8 +163,6 @@ public class MainViewModel extends ViewModel {
         return url;
     }
 
-
-
     /**
      * count workmates who chose placeId
       * @param placeId
@@ -188,12 +184,12 @@ public class MainViewModel extends ViewModel {
      * @param location
      */
     private void loadRestaurantAround(Location location){
-        Log.d(TAG, "MainViewModel.loadRestaurantAround() called with: location = [" + location + "]");
+        Log.d(Tag.TAG, "MainViewModel.loadRestaurantAround()");
 
         FailureListener failureListener = new FailureListener() {
             @Override
             public void onFailure(Exception e) {
-                Log.d(TAG, "MainViewModel.loadRestaurantAround.onFailure() " + e.getMessage());
+                Log.d(Tag.TAG, "MainViewModel.loadRestaurantAround.onFailure() " + e.getMessage());
                 errorMutableLiveData.postValue(e.getMessage());
             }
         };
@@ -205,9 +201,8 @@ public class MainViewModel extends ViewModel {
                 call.enqueue(new Callback<PlaceSearch>() {
                     @Override
                     public void onResponse(Call<PlaceSearch> call, Response<PlaceSearch> response) {
-                        Log.d(TAG, "MainViewModel.loadRestaurantAround.onResponse() called with: call = [" + call + "], response = [" + response + "]");
+                        Log.d(Tag.TAG, "MainViewModel.loadRestaurantAround.onResponse() response.isSuccessful=" + response.isSuccessful());
                         if (response.isSuccessful()) {
-                            Log.d(TAG, "MainViewModel.loadRestaurantAround.onResponse() isSuccessful=true");
                             PlaceSearch placeSearch = response.body();
                             List<Result> lstResult = placeSearch.getResults();
                             List<Restaurant> restaurants = new ArrayList<Restaurant>();
@@ -234,15 +229,12 @@ public class MainViewModel extends ViewModel {
                                 restaurants.add(restaurant);
                             }
                             restaurantsMutableLiveData.postValue(restaurants);
-
-                        } else {
-                            Log.d(TAG, "MainViewModel.loadRestaurantAround.onResponse() isSuccessful=false");
                         }
                     }
 
                     @Override
                     public void onFailure(Call<PlaceSearch> call, Throwable t) {
-                        Log.d(TAG, "MainViewModel.loadRestaurantAround.onFailure() " + t.getMessage());
+                        Log.d(Tag.TAG, "MainViewModel.loadRestaurantAround.onFailure() " + t.getMessage());
                         errorMutableLiveData.postValue(t.getMessage());
                     }
                 });
