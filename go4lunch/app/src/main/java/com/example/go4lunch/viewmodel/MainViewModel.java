@@ -10,8 +10,9 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.go4lunch.api.firestore.ChoosenHelper;
-import com.example.go4lunch.api.firestore.ChoosenHelperListener;
+import com.example.go4lunch.api.firestore.FailureListener;
 import com.example.go4lunch.api.firestore.UserHelper;
+import com.example.go4lunch.api.firestore.UserRestaurantAssociationListListener;
 import com.example.go4lunch.models.Autocomplete;
 import com.example.go4lunch.models.Restaurant;
 import com.example.go4lunch.models.User;
@@ -188,24 +189,18 @@ public class MainViewModel extends ViewModel {
      */
     private void loadRestaurantAround(Location location){
         Log.d(TAG, "MainViewModel.loadRestaurantAround() called with: location = [" + location + "]");
-        ChoosenHelperListener choosenHelperListener = new ChoosenHelperListener() {
-            @Override
-            public void onGetChoosen(boolean isChoosen) {
 
-            }
-
+        FailureListener failureListener = new FailureListener() {
             @Override
             public void onFailure(Exception e) {
-
+                Log.d(TAG, "MainViewModel.loadRestaurantAround.onFailure() " + e.getMessage());
+                errorMutableLiveData.postValue(e.getMessage());
             }
+        };
 
+        UserRestaurantAssociationListListener userRestaurantAssociationListListener = new UserRestaurantAssociationListListener() {
             @Override
-            public void onGetUsersWhoChoseThisRestaurant(List<UserRestaurantAssociation> userRestaurantAssociationList) {
-
-            }
-
-            @Override
-            public void onGetChoosenRestaurants(List<UserRestaurantAssociation> userRestaurantAssociations) {
+            public void onGetUserRestaurantAssociationList(List<UserRestaurantAssociation> userRestaurantAssociations) {
                 Call<PlaceSearch> call = googlePlacesApiRepository.getNearbysearch(location);
                 call.enqueue(new Callback<PlaceSearch>() {
                     @Override
@@ -253,10 +248,11 @@ public class MainViewModel extends ViewModel {
                 });
             }
         };
-        // get choosen collection before.
+
+        // get choosen collection before geting restaurant detail.
         // restaurants detail is getting in callback onGetChoosenRestaurants
-        ChoosenHelper.getChoosenRestaurants(choosenHelperListener);
-    }
+        ChoosenHelper.getChoosenRestaurants(userRestaurantAssociationListListener, failureListener);
+    };
 
 
     /**
