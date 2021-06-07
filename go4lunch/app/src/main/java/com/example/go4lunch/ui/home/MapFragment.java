@@ -61,8 +61,6 @@ import java.util.List;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
-    private static final String TAG = Tag.TAG;
-
     private GoogleMap mMap;
     private ProgressBar progressBar;
     private FloatingActionButton floatingActionButton;
@@ -74,7 +72,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     public MapFragment(MainViewModel mainViewModel) {
         // Required empty public constructor
-        Log.d(TAG, "MapFragment() called with: mainViewModel = [" + mainViewModel + "]");
+        Log.d(Tag.TAG, "MapFragment()");
         this.mainViewModel = mainViewModel;
     }
 
@@ -86,7 +84,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d(TAG, "MapFragment.onCreateView() called with: inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
+        Log.d(Tag.TAG, "MapFragment.onCreateView()");
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_map, container, false);
 
@@ -94,7 +92,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         this.mainViewModel.getLocationLiveData().observe(getViewLifecycleOwner(), new Observer<Location>() {
             @Override
             public void onChanged(Location location) {
-                Log.d(TAG, "MapFragment.onChanged(location) called with: location = [" + location + "]");
+                Log.d(Tag.TAG, "MapFragment.onChanged(location)");
                 setLocation(location);
             }
         });
@@ -103,7 +101,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         mainViewModel.getRestaurantsLiveData().observe(getViewLifecycleOwner(), new Observer<List<Restaurant>>() {
             @Override
             public void onChanged(List<Restaurant> restaurants) {
-                Log.d(TAG, "MapFragment.onChanged(restaurants) called with: restaurants = [" + restaurants + "]");
+                Log.d(Tag.TAG, "MapFragment.onChanged(restaurants)");
                 setRestaurants(restaurants);
             }
         });
@@ -118,17 +116,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Log.d(TAG, "MapFragment.onMapReady() called with: googleMap = [" + googleMap + "]");
+        Log.d(Tag.TAG, "MapFragment.onMapReady(). (this.location==null) = " + (this.location==null));
         mMap = googleMap;
         // cycle de vie. Navigation list->map
-        Log.d(TAG, "onMapReady() 1.1 " + this.location);
         if (this.location != null) {
-            Log.d(TAG, "onMapReady() 1.2 " + this.location);
             this.setLocation(this.location);
         }
-        Log.d(TAG, "onMapReady() 2 " + this.restaurants);
         if (this.restaurants != null) {
-            Log.d(TAG, "onMapReady() 3");
             this.setRestaurants(restaurants);
         }
     }
@@ -136,7 +130,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.d(TAG, "MapFragment.onViewCreated() called");
+        Log.d(Tag.TAG, "MapFragment.onViewCreated() called");
 
         progressBar = view.findViewById(R.id.fragment_map_progress_bar);
         progressBar.setVisibility(View.VISIBLE);
@@ -144,7 +138,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     public void setLocation(Location location) {
         try{
-        Log.d(TAG, "MapFragment.setLocation() called with: mMap = [" + mMap + "]. location = [" + location + "]");
+        Log.d(Tag.TAG, "MapFragment.setLocation(location)");
         progressBar.setVisibility(View.VISIBLE);
         this.location = location;
         if(mMap!=null) {
@@ -157,7 +151,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         progressBar.setVisibility(View.INVISIBLE);
         }
         catch (Exception e) {
-            Log.d(TAG, "setLocation() called with: Exception = [" + e.getMessage() + "]");
+            Log.d(Tag.TAG, "setLocation() called with: Exception = [" + e.getMessage() + "]");
         }
     }
 
@@ -199,7 +193,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     public void setRestaurants(List<Restaurant> restaurants){
-        Log.d(TAG, "MapFragment.setRestaurants() called with: mMap = [" + mMap + "]. restaurants = [" + restaurants + "]");
+        Log.d(Tag.TAG, "MapFragment.setRestaurants(restaurants) (mMap==null) = " + (mMap==null));
         this.restaurants = restaurants;
         if(mMap!=null) {
             progressBar.setVisibility(View.VISIBLE);
@@ -231,20 +225,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     @Override
     public void onPause() {
-        Log.d(TAG, "MapFragment.onPause() called");
+        Log.d(Tag.TAG, "MapFragment.onPause() called");
         super.onPause();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(TAG, "MapFragment.onResume() called");
+        Log.d(Tag.TAG, "MapFragment.onResume() called");
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        Log.d(TAG, "MapFragment.onStart() called");
+        Log.d(Tag.TAG, "MapFragment.onStart() called");
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }

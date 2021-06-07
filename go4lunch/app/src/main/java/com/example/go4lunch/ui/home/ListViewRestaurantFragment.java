@@ -30,7 +30,6 @@ import java.util.List;
 
 public class ListViewRestaurantFragment extends Fragment {
 
-    private static final String TAG = Tag.TAG;
     private ProgressBar progressBar;
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
@@ -80,7 +79,7 @@ public class ListViewRestaurantFragment extends Fragment {
     }
 
     private void setRestaurants(List<Restaurant> restaurants){
-        Log.d(TAG, "ListViewRestaurantFragment.setRestaurants() called with: restaurants = [" + restaurants + "]");
+        Log.d(Tag.TAG, "ListViewRestaurantFragment.setRestaurants(restaurants) restaurants.size()=" + restaurants.size());
         progressBar.setVisibility(View.VISIBLE);
         this.restaurantsList.clear();
         this.restaurantsList.addAll(restaurants);
@@ -91,7 +90,7 @@ public class ListViewRestaurantFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.d(TAG, "ListViewRestaurantFragment.onViewCreated() called");
+        Log.d(Tag.TAG, "ListViewRestaurantFragment.onViewCreated() called");
     }
 
     private void showDetailRestaurant(int position){
@@ -107,11 +106,11 @@ public class ListViewRestaurantFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        Log.d(TAG, "ListViewRestaurantFragment.onStart() called");
+        Log.d(Tag.TAG, "ListViewRestaurantFragment.onStart() called");
         mainViewModel.getLocationLiveData().observe(getViewLifecycleOwner(), new Observer<Location>() {
             @Override
             public void onChanged(Location location) {
-                Log.d(TAG, "ListViewRestaurantFragment: getLocationLiveData.onChanged(location) called with: location = [" + location + "]");
+                Log.d(Tag.TAG, "ListViewRestaurantFragment: getLocationLiveData.onChanged(location)");
                 setLocation(location);
             }
         });
@@ -119,11 +118,10 @@ public class ListViewRestaurantFragment extends Fragment {
         mainViewModel.getRestaurantsLiveData().observe(getViewLifecycleOwner(), new Observer<List<Restaurant>>() {
             @Override
             public void onChanged(List<Restaurant> restaurants) {
-                Log.d(TAG, "ListViewRestaurantFragment: getRestaurantsLiveData.onChanged() called with: restaurants = [" + restaurants + "]");
+                Log.d(Tag.TAG, "ListViewRestaurantFragment: getRestaurantsLiveData.onChanged(restaurants)");
                 setRestaurants(restaurants);
             }
         });
-
     }
 
     @Override
@@ -132,25 +130,25 @@ public class ListViewRestaurantFragment extends Fragment {
         // blanck screen !
         this.mainViewModel.activateChoosenRestaurantListener();
 
-        Log.d(TAG, "ListViewRestaurantFragment.onResume() called");
+        Log.d(Tag.TAG, "ListViewRestaurantFragment.onResume() called");
     }
 
     @Override
     public void onPause() {
-        Log.d(TAG, "ListViewRestaurantFragment.onPause() called");
+        Log.d(Tag.TAG, "ListViewRestaurantFragment.onPause() called");
         this.mainViewModel.removerChoosenRestaurantListener();
         super.onPause();
     }
 
     @Override
     public void onStop() {
-        Log.d(TAG, "ListViewRestaurantFragment.onStop() called");
+        Log.d(Tag.TAG, "ListViewRestaurantFragment.onStop() called");
         super.onStop();
     }
 
     @Override
     public void onDestroy() {
-        Log.d(TAG, "ListViewRestaurantFragment.onDestroy() called");
+        Log.d(Tag.TAG, "ListViewRestaurantFragment.onDestroy() called");
         super.onDestroy();
     }
 }

@@ -109,7 +109,7 @@ public class HomeFragment extends Fragment {
         this.gps.getLocationMutableLiveData().observe(getViewLifecycleOwner(), new Observer<Location>() {
             @Override
             public void onChanged(Location location) {
-                Log.d(TAG, "HomeFragment.initGPS.onChanged() called with: location = [" + location + "]");
+                Log.d(TAG, "HomeFragment.initGPS.onChanged(location) lat="+ location.getLatitude() + ", long=" + location.getLongitude());
                 mainViewModel.setLocation(location);
             }
         });

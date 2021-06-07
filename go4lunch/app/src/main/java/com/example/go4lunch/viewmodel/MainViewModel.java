@@ -108,7 +108,7 @@ public class MainViewModel extends ViewModel {
      * @param location
      */
     public void setLocation(Location location){
-        Log.d(TAG, "MainViewModel.setLocation() called with: location = [" + location + "]");
+        Log.d(TAG, "MainViewModel.setLocation(location) " + location.getLatitude() + ", " + location.getLongitude());
         this.locationMutableLiveData.postValue(location);
         // reload restaurants
         this.loadRestaurantAround(location);
