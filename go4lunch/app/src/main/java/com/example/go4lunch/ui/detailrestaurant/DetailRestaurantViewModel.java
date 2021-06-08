@@ -44,8 +44,10 @@ public class DetailRestaurantViewModel extends ViewModel {
     private final MutableLiveData<Boolean> likedMutableLiveData = new MutableLiveData<Boolean>();
     private final MutableLiveData<Boolean> chosenMutableLiveData = new MutableLiveData<Boolean>();
     private final MutableLiveData<List<User>> workmatesMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Integer> countLikedMutableLiveData = new MutableLiveData<>();
 
     private ListenerRegistration registrationChosen;
+    private ListenerRegistration registrationLiked;
 
     private final ChosenListener chosenListener;
     private final FailureListener failureListener;
@@ -105,6 +107,10 @@ public class DetailRestaurantViewModel extends ViewModel {
 
     public LiveData<List<User>> getWorkmatesLiveData() {
         return workmatesMutableLiveData;
+    }
+
+    public LiveData<Integer> getCountLikedLiveData() {
+        return countLikedMutableLiveData;
     }
 
     /**
@@ -304,6 +310,35 @@ public class DetailRestaurantViewModel extends ViewModel {
         if (registrationChosen != null) {
             Log.d(Tag.TAG, "DetailRestaurantViewModel.removeUsersListener() called");
             registrationChosen.remove();
+        }
+    };
+
+    /**
+     * for real time workmates list
+     * @param placeId
+     */
+    public void activateLikedByPlaceListener(String placeId){
+        Log.d(Tag.TAG, "DetailRestaurantViewModel.activateUsersListener() called");
+        registrationLiked = LikeHelper.getLikedCollection()
+                .whereEqualTo("placeId", placeId)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value,
+                                        @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
+                        if (error != null){
+                            errorMutableLiveData.postValue(error.getMessage());
+                            return;
+                        }
+                        int countLike = value.size();
+                        countLikedMutableLiveData.postValue(new Integer(countLike));
+                    }
+                });
+    };
+
+    public void removeLikedByPlaceListener(){
+        if (registrationLiked != null) {
+            Log.d(Tag.TAG, "DetailRestaurantViewModel.removeUsersListener() called");
+            registrationLiked.remove();
         }
     };
 

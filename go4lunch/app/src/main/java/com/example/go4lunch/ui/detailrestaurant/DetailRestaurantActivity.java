@@ -177,6 +177,14 @@ public class DetailRestaurantActivity extends AppCompatActivity {
             }
         });
         this.detailRestaurantViewModel.loadWorkmatesByPlace(this.placeId);
+
+        // observe like
+        this.detailRestaurantViewModel.getCountLikedLiveData().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                setStarCount(integer.intValue());
+            }
+        });
     }
 
     private void loadDetailRestaurant(String placeId){
@@ -299,6 +307,7 @@ public class DetailRestaurantActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         detailRestaurantViewModel.activateWormatesByPlaceListener(this.placeId);
+        detailRestaurantViewModel.activateLikedByPlaceListener(this.placeId);
         Log.d(TAG, "DetailRestaurantActivity.onResume() called");
     }
 
@@ -306,6 +315,7 @@ public class DetailRestaurantActivity extends AppCompatActivity {
     protected void onPause() {
         Log.d(TAG, "DetailRestaurantActivity.onPause() called");
         detailRestaurantViewModel.removeWormatesByPlaceListener();
+        detailRestaurantViewModel.removeLikedByPlaceListener();
         super.onPause();
     }
 
