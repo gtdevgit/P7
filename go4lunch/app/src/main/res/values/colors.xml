@@ -21,4 +21,6 @@
     <color name="secondaryTextColor">#ffffff</color>
     <color name="yellow">#FFEB3B</color>
     <color name="pink">#E136F4</color>
+    <color name="gray">#9e9e9e</color>
+
 </resources>

@@ -113,28 +113,4 @@ public class UserHelper {
         return UserHelper.getUsersCollection().get();
     }
 
-    public static void test(){
-
-        CollectionReference colRef = UserHelper.getUsersCollection();
-        colRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
-                if (error != null){
-                    Log.e(TAG, "onEvent: " + error.getMessage() );
-                    return;
-                }
-                List<User> users = new ArrayList<>();
-                for (QueryDocumentSnapshot document : value) {
-                    if (document.exists()) {
-                        User user = document.toObject(User.class);
-                        users.add(user);
-                    }
-                }
-
-            }
-        });
-
-
-    }
-
 }

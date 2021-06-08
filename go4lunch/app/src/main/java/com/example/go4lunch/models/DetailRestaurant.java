@@ -17,8 +17,9 @@ public class DetailRestaurant {
     private boolean isOpen;
     private List<String> workmates;
     private List<String> urlPhotos;
+    private int countLike;
 
-    public DetailRestaurant(String placeId, String name, String info, String phoneNumber, String website, String urlPicture, double rating, boolean haveStar1, boolean haveStar2, boolean haveStar3, boolean isLiked, boolean isOpen, List<String> workmates, List<String> urlPhotos) {
+    public DetailRestaurant(String placeId, String name, String info, String phoneNumber, String website, String urlPicture, double rating, boolean haveStar1, boolean haveStar2, boolean haveStar3, boolean isLiked, boolean isOpen, List<String> workmates, List<String> urlPhotos, int countLike) {
         this.placeId = placeId;
         this.name = name;
         this.info = info;
@@ -33,6 +34,7 @@ public class DetailRestaurant {
         this.isOpen = isOpen;
         this.workmates = workmates;
         this.urlPhotos = urlPhotos;
+        this.countLike = countLike;
     }
 
     public String getPlaceId() {
@@ -145,5 +147,13 @@ public class DetailRestaurant {
 
     public void setUrlPhotos(List<String> urlPhotos) {
         this.urlPhotos = urlPhotos;
+    }
+
+    public int getCountLike() {
+        return countLike;
+    }
+
+    public void setCountLike(int countLike) {
+        this.countLike = countLike;
     }
 }

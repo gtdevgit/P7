@@ -18,9 +18,9 @@ public class ListViewRestaurantViewHolder extends RecyclerView.ViewHolder {
     TextView textViewRestaurantHours;
     TextView textViewRestaurantDistance;
     TextView textViewRestaurantWorkmate;
-    ImageView imageViewRestaurantRating1;
-    ImageView imageViewRestaurantRating2;
-    ImageView imageViewRestaurantRating3;
+    ImageView imageViewRestaurantStar1;
+    ImageView imageViewRestaurantStar2;
+    ImageView imageViewRestaurantStar3;
 
     ImageView imageViewRestaurant;
 
@@ -32,9 +32,9 @@ public class ListViewRestaurantViewHolder extends RecyclerView.ViewHolder {
         textViewRestaurantHours = itemView.findViewById(R.id.row_restaurant_hours) ;
         textViewRestaurantDistance = itemView.findViewById(R.id.row_restaurant_distance);
         textViewRestaurantWorkmate = itemView.findViewById(R.id.row_restaurant_workmate);
-        imageViewRestaurantRating1 = itemView.findViewById(R.id.row_restaurant_rating1);
-        imageViewRestaurantRating2 = itemView.findViewById(R.id.row_restaurant_rating2);
-        imageViewRestaurantRating3 = itemView.findViewById(R.id.row_restaurant_rating3);
+        imageViewRestaurantStar1 = itemView.findViewById(R.id.row_restaurant_star1);
+        imageViewRestaurantStar2 = itemView.findViewById(R.id.row_restaurant_star2);
+        imageViewRestaurantStar3 = itemView.findViewById(R.id.row_restaurant_star3);
 
         imageViewRestaurant = itemView.findViewById(R.id.row_restaurant_picture);
     }

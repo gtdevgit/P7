@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.go4lunch.api.firestore.ChoosenHelper;
 import com.example.go4lunch.api.firestore.FailureListener;
+import com.example.go4lunch.api.firestore.LikeHelper;
 import com.example.go4lunch.api.firestore.UserHelper;
 import com.example.go4lunch.api.firestore.UserRestaurantAssociationListListener;
 import com.example.go4lunch.models.Autocomplete;
@@ -164,12 +165,9 @@ public class MainViewModel extends ViewModel {
     }
 
     /**
-     * count workmates who chose placeId
-      * @param placeId
-     * @param userRestaurantAssociations
-     * @return
+     * count placeId record in List<UserRestaurantAssociation>
      */
-    private int countWorkmates(String placeId, List<UserRestaurantAssociation> userRestaurantAssociations){
+    private int countUserRestaurantAssociationByPlaceId(String placeId, List<UserRestaurantAssociation> userRestaurantAssociations){
         int result = 0;
         for (UserRestaurantAssociation userRestaurantAssociation : userRestaurantAssociations){
             if (userRestaurantAssociation.getPlaceId().equals(placeId)) {
@@ -180,11 +178,31 @@ public class MainViewModel extends ViewModel {
     }
 
     /**
+     * count likes by restaurants
+     */
+    private int countLikeByRestaurant(String placeId, List<UserRestaurantAssociation> userRestaurantAssociations){
+        return countUserRestaurantAssociationByPlaceId(placeId, userRestaurantAssociations);
+    }
+
+    /**
+     * count workmates who chose placeId
+      * @param placeId
+     * @param userRestaurantAssociations
+     * @return
+     */
+    private int countWorkmates(String placeId, List<UserRestaurantAssociation> userRestaurantAssociations){
+        return countUserRestaurantAssociationByPlaceId(placeId, userRestaurantAssociations);
+    }
+
+    /**
      * loadRestaurantAround
      * @param location
      */
     private void loadRestaurantAround(Location location){
         Log.d(Tag.TAG, "MainViewModel.loadRestaurantAround()");
+
+        List<UserRestaurantAssociation> likedUserRestaurants = new ArrayList<>();
+        List<UserRestaurantAssociation> chossenUserRestaurants = new ArrayList<>();
 
         FailureListener failureListener = new FailureListener() {
             @Override
@@ -194,7 +212,7 @@ public class MainViewModel extends ViewModel {
             }
         };
 
-        UserRestaurantAssociationListListener userRestaurantAssociationListListener = new UserRestaurantAssociationListListener() {
+        UserRestaurantAssociationListListener choosenUserRestaurantAssociationListListener = new UserRestaurantAssociationListListener() {
             @Override
             public void onGetUserRestaurantAssociationList(List<UserRestaurantAssociation> userRestaurantAssociations) {
                 Call<PlaceSearch> call = googlePlacesApiRepository.getNearbysearch(location);
@@ -216,6 +234,7 @@ public class MainViewModel extends ViewModel {
                                 double rating = result.getRating();
                                 String urlPicture = findUrlPicture(result);
                                 int workmates = countWorkmates(result.getPlaceId(), userRestaurantAssociations);
+                                int countLike = countLikeByRestaurant(result.getPlaceId(), likedUserRestaurants);
                                 Restaurant restaurant = new Restaurant(result.getPlaceId(),
                                         name,
                                         latitude,
@@ -225,7 +244,8 @@ public class MainViewModel extends ViewModel {
                                         hours,
                                         workmates,
                                         rating,
-                                        urlPicture);
+                                        urlPicture,
+                                        countLike);
                                 restaurants.add(restaurant);
                             }
                             restaurantsMutableLiveData.postValue(restaurants);
@@ -241,11 +261,19 @@ public class MainViewModel extends ViewModel {
             }
         };
 
-        // get choosen collection before geting restaurant detail.
-        // restaurants detail is getting in callback onGetChoosenRestaurants
-        ChoosenHelper.getChoosenRestaurants(userRestaurantAssociationListListener, failureListener);
-    };
+        UserRestaurantAssociationListListener likedUserRestaurantAssociationListListener = new UserRestaurantAssociationListListener() {
+            @Override
+            public void onGetUserRestaurantAssociationList(List<UserRestaurantAssociation> userRestaurantAssociations) {
+                likedUserRestaurants.addAll(userRestaurantAssociations);
+                ChoosenHelper.getChoosenRestaurants(choosenUserRestaurantAssociationListListener, failureListener);
+            }
+        };
 
+        // first : get liked collection to count like by placeId
+        // second : get chosen collection to count workmate by placeId
+        // third : get detail restaurants
+        LikeHelper.getLikedRestaurants(likedUserRestaurantAssociationListListener, failureListener);
+    };
 
     /**
      * to get real time change workmates count by restaurant

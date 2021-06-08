@@ -64,16 +64,39 @@
                     app:layout_constraintTop_toTopOf="parent"
                     tools:text="Restaurant" />
 
+
                 <ImageView
-                    android:id="@+id/activity_detail_restaurant_star"
+                    android:id="@+id/activity_detail_restaurant_star1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/default_large_margin"
+                    android:layout_marginBottom="@dimen/default_margin"
                     app:layout_constraintBottom_toBottomOf="@+id/activity_detail_restaurant_name"
-                    app:layout_constraintStart_toEndOf="@+id/activity_detail_restaurant_name"
-                    app:layout_constraintTop_toTopOf="@+id/activity_detail_restaurant_name"
+
+                    app:layout_constraintRight_toLeftOf="@+id/activity_detail_restaurant_star2"
                     app:srcCompat="@drawable/ic_baseline_star_24"
-                    app:tint="@color/yellow" />
+                    app:tint="@color/white" />
+                <ImageView
+                    android:id="@+id/activity_detail_restaurant_star2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/default_margin"
+                    android:layout_marginBottom="@dimen/default_margin"
+                    app:layout_constraintBottom_toBottomOf="@+id/activity_detail_restaurant_name"
+                    app:layout_constraintRight_toLeftOf="@+id/activity_detail_restaurant_star3"
+                    app:srcCompat="@drawable/ic_baseline_star_24"
+                    app:tint="@color/white" />
+                <ImageView
+                    android:id="@+id/activity_detail_restaurant_star3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/default_margin"
+                    android:layout_marginBottom="@dimen/default_margin"
+                    app:layout_constraintBottom_toBottomOf="@+id/activity_detail_restaurant_name"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:srcCompat="@drawable/ic_baseline_star_24"
+                    app:tint="@color/white" />
+
 
                 <TextView
                     android:id="@+id/activity_detail_restaurant_info"

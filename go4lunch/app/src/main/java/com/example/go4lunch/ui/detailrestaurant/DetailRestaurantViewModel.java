@@ -152,61 +152,75 @@ public class DetailRestaurantViewModel extends ViewModel {
     }
 
     public void loadDetailRestaurant(String placeId) {
-
         Log.d(Tag.TAG, "loadDetailRestaurant() called with: placeId = [" + placeId + "]");
-        Call<PlaceDetails> call = googlePlacesApiRepository.getDetails(placeId);
-        call.enqueue(new Callback<PlaceDetails>() {
+        List<UserRestaurantAssociation> likedUserRestaurants = new ArrayList<>();
+
+        UserRestaurantAssociationListListener userRestaurantAssociationListListener = new UserRestaurantAssociationListListener() {
             @Override
-            public void onResponse(Call<PlaceDetails> call, Response<PlaceDetails> response) {
-                Log.d(Tag.TAG, "onResponse() called with: call = [" + call + "], response = [" + response + "]");
-                if (response.isSuccessful()) {
-                    PlaceDetails placeDetails = response.body();
-                    String placeId = placeDetails.getResult().getPlaceId();
-                    String name = placeDetails.getResult().getName();
-                    String info = findAddress(placeDetails.getResult().getFormattedAddress(), placeDetails.getResult().getVicinity());
-                    String phoneNumber = placeDetails.getResult().getInternationalPhoneNumber();
-                    String website = placeDetails.getResult().getWebsite();
-                    List<String> urlPhotos = new ArrayList<>();
-                    if (placeDetails.getResult().getPhotos() != null) {
-                        for (Photo photo : placeDetails.getResult().getPhotos()){
-                            if ((photo.getPhotoReference() != null) && (photo.getPhotoReference().trim().length() > 0)) {
-                                urlPhotos.add(googlePlacesApiRepository.getUrlPlacePhoto(photo.getPhotoReference()));
+            public void onGetUserRestaurantAssociationList(List<UserRestaurantAssociation> userRestaurantAssociations) {
+                likedUserRestaurants.addAll(userRestaurantAssociations);
+
+                Call<PlaceDetails> call = googlePlacesApiRepository.getDetails(placeId);
+                call.enqueue(new Callback<PlaceDetails>() {
+                    @Override
+                    public void onResponse(Call<PlaceDetails> call, Response<PlaceDetails> response) {
+                        Log.d(Tag.TAG, "onResponse() called with: call = [" + call + "], response = [" + response + "]");
+                        if (response.isSuccessful()) {
+                            PlaceDetails placeDetails = response.body();
+                            String placeId = placeDetails.getResult().getPlaceId();
+                            String name = placeDetails.getResult().getName();
+                            String info = findAddress(placeDetails.getResult().getFormattedAddress(), placeDetails.getResult().getVicinity());
+                            String phoneNumber = placeDetails.getResult().getInternationalPhoneNumber();
+                            String website = placeDetails.getResult().getWebsite();
+                            List<String> urlPhotos = new ArrayList<>();
+                            if (placeDetails.getResult().getPhotos() != null) {
+                                for (Photo photo : placeDetails.getResult().getPhotos()){
+                                    if ((photo.getPhotoReference() != null) && (photo.getPhotoReference().trim().length() > 0)) {
+                                        urlPhotos.add(googlePlacesApiRepository.getUrlPlacePhoto(photo.getPhotoReference()));
+                                    }
+                                }
                             }
+                            String urlPicture = (urlPhotos.size() > 0) ? urlPhotos.get(0) : null;
+
+                            double rating = placeDetails.getResult().getRating();
+                            boolean haveStar1 = false;
+                            boolean haveStar2 = false;
+                            boolean haveStar3 = false;
+                            boolean isLiked = false;
+                            boolean isOpen = (placeDetails.getResult().getOpeningHours() == null) ? false : placeDetails.getResult().getOpeningHours().getOpenNow();
+                            List<String> workmates = null;
+                            int countLike = likedUserRestaurants.size();
+                            DetailRestaurant detailRestaurant = new DetailRestaurant(placeId,
+                                    name,
+                                    info,
+                                    phoneNumber,
+                                    website,
+                                    urlPicture,
+                                    rating,
+                                    haveStar1,
+                                    haveStar2,
+                                    haveStar3,
+                                    isLiked,
+                                    isOpen,
+                                    workmates,
+                                    urlPhotos,
+                                    countLike);
+                            detailRestaurantMutableLiveData.postValue(detailRestaurant);
                         }
                     }
-                    String urlPicture = (urlPhotos.size() > 0) ? urlPhotos.get(0) : null;
 
-                    double rating = placeDetails.getResult().getRating();
-                    boolean haveStar1 = false;
-                    boolean haveStar2 = false;
-                    boolean haveStar3 = false;
-                    boolean isLiked = false;
-                    boolean isOpen = (placeDetails.getResult().getOpeningHours() == null) ? false : placeDetails.getResult().getOpeningHours().getOpenNow();
-                    List<String> workmates = null;
-                    DetailRestaurant detailRestaurant = new DetailRestaurant(placeId,
-                            name,
-                            info,
-                            phoneNumber,
-                            website,
-                            urlPicture,
-                            rating,
-                            haveStar1,
-                            haveStar2,
-                            haveStar3,
-                            isLiked,
-                            isOpen,
-                            workmates,
-                            urlPhotos);
-                    detailRestaurantMutableLiveData.postValue(detailRestaurant);
-                }
+                    @Override
+                    public void onFailure(Call<PlaceDetails> call, Throwable t) {
+                        Log.d(Tag.TAG, "onFailure() called with: call = [" + call + "], t = [" + t + "]");
+                        errorMutableLiveData.postValue(t.getMessage());
+                    }
+                });
             }
+        };
 
-            @Override
-            public void onFailure(Call<PlaceDetails> call, Throwable t) {
-                Log.d(Tag.TAG, "onFailure() called with: call = [" + call + "], t = [" + t + "]");
-                errorMutableLiveData.postValue(t.getMessage());
-            }
-        });
+        LikeHelper.getUsersWhoLikedThisRestaurant(placeId, userRestaurantAssociationListListener, failureListener);
+
+
     }
 
 

@@ -1,5 +1,6 @@
 package com.example.go4lunch.ui.detailrestaurant;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -20,6 +21,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -56,6 +58,9 @@ public class DetailRestaurantActivity extends AppCompatActivity {
     private List<User> usersList;
 
     private ImageView imageView;
+    private ImageView imageViewStar1;
+    private ImageView imageViewStar2;
+    private ImageView imageViewStar3;
     private TextView textViewName;
     private TextView textViewInfo;
     private BottomNavigationView bottomNavigationView;
@@ -84,6 +89,9 @@ public class DetailRestaurantActivity extends AppCompatActivity {
         textViewName = findViewById(R.id.activity_detail_restaurant_name);
         textViewInfo = findViewById(R.id.activity_detail_restaurant_info);
         imageView = findViewById(R.id.activity_detail_restaurant_picture);
+        imageViewStar1 = findViewById(R.id.activity_detail_restaurant_star1);
+        imageViewStar2 = findViewById(R.id.activity_detail_restaurant_star2);
+        imageViewStar3 = findViewById(R.id.activity_detail_restaurant_star3);
 
         bottomNavigationView = findViewById(R.id.activity_detail_restaurant_bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -109,6 +117,7 @@ public class DetailRestaurantActivity extends AppCompatActivity {
             @Override
             public void onChanged(DetailRestaurant detailRestaurant) {
                 textViewName.setText(detailRestaurant.getName());
+                setStarCount(detailRestaurant.getCountLike());
                 textViewInfo.setText(detailRestaurant.getInfo());
 
                 if (detailRestaurant.getUrlPicture() == null) {
@@ -171,8 +180,6 @@ public class DetailRestaurantActivity extends AppCompatActivity {
             }
         });
         this.detailRestaurantViewModel.loadWorkmatesByPlace(this.placeId);
-
-
     }
 
     private void loadDetailRestaurant(String placeId){
@@ -269,6 +276,20 @@ public class DetailRestaurantActivity extends AppCompatActivity {
         this.usersList.clear();
         this.usersList.addAll(users);
         workmatesAdapter.notifyDataSetChanged();
+    }
+
+    private int getStarColorByLevel(int count, int level){
+        if (count < level) {
+            return ContextCompat.getColor(this, R.color.white);
+        } else {
+            return ContextCompat.getColor(this, R.color.yellow);
+        }
+    }
+
+    private void setStarCount(int count){
+        imageViewStar1.setColorFilter(getStarColorByLevel(count, 1));
+        imageViewStar2.setColorFilter(getStarColorByLevel(count, 2));
+        imageViewStar3.setColorFilter(getStarColorByLevel(count, 3));
     }
 
     @Override

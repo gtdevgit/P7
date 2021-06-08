@@ -12,6 +12,13 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class LikeHelper {
     private static final String TAG = Tag.TAG;
@@ -107,5 +114,63 @@ public class LikeHelper {
                     Log.d(TAG, "deleteLike->onFailure() called with: e = [" + e + "]");
                 }
             });
+    }
+
+    public static void getLikedRestaurants(UserRestaurantAssociationListListener userRestaurantAssociationListListener, FailureListener failureListener) {
+        List<UserRestaurantAssociation> userRestaurantAssociationList = new ArrayList<>();
+        getLikedCollection()
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()){
+                            QuerySnapshot querySnapshot = task.getResult();
+                            for (QueryDocumentSnapshot document : querySnapshot) {
+                                UserRestaurantAssociation userRestaurantAssociation = document.toObject(UserRestaurantAssociation.class);
+                                userRestaurantAssociationList.add(userRestaurantAssociation);
+                            }
+                            userRestaurantAssociationListListener.onGetUserRestaurantAssociationList(userRestaurantAssociationList);
+                        } else {
+                            failureListener.onFailure(task.getException());
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull @NotNull Exception e) {
+                        failureListener.onFailure(e);
+                    }
+                });
+    }
+
+    public static void getUsersWhoLikedThisRestaurant(String placeId, UserRestaurantAssociationListListener userRestaurantAssociationListListener,
+                                                      FailureListener failureListener) {
+        List<UserRestaurantAssociation> userRestaurantAssociations = new ArrayList<>();
+        Log.d(Tag.TAG, "getUsersWhoLikedThisRestaurant");
+        getLikedCollection()
+                .whereEqualTo("placeId", placeId)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()){
+                            Log.d(Tag.TAG, "getUsersWhoLikedThisRestaurant.onComplete() ");
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                UserRestaurantAssociation userRestaurantAssociation = document.toObject(UserRestaurantAssociation.class);
+                                Log.d(Tag.TAG, "getUsersWhoLikedThisRestaurant.onComplete() userRestaurantAssociation = [" + userRestaurantAssociation + "]");
+                                userRestaurantAssociations.add(document.toObject(UserRestaurantAssociation.class));
+                            }
+                            userRestaurantAssociationListListener.onGetUserRestaurantAssociationList(userRestaurantAssociations);
+                        } else {
+                            failureListener.onFailure(task.getException());
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull @NotNull Exception e) {
+                        failureListener.onFailure(e);
+                    }
+                });
     }
 }

@@ -1,12 +1,14 @@
 package com.example.go4lunch.ui.home;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -43,6 +45,14 @@ public class ListViewRestaurantAdapter extends RecyclerView.Adapter<ListViewRest
         return listViewRestaurantViewHolder;
     }
 
+    private int getStarColorByLevel(Context context, int count, int level){
+        if (count < level) {
+            return ContextCompat.getColor(context, R.color.gray);
+        } else {
+            return ContextCompat.getColor(context, R.color.yellow);
+        }
+    }
+
     @Override
     public void onBindViewHolder(@NonNull ListViewRestaurantViewHolder holder, int position) {
         Restaurant restaurant = restaurants.get(position);
@@ -52,9 +62,14 @@ public class ListViewRestaurantAdapter extends RecyclerView.Adapter<ListViewRest
         holder.textViewRestaurantDistance.setText(restaurant.getFormatedDistance());
         holder.textViewRestaurantWorkmate.setText(String.format("(%d)",  restaurant.getWorkmatesCount()));
 
+        holder.imageViewRestaurantStar1.setColorFilter(getStarColorByLevel(holder.imageViewRestaurantStar1.getContext(), restaurant.getCountLike(), 1));
+        holder.imageViewRestaurantStar2.setColorFilter(getStarColorByLevel(holder.imageViewRestaurantStar2.getContext(), restaurant.getCountLike(), 2));
+        holder.imageViewRestaurantStar3.setColorFilter(getStarColorByLevel(holder.imageViewRestaurantStar3.getContext(), restaurant.getCountLike(), 3));
+
+
         /*
         //todo : liste des restaurants : charger les étoiles
-        //todo : liste des restaurants : charger le nombre de workmate
+
         //todo : liste des restaurants : charger les horaires ou open/close
         holder.imageViewRestaurantRating1.setBackgroundTintList(
             holder.imageViewRestaurantRating1.getContext().getResources().getColorStateList(R.color.colorAccent));

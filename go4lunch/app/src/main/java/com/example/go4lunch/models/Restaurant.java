@@ -13,8 +13,9 @@ public class Restaurant {
     private int workmatesCount;
     private double rating;
     private String urlPicture;
+    private int countLike;
 
-    public Restaurant(String placeId, String name, double latitude, double longitude, float distance, String info, String hours, int workmatesCount, double rating, String urlPicture) {
+    public Restaurant(String placeId, String name, double latitude, double longitude, float distance, String info, String hours, int workmatesCount, double rating, String urlPicture, int countLike) {
         this.placeId = placeId;
         this.name = name;
         this.latitude = latitude;
@@ -25,6 +26,7 @@ public class Restaurant {
         this.workmatesCount = workmatesCount;
         this.rating = rating;
         this.urlPicture = urlPicture;
+        this.countLike = countLike;
     }
 
     public String getPlaceId() {
@@ -105,6 +107,14 @@ public class Restaurant {
 
     public void setUrlPicture(String urlPicture) {
         this.urlPicture = urlPicture;
+    }
+
+    public int getCountLike() {
+        return countLike;
+    }
+
+    public void setCountLike(int countLike) {
+        this.countLike = countLike;
     }
 
     /**

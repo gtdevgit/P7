@@ -62,7 +62,10 @@
             android:maxLines="1"
             android:text="hours"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            app:layout_constraintTop_toBottomOf="@+id/row_restaurant_info"/>
+            app:layout_constraintTop_toBottomOf="@+id/row_restaurant_info"
+            app:tint="@color/white"
+
+            />
 
         <TextView
             android:id="@+id/row_restaurant_distance"
@@ -110,7 +113,7 @@
             app:layout_constraintRight_toLeftOf="@+id/row_restaurant_workmate"/>
 
         <ImageView
-            android:id="@+id/row_restaurant_rating3"
+            android:id="@+id/row_restaurant_star3"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:contentDescription="@string/profile_picture_description"
@@ -124,7 +127,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/row_restaurant_hours"
             app:layout_constraintRight_toLeftOf="@+id/row_restaurant_picture"/>
         <ImageView
-            android:id="@+id/row_restaurant_rating2"
+            android:id="@+id/row_restaurant_star2"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:contentDescription="@string/profile_picture_description"
@@ -136,10 +139,10 @@
             android:gravity="center"
             app:layout_constraintTop_toTopOf="@+id/row_restaurant_hours"
             app:layout_constraintBottom_toBottomOf="@+id/row_restaurant_hours"
-            app:layout_constraintRight_toLeftOf="@+id/row_restaurant_rating3"/>
+            app:layout_constraintRight_toLeftOf="@+id/row_restaurant_star3"/>
 
         <ImageView
-            android:id="@+id/row_restaurant_rating1"
+            android:id="@+id/row_restaurant_star1"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginTop="@dimen/default_margin"
@@ -149,7 +152,7 @@
             android:gravity="center"
             android:src="@drawable/ic_baseline_star_24"
             app:layout_constraintBottom_toBottomOf="@+id/row_restaurant_hours"
-            app:layout_constraintRight_toLeftOf="@+id/row_restaurant_rating2"
+            app:layout_constraintRight_toLeftOf="@+id/row_restaurant_star2"
             app:layout_constraintTop_toTopOf="@+id/row_restaurant_hours"
             app:srcCompat="@drawable/ic_baseline_star_24" />
     </androidx.constraintlayout.widget.ConstraintLayout>
