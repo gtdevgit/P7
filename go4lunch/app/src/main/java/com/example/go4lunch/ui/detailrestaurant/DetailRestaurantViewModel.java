@@ -2,14 +2,13 @@ package com.example.go4lunch.ui.detailrestaurant;
 
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.go4lunch.api.firestore.ChoosenHelper;
-import com.example.go4lunch.api.firestore.ChoosenListener;
+import com.example.go4lunch.api.firestore.ChosenHelper;
+import com.example.go4lunch.api.firestore.ChosenListener;
 import com.example.go4lunch.api.firestore.FailureListener;
 import com.example.go4lunch.api.firestore.LikeHelper;
 import com.example.go4lunch.api.firestore.LikeHelperListener;
@@ -21,24 +20,16 @@ import com.example.go4lunch.models.User;
 import com.example.go4lunch.models.UserRestaurantAssociation;
 import com.example.go4lunch.models.googleplaces.Photo;
 import com.example.go4lunch.models.googleplaces.palcesdetails.PlaceDetails;
-import com.example.go4lunch.models.googleplaces.placesearch.Result;
 import com.example.go4lunch.repository.GooglePlacesApiRepository;
 import com.example.go4lunch.tag.Tag;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.gson.JsonObject;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.LogManager;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -51,12 +42,12 @@ public class DetailRestaurantViewModel extends ViewModel {
     private final MutableLiveData<DetailRestaurant> detailRestaurantMutableLiveData = new MutableLiveData<>();
     private final MutableLiveData<String> errorMutableLiveData = new MutableLiveData<String>();
     private final MutableLiveData<Boolean> likedMutableLiveData = new MutableLiveData<Boolean>();
-    private final MutableLiveData<Boolean> choosenMutableLiveData = new MutableLiveData<Boolean>();
+    private final MutableLiveData<Boolean> chosenMutableLiveData = new MutableLiveData<Boolean>();
     private final MutableLiveData<List<User>> workmatesMutableLiveData = new MutableLiveData<>();
 
-    private ListenerRegistration registrationUsers;
+    private ListenerRegistration registrationChosen;
 
-    private final ChoosenListener choosenListener;
+    private final ChosenListener chosenListener;
     private final FailureListener failureListener;
     private final UserRestaurantAssociationListListener userRestaurantAssociationListListener;
     private final UserListListener userListListener;
@@ -64,10 +55,10 @@ public class DetailRestaurantViewModel extends ViewModel {
     public DetailRestaurantViewModel(GooglePlacesApiRepository googlePlacesApiRepository) {
         this.googlePlacesApiRepository = googlePlacesApiRepository;
 
-        this.choosenListener = new ChoosenListener() {
+        this.chosenListener = new ChosenListener() {
             @Override
-            public void onGetChoosen(boolean isChoosen) {
-                choosenMutableLiveData.postValue(Boolean.valueOf(isChoosen));
+            public void onGetChosen(boolean isChosen) {
+                chosenMutableLiveData.postValue(Boolean.valueOf(isChosen));
             }
         };
 
@@ -108,8 +99,8 @@ public class DetailRestaurantViewModel extends ViewModel {
         return likedMutableLiveData;
     }
 
-    public LiveData<Boolean> getChoosenLiveData() {
-        return choosenMutableLiveData;
+    public LiveData<Boolean> getChosenLiveData() {
+        return chosenMutableLiveData;
     }
 
     public LiveData<List<User>> getWorkmatesLiveData() {
@@ -219,10 +210,7 @@ public class DetailRestaurantViewModel extends ViewModel {
         };
 
         LikeHelper.getUsersWhoLikedThisRestaurant(placeId, userRestaurantAssociationListListener, failureListener);
-
-
     }
-
 
     public void loadIsLiked(String uid, String placeId){
         LikeHelper.isLiked(uid, placeId, new LikeHelperListener() {
@@ -256,8 +244,8 @@ public class DetailRestaurantViewModel extends ViewModel {
      * @param uid
      * @param placeId
      */
-    public void loadIsChoosen(String uid, String placeId){
-        ChoosenHelper.isChoosenRestaurant(uid, placeId, this.choosenListener, this.failureListener);
+    public void loadIsChosen(String uid, String placeId){
+        ChosenHelper.isChosenRestaurant(uid, placeId, this.chosenListener, this.failureListener);
     }
 
     /**
@@ -266,7 +254,7 @@ public class DetailRestaurantViewModel extends ViewModel {
      * @param placeId
      */
     public void choose(String uid, String placeId){
-        ChoosenHelper.createChoosenRestaurant(uid, placeId, this.choosenListener, this.failureListener);
+        ChosenHelper.createChosenRestaurant(uid, placeId, this.chosenListener, this.failureListener);
     }
 
     /**
@@ -275,16 +263,20 @@ public class DetailRestaurantViewModel extends ViewModel {
      * @param placeId
      */
     public void unchoose(String uid, String placeId) {
-        ChoosenHelper.deleteChoosenRestaurant(uid, placeId, this.choosenListener, this.failureListener);
+        ChosenHelper.deleteChosenRestaurant(uid, placeId, this.chosenListener, this.failureListener);
     }
 
     public void loadWorkmatesByPlace(String placeId){
-        ChoosenHelper.getUsersWhoChoseThisRestaurant(placeId, this.userRestaurantAssociationListListener, this.failureListener);
+        ChosenHelper.getUsersWhoChoseThisRestaurant(placeId, this.userRestaurantAssociationListListener, this.failureListener);
     }
 
+    /**
+     * for real time workmates list
+     * @param placeId
+     */
     public void activateWormatesByPlaceListener(String placeId){
         Log.d(Tag.TAG, "DetailRestaurantViewModel.activateUsersListener() called");
-        registrationUsers = ChoosenHelper.getChoosenCollection()
+        registrationChosen = ChosenHelper.getChosenCollection()
             .whereEqualTo("placeId", placeId)
             .addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -309,9 +301,9 @@ public class DetailRestaurantViewModel extends ViewModel {
     };
 
     public void removeWormatesByPlaceListener(){
-        if (registrationUsers != null) {
+        if (registrationChosen != null) {
             Log.d(Tag.TAG, "DetailRestaurantViewModel.removeUsersListener() called");
-            registrationUsers.remove();
+            registrationChosen.remove();
         }
     };
 

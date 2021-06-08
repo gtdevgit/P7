@@ -12,11 +12,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.go4lunch.MyPlace.MyPlace;
-import com.example.go4lunch.repository.GooglePlacesApiRepository;
 import com.example.go4lunch.ui.SettingActivity;
-import com.example.go4lunch.viewmodel.MainViewModel;
-import com.google.android.libraries.places.api.Places;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;

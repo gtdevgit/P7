@@ -17,7 +17,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.models.Restaurant;
@@ -128,7 +127,7 @@ public class ListViewRestaurantFragment extends Fragment {
     public void onResume() {
         super.onResume();
         // blanck screen !
-        this.mainViewModel.activateChoosenRestaurantListener();
+        this.mainViewModel.activateChosenRestaurantListener();
 
         Log.d(Tag.TAG, "ListViewRestaurantFragment.onResume() called");
     }
@@ -136,7 +135,7 @@ public class ListViewRestaurantFragment extends Fragment {
     @Override
     public void onPause() {
         Log.d(Tag.TAG, "ListViewRestaurantFragment.onPause() called");
-        this.mainViewModel.removerChoosenRestaurantListener();
+        this.mainViewModel.removerChosenRestaurantListener();
         super.onPause();
     }
 

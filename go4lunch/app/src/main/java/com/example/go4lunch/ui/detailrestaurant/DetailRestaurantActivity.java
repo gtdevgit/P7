@@ -1,16 +1,13 @@
 package com.example.go4lunch.ui.detailrestaurant;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Bundle;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
-import com.example.go4lunch.api.firestore.ChoosenHelper;
 import com.example.go4lunch.models.DetailRestaurant;
 import com.example.go4lunch.models.User;
 import com.example.go4lunch.repository.GooglePlacesApiRepository;
@@ -54,7 +51,7 @@ public class DetailRestaurantActivity extends AppCompatActivity {
     private String website;
     private boolean telephonySupported;
     private boolean liked;
-    private boolean choosen;
+    private boolean chosen;
     private List<User> usersList;
 
     private ImageView imageView;
@@ -147,15 +144,15 @@ public class DetailRestaurantActivity extends AppCompatActivity {
         });
         this.detailRestaurantViewModel.loadIsLiked(uid, this.placeId);
 
-        // choosen observer
-        this.detailRestaurantViewModel.getChoosenLiveData().observe(this, new Observer<Boolean>() {
+        // chosen observer
+        this.detailRestaurantViewModel.getChosenLiveData().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean aBoolean) {
-                setChoosen(aBoolean.booleanValue());
+                setChosen(aBoolean.booleanValue());
             }
         });
-        Log.d(TAG, "this.detailRestaurantViewModel.loadIsChoosen = [" + uid + "] " + "[" + placeId + "]");
-        this.detailRestaurantViewModel.loadIsChoosen(uid, placeId);
+        Log.d(TAG, "this.detailRestaurantViewModel.loadIsChosen = [" + uid + "] " + "[" + placeId + "]");
+        this.detailRestaurantViewModel.loadIsChosen(uid, placeId);
 
         PackageManager packageManager = getPackageManager();
         telephonySupported = packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY);
@@ -244,7 +241,7 @@ public class DetailRestaurantActivity extends AppCompatActivity {
     }
 
     private void changeChoose(){
-        if (this.choosen) {
+        if (this.chosen) {
             //remove choise
             this.detailRestaurantViewModel.unchoose(this.uid, this.placeId);
         } else {
@@ -253,11 +250,11 @@ public class DetailRestaurantActivity extends AppCompatActivity {
         this.detailRestaurantViewModel.loadWorkmatesByPlace(this.placeId);
     }
 
-    // state choosen and UI update
-    private void setChoosen(boolean isChoosen){
-        Log.d(TAG, "setChoosen() called with: isChoosen = [" + isChoosen + "]");
-        this.choosen = isChoosen;
-        if (this.choosen) {
+    // state chosen and UI update
+    private void setChosen(boolean isChosen){
+        Log.d(TAG, "setChosen() called with: isChosen = [" + isChosen + "]");
+        this.chosen = isChosen;
+        if (this.chosen) {
             this.floatingActionButton.setImageResource(R.drawable.ic_baseline_check_24);
         } else {
             this.floatingActionButton.setImageResource(R.drawable.ic_baseline_star_24);

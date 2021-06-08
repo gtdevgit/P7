@@ -29,7 +29,6 @@ import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private static final String TAG = Tag.TAG;
     private static final int RC_SIGN_IN = 1;
 
     private Button buttonFacebook;
@@ -61,7 +60,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void startSignInActivity(SupportedProvider supportedProvider){
-        Log.d(TAG, "startSignInActivity() called with: supportedProvider = [" + supportedProvider + "]");
+        Log.d(Tag.TAG, "startSignInActivity() called with: supportedProvider = [" + supportedProvider + "]");
         List<AuthUI.IdpConfig> providers = Authentication.getProviderBySupportedProvider(supportedProvider);
 
         startActivityForResult(
@@ -75,12 +74,12 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        Log.d(Tag.TAG, "onActivityResult() called with: requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
         this.handleResponseAfterSignIn(requestCode, resultCode, data);
     }
 
     private void createUserInFirestore(){
-        Log.d(TAG, "createUserInFirestore() called");
+        Log.d(Tag.TAG, "createUserInFirestore() called");
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null){
 
@@ -93,7 +92,7 @@ public class LoginActivity extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "onFailure() called with: e = [" + e + "]");
+                        Log.d(Tag.TAG, "onFailure() called with: e = [" + e + "]");
                         showSnackBar(R.string.error_during_connection);
                     }
                 });
@@ -101,18 +100,18 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void handleResponseAfterSignIn(int requestCode, int resultCode, Intent data){
-        Log.d(TAG, "handleResponseAfterSignIn() called with: requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
+        Log.d(Tag.TAG, "handleResponseAfterSignIn() called with: requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
         IdpResponse response = IdpResponse.fromResultIntent(data);
-        Log.d(TAG, "handleResponseAfterSignIn() response = [" + response + "]");
+        Log.d(Tag.TAG, "handleResponseAfterSignIn() response = [" + response + "]");
 
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) { // SUCCESS
                 this.createUserInFirestore();
 
                 FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-                Log.d(TAG, "handleResponseAfterSignIn() currentUser = [" + currentUser + "]");
-                Log.d(TAG, "handleResponseAfterSignIn() currentUser.getEmail() = [" + currentUser.getEmail() + "]");
-                Log.d(TAG, "handleResponseAfterSignIn() currentUser.getUid() = [" + currentUser.getUid() + "]");
+                Log.d(Tag.TAG, "handleResponseAfterSignIn() currentUser = [" + currentUser + "]");
+                Log.d(Tag.TAG, "handleResponseAfterSignIn() currentUser.getEmail() = [" + currentUser.getEmail() + "]");
+                Log.d(Tag.TAG, "handleResponseAfterSignIn() currentUser.getUid() = [" + currentUser.getUid() + "]");
 
                 showSnackBar(R.string.connection_succeed);
 

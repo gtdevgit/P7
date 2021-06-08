@@ -3,34 +3,26 @@ package com.example.go4lunch.viewmodel;
 import android.location.Location;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.go4lunch.api.firestore.ChoosenHelper;
+import com.example.go4lunch.api.firestore.ChosenHelper;
 import com.example.go4lunch.api.firestore.FailureListener;
 import com.example.go4lunch.api.firestore.LikeHelper;
-import com.example.go4lunch.api.firestore.UserHelper;
 import com.example.go4lunch.api.firestore.UserRestaurantAssociationListListener;
 import com.example.go4lunch.models.Autocomplete;
 import com.example.go4lunch.models.Restaurant;
-import com.example.go4lunch.models.User;
 import com.example.go4lunch.models.UserRestaurantAssociation;
 import com.example.go4lunch.models.googleplaces.placesearch.Result;
 import com.example.go4lunch.models.googleplaces.placesearch.PlaceSearch;
 import com.example.go4lunch.repository.GooglePlacesApiRepository;
 import com.example.go4lunch.tag.Tag;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +43,7 @@ public class MainViewModel extends ViewModel {
 
     private LoadRestaurantListener loadRestaurantListener;
 
-    private ListenerRegistration registrationChoosenRestaurant;
+    private ListenerRegistration registrationChosenRestaurant;
 
     /**
      * GooglePlacesApiRepository
@@ -212,7 +204,7 @@ public class MainViewModel extends ViewModel {
             }
         };
 
-        UserRestaurantAssociationListListener choosenUserRestaurantAssociationListListener = new UserRestaurantAssociationListListener() {
+        UserRestaurantAssociationListListener chosenUserRestaurantAssociationListListener = new UserRestaurantAssociationListListener() {
             @Override
             public void onGetUserRestaurantAssociationList(List<UserRestaurantAssociation> userRestaurantAssociations) {
                 Call<PlaceSearch> call = googlePlacesApiRepository.getNearbysearch(location);
@@ -265,7 +257,7 @@ public class MainViewModel extends ViewModel {
             @Override
             public void onGetUserRestaurantAssociationList(List<UserRestaurantAssociation> userRestaurantAssociations) {
                 likedUserRestaurants.addAll(userRestaurantAssociations);
-                ChoosenHelper.getChoosenRestaurants(choosenUserRestaurantAssociationListListener, failureListener);
+                ChosenHelper.getChosenRestaurants(chosenUserRestaurantAssociationListListener, failureListener);
             }
         };
 
@@ -278,9 +270,9 @@ public class MainViewModel extends ViewModel {
     /**
      * to get real time change workmates count by restaurant
      */
-    public void activateChoosenRestaurantListener(){
+    public void activateChosenRestaurantListener(){
         Log.d(Tag.TAG, "WorkmatesViewModel.activateUsersListener() called");
-        registrationChoosenRestaurant = ChoosenHelper.getChoosenCollection().addSnapshotListener(new EventListener<QuerySnapshot>() {
+        registrationChosenRestaurant = ChosenHelper.getChosenCollection().addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
                 if (error != null){
@@ -292,10 +284,10 @@ public class MainViewModel extends ViewModel {
         });
     }
 
-    public void removerChoosenRestaurantListener(){
-        if (registrationChoosenRestaurant != null) {
+    public void removerChosenRestaurantListener(){
+        if (registrationChosenRestaurant != null) {
             Log.d(Tag.TAG, "WorkmatesViewModel.removeUsersListener() called");
-            registrationChoosenRestaurant.remove();
+            registrationChosenRestaurant.remove();
         }
     }
 

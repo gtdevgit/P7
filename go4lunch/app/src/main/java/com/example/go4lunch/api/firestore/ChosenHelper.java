@@ -4,7 +4,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.go4lunch.models.User;
 import com.example.go4lunch.models.UserRestaurantAssociation;
 import com.example.go4lunch.tag.Tag;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -21,9 +20,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChoosenHelper {
+public class ChosenHelper {
 
-    private static final String COLLECTION_NAME_CHOSEN = "choosen_restaurants";
+    private static final String COLLECTION_NAME_CHOSEN = "chosen_restaurants";
 
     // ****************************
     // *** Selected restaurants ***
@@ -33,27 +32,27 @@ public class ChoosenHelper {
      * Selected collection
      * @return
      */
-    public static CollectionReference getChoosenCollection() {
+    public static CollectionReference getChosenCollection() {
         return FirebaseFirestore.getInstance().collection(COLLECTION_NAME_CHOSEN);
     }
 
-    public static void isChoosenRestaurant(String uid, String placeId, ChoosenListener choosenListener, FailureListener failureListener) {
-        getChoosenCollection().document(uid)
+    public static void isChosenRestaurant(String uid, String placeId, ChosenListener chosenListener, FailureListener failureListener) {
+        getChosenCollection().document(uid)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
                             DocumentSnapshot document = task.getResult();
-                            Log.d(Tag.TAG, "ChoosenHelper.isChoosen()->onComplete() isSuccessful = true, document exist = [" + document.exists() + "]");
+                            Log.d(Tag.TAG, "ChosenHelper.isChosen()->onComplete() isSuccessful = true, document exist = [" + document.exists() + "]");
                             if (document.exists()) {
                                 UserRestaurantAssociation userRestaurantAssociation = document.toObject(UserRestaurantAssociation.class);
-                                Log.d(Tag.TAG, "ChoosenHelper.isChoosen()->onComplete() plaseId ok =" + (userRestaurantAssociation.getPlaceId() == placeId));
+                                Log.d(Tag.TAG, "ChosenHelper.isChosen()->onComplete() plaseId ok =" + (userRestaurantAssociation.getPlaceId() == placeId));
                                 // must check if si this the good palce
-                                choosenListener.onGetChoosen(userRestaurantAssociation.getPlaceId().equals(placeId));
+                                chosenListener.onGetChosen(userRestaurantAssociation.getPlaceId().equals(placeId));
                             } else {
-                                Log.d(Tag.TAG, "ChoosenHelper.isChoosen()->onComplete() false");
-                                choosenListener.onGetChoosen(false);
+                                Log.d(Tag.TAG, "ChosenHelper.isChosen()->onComplete() false");
+                                chosenListener.onGetChosen(false);
                             }
                         } else {
                             failureListener.onFailure(task.getException());
@@ -63,21 +62,21 @@ public class ChoosenHelper {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.d(Tag.TAG, "ChoosenHelper.isChoosen->onFailure() called with: e = [" + e + "]");
+                        Log.d(Tag.TAG, "ChosenHelper.isChosen->onFailure() called with: e = [" + e + "]");
                         failureListener.onFailure(e);
                     }
                 });
     }
 
-    public static void createChoosenRestaurant(String uid, String placeId, ChoosenListener choosenListener, FailureListener failureListener){
-        Log.d(Tag.TAG, "createChoosenRestaurant() called with: uid = [" + uid + "], placeId = [" + placeId + "]");
+    public static void createChosenRestaurant(String uid, String placeId, ChosenListener chosenListener, FailureListener failureListener){
+        Log.d(Tag.TAG, "createChosenRestaurant() called with: uid = [" + uid + "], placeId = [" + placeId + "]");
         UserRestaurantAssociation userRestaurantAssociation = new UserRestaurantAssociation(uid, placeId);
-        getChoosenCollection().document(uid).set(userRestaurantAssociation)
+        getChosenCollection().document(uid).set(userRestaurantAssociation)
             .addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()) {
-                        choosenListener.onGetChoosen(true);
+                        chosenListener.onGetChosen(true);
                     } else {
                         failureListener.onFailure(task.getException());
                     }
@@ -86,20 +85,20 @@ public class ChoosenHelper {
             .addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Log.d(Tag.TAG, "ChooseRestaurant.onFailure() called with: e = [" + e + "]");
+                    Log.d(Tag.TAG, "createChosenRestaurant.onFailure() called with: e = [" + e + "]");
                     failureListener.onFailure(e);
                 }
             });
     }
 
-    public static void deleteChoosenRestaurant(String uid, String placeId, ChoosenListener choosenListener, FailureListener failureListener) {
+    public static void deleteChosenRestaurant(String uid, String placeId, ChosenListener chosenListener, FailureListener failureListener) {
         Log.d(Tag.TAG, "deleteLike() called with: uid = [" + uid + "], placeId = [" + placeId + "]");
-        getChoosenCollection().document(uid).delete()
+        getChosenCollection().document(uid).delete()
             .addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()){
-                        choosenListener.onGetChoosen(false);
+                        chosenListener.onGetChosen(false);
                     } else {
                         failureListener.onFailure(task.getException());
                     }
@@ -118,7 +117,7 @@ public class ChoosenHelper {
                                                       FailureListener failureListener) {
         List<UserRestaurantAssociation> userRestaurantAssociations = new ArrayList<>();
         Log.d(Tag.TAG, "getUsersWhoChoseThisRestaurant: ");
-        getChoosenCollection()
+        getChosenCollection()
                 .whereEqualTo("placeId", placeId)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -145,10 +144,10 @@ public class ChoosenHelper {
                 });
     }
 
-    public static void getChoosenRestaurants(UserRestaurantAssociationListListener userRestaurantAssociationListListener, FailureListener failureListener) {
+    public static void getChosenRestaurants(UserRestaurantAssociationListListener userRestaurantAssociationListListener, FailureListener failureListener) {
         List<UserRestaurantAssociation> userRestaurantAssociationList = new ArrayList<>();
-        Log.d(Tag.TAG, "getChoosenRestaurants");
-        getChoosenCollection()
+        Log.d(Tag.TAG, "getChosenRestaurants");
+        getChosenCollection()
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -158,7 +157,7 @@ public class ChoosenHelper {
                                 UserRestaurantAssociation userRestaurantAssociation = document.toObject(UserRestaurantAssociation.class);
                                 userRestaurantAssociationList.add(document.toObject(UserRestaurantAssociation.class));
                             }
-                            Log.d(Tag.TAG, "getChoosenRestaurants. successful with userRestaurantAssociationList.size()=" + userRestaurantAssociationList.size());
+                            Log.d(Tag.TAG, "getChosenRestaurants. successful with userRestaurantAssociationList.size()=" + userRestaurantAssociationList.size());
                             userRestaurantAssociationListListener.onGetUserRestaurantAssociationList(userRestaurantAssociationList);
                         } else {
                             failureListener.onFailure(task.getException());
