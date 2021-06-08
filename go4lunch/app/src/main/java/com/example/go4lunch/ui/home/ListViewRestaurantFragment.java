@@ -128,6 +128,7 @@ public class ListViewRestaurantFragment extends Fragment {
         super.onResume();
         // blanck screen !
         this.mainViewModel.activateChosenRestaurantListener();
+        this.mainViewModel.activateLikedRestaurantListener();
 
         Log.d(Tag.TAG, "ListViewRestaurantFragment.onResume() called");
     }
@@ -136,6 +137,7 @@ public class ListViewRestaurantFragment extends Fragment {
     public void onPause() {
         Log.d(Tag.TAG, "ListViewRestaurantFragment.onPause() called");
         this.mainViewModel.removerChosenRestaurantListener();
+        this.mainViewModel.removeLikedRestaurantListener();
         super.onPause();
     }
 

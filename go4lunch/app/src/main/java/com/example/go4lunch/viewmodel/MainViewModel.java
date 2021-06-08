@@ -44,6 +44,7 @@ public class MainViewModel extends ViewModel {
     private LoadRestaurantListener loadRestaurantListener;
 
     private ListenerRegistration registrationChosenRestaurant;
+    private ListenerRegistration registrationLikedRestaurant;
 
     /**
      * GooglePlacesApiRepository
@@ -291,4 +292,25 @@ public class MainViewModel extends ViewModel {
         }
     }
 
+    public void activateLikedRestaurantListener(){
+        Log.d(Tag.TAG, "activateLikedRestaurantListener() called");
+        registrationLikedRestaurant = LikeHelper.getLikedCollection()
+            .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                @Override
+                public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
+                    if (error != null){
+                        errorMutableLiveData.postValue(error.getMessage());
+                        return;
+                    }
+                    loadRestaurantAround(getLocationLiveData().getValue());
+                }
+            });
+    }
+
+    public void removeLikedRestaurantListener(){
+        if (registrationLikedRestaurant != null) {
+            Log.d(Tag.TAG, "WorkmatesViewModel.removeUsersListener() called");
+            registrationLikedRestaurant.remove();
+        }
+    }
 }
