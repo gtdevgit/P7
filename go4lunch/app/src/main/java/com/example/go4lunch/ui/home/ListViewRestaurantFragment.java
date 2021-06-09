@@ -84,6 +84,8 @@ public class ListViewRestaurantFragment extends Fragment {
         this.restaurantsList.addAll(restaurants);
         progressBar.setVisibility(View.INVISIBLE);
         listViewRestaurantAdapter.notifyDataSetChanged();
+
+
     }
 
     @Override

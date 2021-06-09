@@ -18,6 +18,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -32,6 +33,7 @@ import android.widget.TextView;
 
 import com.example.go4lunch.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -54,6 +56,7 @@ public class DetailRestaurantActivity extends AppCompatActivity {
     private boolean chosen;
     private List<User> usersList;
 
+    private ConstraintLayout constraintLayout;
     private ImageView imageView;
     private ImageView imageViewStar1;
     private ImageView imageViewStar2;
@@ -83,6 +86,7 @@ public class DetailRestaurantActivity extends AppCompatActivity {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         this.uid = currentUser.getUid();
 
+        constraintLayout = findViewById(R.id.activity_detail_restaurant_constraint_layout);
         textViewName = findViewById(R.id.activity_detail_restaurant_name);
         textViewInfo = findViewById(R.id.activity_detail_restaurant_info);
         imageView = findViewById(R.id.activity_detail_restaurant_picture);
@@ -110,6 +114,14 @@ public class DetailRestaurantActivity extends AppCompatActivity {
         });
 
         this.detailRestaurantViewModel = new DetailRestaurantViewModel(new GooglePlacesApiRepository(getString(R.string.google_api_key)));
+
+        this.detailRestaurantViewModel.getErrorLiveData().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                showSnackBar(s);
+            }
+        });
+
         this.detailRestaurantViewModel.getDetailRestaurantLiveData().observe(this, new Observer<DetailRestaurant>() {
             @Override
             public void onChanged(DetailRestaurant detailRestaurant) {
@@ -329,5 +341,9 @@ public class DetailRestaurantActivity extends AppCompatActivity {
     protected void onDestroy() {
         Log.d(TAG, "DetailRestaurantActivity.onDestroy() called");
         super.onDestroy();
+    }
+
+    private void showSnackBar(String message){
+        Snackbar.make(this.constraintLayout, message, Snackbar.LENGTH_SHORT).show();
     }
 }

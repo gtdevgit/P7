@@ -14,10 +14,12 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.ui.SettingActivity;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -47,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private MenuItem menuItemSearch;
 
+    private ConstraintLayout constraintLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,10 +77,16 @@ public class MainActivity extends AppCompatActivity {
             textViewUserName = headView.findViewById(R.id.navigation_header_user_name);
             textViewUserEmail = headView.findViewById(R.id.navigation_header_user_email);
         }
+
+        constraintLayout = findViewById(R.id.activity_main_constraint_layout);
     }
 
     public MenuItem getMenuItemSearch(){
         return menuItemSearch;
+    }
+
+    public ConstraintLayout getConstraintLayout() {
+        return constraintLayout;
     }
 
     @Override
@@ -169,4 +179,6 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "MainActivity.onDestroy() called");
         super.onDestroy();
     }
+
+
 }

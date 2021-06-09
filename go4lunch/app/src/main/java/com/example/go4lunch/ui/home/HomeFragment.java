@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
@@ -24,6 +25,7 @@ import com.example.go4lunch.repository.GooglePlacesApiRepository;
 import com.example.go4lunch.tag.Tag;
 import com.example.go4lunch.viewmodel.MainViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.snackbar.Snackbar;
 
 import static android.widget.Toast.LENGTH_SHORT;
 
@@ -101,6 +103,12 @@ public class HomeFragment extends Fragment {
         Log.d(TAG, "HomeFragment.initViewModel() called");
         this.mainViewModel = new MainViewModel(
                 new GooglePlacesApiRepository(getString(R.string.google_api_key)));
+        this.mainViewModel.getErrorLiveData().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                showSnackBar(s);
+            }
+        });
     }
 
     public void initGPS(){
@@ -146,4 +154,11 @@ public class HomeFragment extends Fragment {
         Log.d(TAG, "HomeFragment.onDestroy() called");
         super.onDestroy();
     }
+
+    private void showSnackBar(String message){
+        ConstraintLayout constraintLayout = ((MainActivity) getActivity()).getConstraintLayout();
+        Snackbar.make(constraintLayout, message, Snackbar.LENGTH_SHORT).show();
+    }
+
+
 }
