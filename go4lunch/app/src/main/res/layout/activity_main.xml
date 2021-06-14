@@ -11,7 +11,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/activity_main_constraint_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent" >
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <include
         layout="@layout/app_bar_main"

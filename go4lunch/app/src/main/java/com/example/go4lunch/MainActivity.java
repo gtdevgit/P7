@@ -13,6 +13,8 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.ui.SettingActivity;
+import com.example.go4lunch.ui.notification.NotificationHelper;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -79,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         constraintLayout = findViewById(R.id.activity_main_constraint_layout);
+
     }
 
     public MenuItem getMenuItemSearch(){
@@ -179,6 +182,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "MainActivity.onDestroy() called");
         super.onDestroy();
     }
+
 
 
 }

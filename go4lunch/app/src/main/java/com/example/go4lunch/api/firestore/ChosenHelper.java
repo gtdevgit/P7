@@ -48,7 +48,7 @@ public class ChosenHelper {
                             if (document.exists()) {
                                 UserRestaurantAssociation userRestaurantAssociation = document.toObject(UserRestaurantAssociation.class);
                                 Log.d(Tag.TAG, "ChosenHelper.isChosen()->onComplete() plaseId ok =" + (userRestaurantAssociation.getPlaceId() == placeId));
-                                // must check if si this the good palce
+                                // must check if is this the good place
                                 chosenListener.onGetChosen(userRestaurantAssociation.getPlaceId().equals(placeId));
                             } else {
                                 Log.d(Tag.TAG, "ChosenHelper.isChosen()->onComplete() false");

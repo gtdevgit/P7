@@ -30,6 +30,7 @@ import com.example.go4lunch.models.DetailRestaurant;
 import com.example.go4lunch.models.Restaurant;
 import com.example.go4lunch.tag.Tag;
 import com.example.go4lunch.ui.detailrestaurant.DetailRestaurantActivity;
+import com.example.go4lunch.ui.notification.NotificationHelper;
 import com.example.go4lunch.viewmodel.MainViewModel;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -87,6 +88,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         Log.d(Tag.TAG, "MapFragment.onCreateView()");
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_map, container, false);
+
+        floatingActionButton = view.findViewById(R.id.fragment_map_floatingActionButton);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendNotification();
+            }
+        });
 
         // location observer
         this.mainViewModel.getLocationLiveData().observe(getViewLifecycleOwner(), new Observer<Location>() {
@@ -241,5 +250,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         Log.d(Tag.TAG, "MapFragment.onStart() called");
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+    }
+
+    private void sendNotification(){
+        NotificationHelper.sendNotification(getContext(), "manger !");
     }
 }
