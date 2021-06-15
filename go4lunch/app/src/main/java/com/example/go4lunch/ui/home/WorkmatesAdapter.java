@@ -15,6 +15,7 @@ import com.example.go4lunch.R;
 import com.example.go4lunch.models.User;
 import com.example.go4lunch.tag.Tag;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class WorkmatesAdapter extends RecyclerView.Adapter<WorkmatesViewHolder> {
@@ -22,8 +23,8 @@ public class WorkmatesAdapter extends RecyclerView.Adapter<WorkmatesViewHolder> 
     private static final String TAG = Tag.TAG;
     private List<User> users;
 
-    public WorkmatesAdapter(List<User> users) {
-        this.users = users;
+    public WorkmatesAdapter() {
+        this.users = new ArrayList<>();
     }
 
     @NonNull
@@ -62,5 +63,10 @@ public class WorkmatesAdapter extends RecyclerView.Adapter<WorkmatesViewHolder> 
     public int getItemCount() {
         Log.d(TAG, "WorkmatesAdapter. getItemCount() called with users.size() = " + users.size());
         return users.size();
+    }
+
+    public void updateData(List<User> users){
+        this.users = users;
+        this.notifyDataSetChanged();
     }
 }

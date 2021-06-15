@@ -29,7 +29,6 @@ public class WorkmatesFragment extends Fragment {
     private static final String TAG = Tag.TAG;
 
     private WorkmatesViewModel workmatesViewModel;
-    private List<User> usersList;
 
     TextView TextViewUserList;
     private RecyclerView recyclerView;
@@ -58,8 +57,7 @@ public class WorkmatesFragment extends Fragment {
         layoutManager = new LinearLayoutManager(root.getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        usersList = new ArrayList<>();
-        workmatesAdapter = new WorkmatesAdapter(usersList);
+        workmatesAdapter = new WorkmatesAdapter();
         recyclerView.setAdapter(workmatesAdapter);
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
@@ -69,13 +67,9 @@ public class WorkmatesFragment extends Fragment {
         workmatesViewModel.getWorkmatesLiveData().observe(getViewLifecycleOwner(), new Observer<List<User>>() {
             @Override
             public void onChanged(List<User> users) {
-                Log.d(TAG, "WorkmatesFragment: onChanged() called with: users = [" + users + "]");
-                usersList.clear();
-                usersList.addAll(users);
-                Log.d(TAG, "WorkmatesFragment: onChanged() called with: usersList = [" + usersList + "]");
-                Log.d(TAG, "WorkmatesFragment: onChanged() usersList.size() = [" + usersList.size() + "]");
+                Log.d(TAG, "WorkmatesFragment: onChanged() users.size() = [" + users.size() + "]");
+                workmatesAdapter.updateData(users);
                 workmateProgressBar.setVisibility(View.INVISIBLE);
-                workmatesAdapter.notifyDataSetChanged();
             }
         });
 

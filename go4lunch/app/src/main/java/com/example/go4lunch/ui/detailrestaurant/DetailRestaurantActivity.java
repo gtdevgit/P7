@@ -54,7 +54,6 @@ public class DetailRestaurantActivity extends AppCompatActivity {
     private boolean telephonySupported;
     private boolean liked;
     private boolean chosen;
-    private List<User> usersList;
 
     private ConstraintLayout constraintLayout;
     private ImageView imageView;
@@ -173,8 +172,7 @@ public class DetailRestaurantActivity extends AppCompatActivity {
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        usersList = new ArrayList<>();
-        workmatesAdapter = new WorkmatesAdapter(usersList);
+        workmatesAdapter = new WorkmatesAdapter();
         recyclerView.setAdapter(workmatesAdapter);
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
@@ -290,8 +288,7 @@ public class DetailRestaurantActivity extends AppCompatActivity {
     }
 
     private void setWorkmates(List<User> users){
-        this.usersList.clear();
-        this.usersList.addAll(users);
+        workmatesAdapter.updateData(users);
         workmatesAdapter.notifyDataSetChanged();
     }
 
