@@ -235,23 +235,27 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     @Override
-    public void onPause() {
-        Log.d(Tag.TAG, "MapFragment.onPause() called");
-        super.onPause();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.d(Tag.TAG, "MapFragment.onResume() called");
-    }
-
-    @Override
     public void onStart() {
         super.onStart();
         Log.d(Tag.TAG, "MapFragment.onStart() called");
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(Tag.TAG, "MapFragment.onResume() ********************");
+        if ((mMap != null) && (this.location != null)) {
+            this.mainViewModel.activateChosenRestaurantListener();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        Log.d(Tag.TAG, "MapFragment.onPause() called");
+        this.mainViewModel.removerChosenRestaurantListener();
+        super.onPause();
     }
 
     private void centerUserPosition(){
