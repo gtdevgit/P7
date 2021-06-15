@@ -17,6 +17,7 @@ import com.example.go4lunch.R;
 import com.example.go4lunch.models.Restaurant;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ListViewRestaurantAdapter extends RecyclerView.Adapter<ListViewRestaurantViewHolder> {
@@ -24,8 +25,8 @@ public class ListViewRestaurantAdapter extends RecyclerView.Adapter<ListViewRest
     private List<Restaurant> restaurants;
     private OnClickListenerRestaurant onClickListenerRestaurant;
 
-    public ListViewRestaurantAdapter(List<Restaurant> restaurants, OnClickListenerRestaurant onClickListenerRestaurant) {
-        this.restaurants = restaurants;
+    public ListViewRestaurantAdapter(OnClickListenerRestaurant onClickListenerRestaurant) {
+        this.restaurants = new ArrayList<>();
         this.onClickListenerRestaurant = onClickListenerRestaurant;
     }
 
@@ -39,7 +40,8 @@ public class ListViewRestaurantAdapter extends RecyclerView.Adapter<ListViewRest
             @Override
             public void onClick(View v) {
                 int position = listViewRestaurantViewHolder.getAdapterPosition();
-                onClickListenerRestaurant.onCLickRestaurant(position);
+                Restaurant restaurant = restaurants.get(position);
+                onClickListenerRestaurant.onCLickRestaurant(restaurant);
             }
         });
         return listViewRestaurantViewHolder;
@@ -66,18 +68,8 @@ public class ListViewRestaurantAdapter extends RecyclerView.Adapter<ListViewRest
         holder.imageViewRestaurantStar2.setColorFilter(getStarColorByLevel(holder.imageViewRestaurantStar2.getContext(), restaurant.getCountLike(), 2));
         holder.imageViewRestaurantStar3.setColorFilter(getStarColorByLevel(holder.imageViewRestaurantStar3.getContext(), restaurant.getCountLike(), 3));
 
-
-        /*
-        //todo : liste des restaurants : charger les étoiles
-
         //todo : liste des restaurants : charger les horaires ou open/close
-        holder.imageViewRestaurantRating1.setBackgroundTintList(
-            holder.imageViewRestaurantRating1.getContext().getResources().getColorStateList(R.color.colorAccent));
-        holder.imageViewRestaurantRating2.setBackgroundTintList(
-            holder.imageViewRestaurantRating1.getContext().getResources().getColorStateList(R.color.colorAccent));
-        holder.imageViewRestaurantRating3.setBackgroundTintList(
-            holder.imageViewRestaurantRating1.getContext().getResources().getColorStateList(R.color.colorAccent));
-         */
+
         if (restaurant.getUrlPicture() == null) {
             // Clear picture
             Glide.with(holder.imageViewRestaurant.getContext())
@@ -99,4 +91,8 @@ public class ListViewRestaurantAdapter extends RecyclerView.Adapter<ListViewRest
         return restaurants.size();
     }
 
+    public void updateData(List<Restaurant> restaurants) {
+        this.restaurants = restaurants;
+        this.notifyDataSetChanged();
+    }
 }

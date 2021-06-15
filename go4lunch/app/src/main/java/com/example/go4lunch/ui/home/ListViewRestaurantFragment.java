@@ -37,7 +37,6 @@ public class ListViewRestaurantFragment extends Fragment {
     private MainViewModel mainViewModel;
 
     private Location location;
-    private List<Restaurant> restaurantsList;
     ListViewRestaurantAdapter listViewRestaurantAdapter;
 
     public ListViewRestaurantFragment(MainViewModel mainViewModel) {
@@ -57,11 +56,10 @@ public class ListViewRestaurantFragment extends Fragment {
         layoutManager = new LinearLayoutManager(root.getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        restaurantsList = new ArrayList<>();
-        listViewRestaurantAdapter = new ListViewRestaurantAdapter(restaurantsList, new OnClickListenerRestaurant() {
+        listViewRestaurantAdapter = new ListViewRestaurantAdapter(new OnClickListenerRestaurant() {
             @Override
-            public void onCLickRestaurant(int position) {
-                showDetailRestaurant(position);
+            public void onCLickRestaurant(Restaurant restaurant) {
+                showDetailRestaurant(restaurant.getPlaceId());
             }
         });
         recyclerView.setAdapter(listViewRestaurantAdapter);
@@ -80,12 +78,8 @@ public class ListViewRestaurantFragment extends Fragment {
     private void setRestaurants(List<Restaurant> restaurants){
         Log.d(Tag.TAG, "ListViewRestaurantFragment.setRestaurants(restaurants) restaurants.size()=" + restaurants.size());
         progressBar.setVisibility(View.VISIBLE);
-        this.restaurantsList.clear();
-        this.restaurantsList.addAll(restaurants);
+        listViewRestaurantAdapter.updateData(restaurants);
         progressBar.setVisibility(View.INVISIBLE);
-        listViewRestaurantAdapter.notifyDataSetChanged();
-
-
     }
 
     @Override
@@ -94,8 +88,7 @@ public class ListViewRestaurantFragment extends Fragment {
         Log.d(Tag.TAG, "ListViewRestaurantFragment.onViewCreated() called");
     }
 
-    private void showDetailRestaurant(int position){
-        String placeId = restaurantsList.get(position).getPlaceId();
+    private void showDetailRestaurant(String placeId){
         Intent intent;
         intent = new Intent(this.getActivity(), DetailRestaurantActivity.class);
         Bundle bundle = new Bundle();
@@ -128,11 +121,9 @@ public class ListViewRestaurantFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        // blanck screen !
+        Log.d(Tag.TAG, "ListViewRestaurantFragment.onResume() called");
         this.mainViewModel.activateChosenRestaurantListener();
         this.mainViewModel.activateLikedRestaurantListener();
-
-        Log.d(Tag.TAG, "ListViewRestaurantFragment.onResume() called");
     }
 
     @Override
