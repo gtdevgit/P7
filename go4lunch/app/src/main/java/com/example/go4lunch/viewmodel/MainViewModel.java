@@ -195,7 +195,6 @@ public class MainViewModel extends ViewModel {
         Log.d(Tag.TAG, "MainViewModel.loadRestaurantAround()");
 
         List<UserRestaurantAssociation> likedUserRestaurants = new ArrayList<>();
-        List<UserRestaurantAssociation> chossenUserRestaurants = new ArrayList<>();
 
         FailureListener failureListener = new FailureListener() {
             @Override
