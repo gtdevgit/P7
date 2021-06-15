@@ -12,11 +12,10 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.go4lunch.notification.NotificationHelper;
 import com.example.go4lunch.ui.SettingActivity;
-import com.example.go4lunch.ui.notification.NotificationHelper;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.example.go4lunch.notification.NotificationWorker;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -29,8 +28,9 @@ import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-
-import java.util.Observer;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
 
 //implements OnMapReadyCallback
 public class MainActivity extends AppCompatActivity {
@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
         constraintLayout = findViewById(R.id.activity_main_constraint_layout);
 
+        NotificationHelper.startNotificationWorker(this);
     }
 
     public MenuItem getMenuItemSearch(){
