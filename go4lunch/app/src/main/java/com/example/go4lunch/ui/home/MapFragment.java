@@ -93,7 +93,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendNotification();
+                centerUserPosition();
             }
         });
 
@@ -254,7 +254,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         mapFragment.getMapAsync(this);
     }
 
-    private void sendNotification(){
-        NotificationHelper.sendNotification(getContext(), "manger !");
+    private void centerUserPosition(){
+        if ((mMap != null) && (this.location != null)) {
+            LatLng latlng = new LatLng(location.getLatitude(), location.getLongitude());
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, 14));
+        }
     }
 }
