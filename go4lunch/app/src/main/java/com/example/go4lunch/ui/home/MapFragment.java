@@ -207,13 +207,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         if(mMap!=null) {
             progressBar.setVisibility(View.VISIBLE);
             // todo : this Bitmap must be in ressources
-            Bitmap bitmap = drawableToBitmap(getResources().getDrawable(R.drawable.ic_baseline_restaurant_24_primary_color, getContext().getTheme()));
+            Bitmap bitmapUnselected = drawableToBitmap(getResources().getDrawable(R.drawable.ic_baseline_restaurant_24_primary_color, getContext().getTheme()));
+            Bitmap bitmapSelected = drawableToBitmap(getResources().getDrawable(R.drawable.ic_baseline_restaurant_24_selected, getContext().getTheme()));
+
             for (Restaurant restaurant : restaurants){
                 LatLng latlng = new LatLng(restaurant.getLatitude(), restaurant.getLongitude());
                 Marker marker = mMap.addMarker(new MarkerOptions()
                                 .position(latlng)
                                 .title(restaurant.getName())
-                                .icon(BitmapDescriptorFactory.fromBitmap(bitmap))
+                                .icon(BitmapDescriptorFactory.fromBitmap((restaurant.getWorkmatesCount() > 0 ? bitmapSelected : bitmapUnselected)))
                 );
                 marker.setTag(restaurant.getPlaceId());
                 mMap.setOnMarkerClickListener(this::onMarkerClick);
