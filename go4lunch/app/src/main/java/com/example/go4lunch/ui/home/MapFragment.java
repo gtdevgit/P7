@@ -153,6 +153,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         if(mMap!=null) {
             progressBar.setVisibility(View.INVISIBLE);
             LatLng latlng = new LatLng(location.getLatitude(), location.getLongitude());
+            mMap.clear();
             mMap.addMarker(new MarkerOptions().position(latlng).title("You position"));
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, 14));
         }
@@ -209,7 +210,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             // todo : this Bitmap must be in ressources
             Bitmap bitmapUnselected = drawableToBitmap(getResources().getDrawable(R.drawable.ic_baseline_restaurant_24_primary_color, getContext().getTheme()));
             Bitmap bitmapSelected = drawableToBitmap(getResources().getDrawable(R.drawable.ic_baseline_restaurant_24_selected, getContext().getTheme()));
-
             for (Restaurant restaurant : restaurants){
                 LatLng latlng = new LatLng(restaurant.getLatitude(), restaurant.getLongitude());
                 Marker marker = mMap.addMarker(new MarkerOptions()
