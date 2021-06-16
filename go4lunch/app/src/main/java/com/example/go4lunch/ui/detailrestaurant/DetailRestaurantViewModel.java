@@ -84,7 +84,7 @@ public class DetailRestaurantViewModel extends ViewModel {
                 Log.d(Tag.TAG, "DetailRestaurantViewModel.onGetUsersWhoChoseThisRestaurant() called with: userRestaurantAssociations = [" + userRestaurantAssociations + "]");
                 List<String> uidList = userRestaurantAssociationListToUidList(userRestaurantAssociations);
 
-                UserHelper.getUsersByList(uidList, userListListener, failureListener);
+                UserHelper.getUsersByUidList(uidList, userListListener, failureListener);
             }
         };
     }
@@ -301,7 +301,7 @@ public class DetailRestaurantViewModel extends ViewModel {
                     }
                 }
                 List<String> uidList = userRestaurantAssociationListToUidList(userRestaurantAssociations);
-                UserHelper.getUsersByList(uidList, userListListener, failureListener);
+                UserHelper.getUsersByUidList(uidList, userListListener, failureListener);
             }
         });
     };

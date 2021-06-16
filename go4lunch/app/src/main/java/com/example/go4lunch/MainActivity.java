@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     // todo : test intrumentalisés
     // todo : réorganiser un peu l'architecture. centraliser les view model / créer un factory + injection
     // Todo : optionnel : MAP : Tracer le chemin vers le restaurant choisi.
+    // suppression utilisateur, supprimer les choix, aussi les like ?
 
     private static final String TAG = "MainActivity";
 

@@ -12,7 +12,7 @@ public class UserRestaurantAssociation {
     /**
      * created date
      */
-    private long currentTime;
+    private long createdTime;
 
     /**
      * need no-argument constructor for deserialize firestore document to object
@@ -22,7 +22,7 @@ public class UserRestaurantAssociation {
     public UserRestaurantAssociation(String userUid, String placeId) {
         this.userUid = userUid;
         this.placeId = placeId;
-        currentTime = System.currentTimeMillis();
+        createdTime = System.currentTimeMillis();
     }
 
     public String getUserUid() {
@@ -41,11 +41,11 @@ public class UserRestaurantAssociation {
         this.placeId = placeId;
     }
 
-    public long getCurrentTime() {
-        return currentTime;
+    public long getCreatedTime() {
+        return createdTime;
     }
 
     public void setCurrentTime(long currentTime) {
-        this.currentTime = currentTime;
+        this.createdTime = currentTime;
     }
 }

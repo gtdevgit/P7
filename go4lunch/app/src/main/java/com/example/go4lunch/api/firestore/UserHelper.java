@@ -63,7 +63,7 @@ public class UserHelper {
                 });
     }
 
-    public static void getUsersByList(List<String> uidList, UserListListener userListListener, FailureListener failureListener){
+    public static void getUsersByUidList(List<String> uidList, UserListListener userListListener, FailureListener failureListener){
         List<User> users = new ArrayList<>();
         Log.d(TAG, "UserHelper.getUsersByList() called with: uidList.size()=" + uidList.size());
         if ((uidList != null) && (uidList.size() > 0)){

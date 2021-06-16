@@ -18,6 +18,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class ChosenHelper {
@@ -159,6 +160,56 @@ public class ChosenHelper {
                             }
                             Log.d(Tag.TAG, "getChosenRestaurants. successful with userRestaurantAssociationList.size()=" + userRestaurantAssociationList.size());
                             userRestaurantAssociationListListener.onGetUserRestaurantAssociationList(userRestaurantAssociationList);
+                        } else {
+                            failureListener.onFailure(task.getException());
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull @NotNull Exception e) {
+                        failureListener.onFailure(e);
+                    }
+                });
+    }
+
+    public static void getChosenRestaurantByUser(String uid, UserRestaurantAssociationListener userRestaurantAssociationListener, FailureListener failureListener){
+        Log.d(Tag.TAG, "getChosenRestaurantByUser() called with: uid = [" + uid + "]");
+        getChosenCollection().document(uid)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
+                        Log.d(Tag.TAG, "getChosenRestaurantByUser() onComplete() task.isSuccessful()=" + task.isSuccessful());
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot documentSnapshot = task.getResult();
+                            Log.d(Tag.TAG, "getChosenRestaurantByUser() onComplete() documentSnapshot.exists()=" + documentSnapshot.exists());
+                            if (documentSnapshot.exists()){
+                                UserRestaurantAssociation userRestaurantAssociation = documentSnapshot.toObject(UserRestaurantAssociation.class);
+                                // test la date
+                                long createdTime = userRestaurantAssociation.getCreatedTime();
+                                // current time
+                                Calendar firstHourOffTheDay = Calendar.getInstance();
+                                // current day at 00h00
+                                firstHourOffTheDay.set(Calendar.HOUR, 0);
+                                firstHourOffTheDay.set(Calendar.MINUTE, 0);
+                                firstHourOffTheDay.set(Calendar.SECOND, 0);
+                                firstHourOffTheDay.set(Calendar.MILLISECOND, 0);
+                                // current day at 23h59m59s999
+                                Calendar lastHourOffTheDay = Calendar.getInstance();
+                                lastHourOffTheDay.set(Calendar.HOUR, 23);
+                                lastHourOffTheDay.set(Calendar.MINUTE, 59);
+                                lastHourOffTheDay.set(Calendar.SECOND, 59);
+                                lastHourOffTheDay.set(Calendar.MILLISECOND, 999);
+
+                                // createdTime must be in current day
+                                if ((createdTime >= firstHourOffTheDay.getTimeInMillis()) &&
+                                        (createdTime <= lastHourOffTheDay.getTimeInMillis())){
+                                    userRestaurantAssociationListener.onGetUserRestaurantAssociation(userRestaurantAssociation);
+                                } else {
+                                    Log.d(Tag.TAG, "onComplete() bad time !");
+                                }
+                            }
                         } else {
                             failureListener.onFailure(task.getException());
                         }

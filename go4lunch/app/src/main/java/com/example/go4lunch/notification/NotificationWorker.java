@@ -2,15 +2,26 @@ package com.example.go4lunch.notification;
 
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import com.example.go4lunch.api.firestore.ChosenHelper;
+import com.example.go4lunch.api.firestore.FailureListener;
+import com.example.go4lunch.api.firestore.UserRestaurantAssociationListListener;
+import com.example.go4lunch.api.firestore.UserRestaurantAssociationListener;
+import com.example.go4lunch.models.UserRestaurantAssociation;
+import com.example.go4lunch.tag.Tag;
+import com.google.firebase.auth.FirebaseAuth;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.logging.LogManager;
 
 public class NotificationWorker extends Worker {
 
@@ -25,16 +36,23 @@ public class NotificationWorker extends Worker {
     @NotNull
     @Override
     public Result doWork() {
-        List<String> workmates = new ArrayList<>();
-        workmates.add("Jean");
-        workmates.add("Alain");
-        workmates.add("Kevin");
-        workmates.add("Lucie");
+        Log.d(Tag.TAG, "doWork() called");
+        String uid = FirebaseAuth.getInstance().getUid();
+        NotificationHelper.createMessage(uid,
+                new NotificationMessageListener() {
+                    @Override
+                    public void onCreatedMessage(String restaurantName, String restaurantAddress, List<String> workmates) {
+                        NotificationHelper.sendNotification(context, restaurantName, restaurantAddress, workmates);
+                    }
+                },
+                new FailureListener() {
+                    @Override
+                    public void onFailure(Exception e) {
 
-        NotificationHelper.sendNotification(this.context, "LE ZING", "10 rue du bois", workmates);
+                    }
+                });
 
         NotificationHelper.startNotificationWorker(this.context);
-
         return Result.success();
     }
 }
