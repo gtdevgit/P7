@@ -1,5 +1,7 @@
 package com.example.go4lunch.models;
 
+import androidx.annotation.ColorRes;
+
 import java.util.List;
 
 public class DetailRestaurant {
@@ -18,8 +20,15 @@ public class DetailRestaurant {
     private List<String> workmates;
     private List<String> urlPhotos;
     private int countLike;
+    private int star1Color;
+    private int star2Color;
+    private int star3Color;
 
-    public DetailRestaurant(String placeId, String name, String info, String phoneNumber, String website, String urlPicture, double rating, boolean haveStar1, boolean haveStar2, boolean haveStar3, boolean isLiked, boolean isOpen, List<String> workmates, List<String> urlPhotos, int countLike) {
+    public DetailRestaurant(String placeId, String name, String info, String phoneNumber,
+                            String website, String urlPicture, double rating, boolean haveStar1,
+                            boolean haveStar2, boolean haveStar3, boolean isLiked, boolean isOpen,
+                            List<String> workmates, List<String> urlPhotos, int countLike,
+                            int star1Color, int star2Color, int star3Color) {
         this.placeId = placeId;
         this.name = name;
         this.info = info;
@@ -35,6 +44,10 @@ public class DetailRestaurant {
         this.workmates = workmates;
         this.urlPhotos = urlPhotos;
         this.countLike = countLike;
+        this.star1Color = star1Color;
+        this.star2Color = star2Color;
+        this.star3Color = star3Color;
+
     }
 
     public String getPlaceId() {
@@ -155,5 +168,29 @@ public class DetailRestaurant {
 
     public void setCountLike(int countLike) {
         this.countLike = countLike;
+    }
+
+    public int getStar1Color() {
+        return star1Color;
+    }
+
+    public void setStar1Color(int star1Color) {
+        this.star1Color = star1Color;
+    }
+
+    public int getStar2Color() {
+        return star2Color;
+    }
+
+    public void setStar2Color(int star2Color) {
+        this.star2Color = star2Color;
+    }
+
+    public int getStar3Color() {
+        return star3Color;
+    }
+
+    public void setStar3Color(int star3Color) {
+        this.star3Color = star3Color;
     }
 }

@@ -15,6 +15,7 @@ import com.example.go4lunch.tag.Tag;
 import com.example.go4lunch.ui.home.WorkmatesAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -125,7 +126,10 @@ public class DetailRestaurantActivity extends AppCompatActivity {
             @Override
             public void onChanged(DetailRestaurant detailRestaurant) {
                 textViewName.setText(detailRestaurant.getName());
-                setStarCount(detailRestaurant.getCountLike());
+                setStar1Color(detailRestaurant.getStar1Color());
+                setStar2Color(detailRestaurant.getStar2Color());
+                setStar3Color(detailRestaurant.getStar3Color());
+
                 textViewInfo.setText(detailRestaurant.getInfo());
 
                 if (detailRestaurant.getUrlPicture() == null) {
@@ -187,12 +191,23 @@ public class DetailRestaurantActivity extends AppCompatActivity {
             }
         });
         this.detailRestaurantViewModel.loadWorkmatesByPlace(this.placeId);
-
-        // observe like
-        this.detailRestaurantViewModel.getCountLikedLiveData().observe(this, new Observer<Integer>() {
+        
+        this.detailRestaurantViewModel.getStar1ColorMutableLiveData().observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(Integer integer) {
-                setStarCount(integer.intValue());
+                setStar1Color(integer.intValue());
+            }
+        });
+        this.detailRestaurantViewModel.getStar2ColorMutableLiveData().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                setStar2Color(integer.intValue());
+            }
+        });
+        this.detailRestaurantViewModel.getStar3ColorMutableLiveData().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                setStar3Color(integer.intValue());
             }
         });
     }
@@ -292,18 +307,16 @@ public class DetailRestaurantActivity extends AppCompatActivity {
         workmatesAdapter.notifyDataSetChanged();
     }
 
-    private int getStarColorByLevel(int count, int level){
-        if (count < level) {
-            return ContextCompat.getColor(this, R.color.white);
-        } else {
-            return ContextCompat.getColor(this, R.color.yellow);
-        }
+    private void setStar1Color(@ColorRes int color){
+        imageViewStar1.setColorFilter(ContextCompat.getColor(this, color));
     }
 
-    private void setStarCount(int count){
-        imageViewStar1.setColorFilter(getStarColorByLevel(count, 1));
-        imageViewStar2.setColorFilter(getStarColorByLevel(count, 2));
-        imageViewStar3.setColorFilter(getStarColorByLevel(count, 3));
+    private void setStar2Color(@ColorRes int color){
+        imageViewStar2.setColorFilter(ContextCompat.getColor(this, color));
+    }
+
+    private void setStar3Color(@ColorRes int color){
+        imageViewStar3.setColorFilter(ContextCompat.getColor(this, color));
     }
 
     @Override

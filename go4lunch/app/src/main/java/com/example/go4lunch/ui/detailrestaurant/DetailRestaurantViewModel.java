@@ -3,10 +3,12 @@ package com.example.go4lunch.ui.detailrestaurant;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.go4lunch.R;
 import com.example.go4lunch.api.firestore.ChosenHelper;
 import com.example.go4lunch.api.firestore.ChosenListener;
 import com.example.go4lunch.api.firestore.FailureListener;
@@ -37,6 +39,10 @@ import retrofit2.Response;
 
 public class DetailRestaurantViewModel extends ViewModel {
 
+    private final int STAR_LEVEL_1 = 1;
+    private final int STAR_LEVEL_2 = 2;
+    private final int STAR_LEVEL_3 = 3;
+
     private GooglePlacesApiRepository googlePlacesApiRepository;
 
     private final MutableLiveData<DetailRestaurant> detailRestaurantMutableLiveData = new MutableLiveData<>();
@@ -45,6 +51,10 @@ public class DetailRestaurantViewModel extends ViewModel {
     private final MutableLiveData<Boolean> chosenMutableLiveData = new MutableLiveData<Boolean>();
     private final MutableLiveData<List<User>> workmatesMutableLiveData = new MutableLiveData<>();
     private final MutableLiveData<Integer> countLikedMutableLiveData = new MutableLiveData<>();
+
+    private final MutableLiveData<Integer> star1ColorMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Integer> star2ColorMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Integer> star3ColorMutableLiveData = new MutableLiveData<>();
 
     private ListenerRegistration registrationChosen;
     private ListenerRegistration registrationLiked;
@@ -111,6 +121,18 @@ public class DetailRestaurantViewModel extends ViewModel {
 
     public LiveData<Integer> getCountLikedLiveData() {
         return countLikedMutableLiveData;
+    }
+
+    public LiveData<Integer> getStar1ColorMutableLiveData() {
+        return star1ColorMutableLiveData;
+    }
+
+    public LiveData<Integer> getStar2ColorMutableLiveData() {
+        return star2ColorMutableLiveData;
+    }
+
+    public LiveData<Integer> getStar3ColorMutableLiveData() {
+        return star3ColorMutableLiveData;
     }
 
     /**
@@ -180,13 +202,20 @@ public class DetailRestaurantViewModel extends ViewModel {
                             String urlPicture = (urlPhotos.size() > 0) ? urlPhotos.get(0) : null;
 
                             double rating = placeDetails.getResult().getRating();
-                            boolean haveStar1 = false;
-                            boolean haveStar2 = false;
-                            boolean haveStar3 = false;
                             boolean isLiked = false;
                             boolean isOpen = (placeDetails.getResult().getOpeningHours() == null) ? false : placeDetails.getResult().getOpeningHours().getOpenNow();
                             List<String> workmates = null;
-                            int countLike = likedUserRestaurants.size();
+
+                            int likeCounter = likedUserRestaurants.size();
+                            boolean haveStar1 = getStarByLevel(STAR_LEVEL_1, likeCounter);
+                            int star1Color = getStarColorByLevel(STAR_LEVEL_1, likeCounter);
+
+                            boolean haveStar2 = getStarByLevel(STAR_LEVEL_2, likeCounter);
+                            int star2Color = getStarColorByLevel(STAR_LEVEL_2, likeCounter);
+
+                            boolean haveStar3 = getStarByLevel(STAR_LEVEL_3, likeCounter);
+                            int star3Color = getStarColorByLevel(STAR_LEVEL_3, likeCounter);
+
                             DetailRestaurant detailRestaurant = new DetailRestaurant(placeId,
                                     name,
                                     info,
@@ -201,7 +230,10 @@ public class DetailRestaurantViewModel extends ViewModel {
                                     isOpen,
                                     workmates,
                                     urlPhotos,
-                                    countLike);
+                                    likeCounter,
+                                    star1Color,
+                                    star2Color,
+                                    star3Color);
                             detailRestaurantMutableLiveData.postValue(detailRestaurant);
                         }
                     }
@@ -216,6 +248,18 @@ public class DetailRestaurantViewModel extends ViewModel {
         };
 
         LikeHelper.getUsersWhoLikedThisRestaurant(placeId, userRestaurantAssociationListListener, failureListener);
+    }
+
+    private boolean getStarByLevel(int level, int likeCounter){
+        return (likeCounter >= level);
+    }
+
+    private int getStarColorByLevel(int level, int likeCounter){
+        if (getStarByLevel(level, likeCounter)) {
+            return R.color.yellow;
+        } else {
+            return R.color.white;
+        }
     }
 
     public void loadIsLiked(String uid, String placeId){
@@ -329,8 +373,14 @@ public class DetailRestaurantViewModel extends ViewModel {
                             errorMutableLiveData.postValue(error.getMessage());
                             return;
                         }
-                        int countLike = value.size();
-                        countLikedMutableLiveData.postValue(new Integer(countLike));
+                        int likeCounter = value.size();
+                        countLikedMutableLiveData.postValue(new Integer(likeCounter));
+                        int star1Color = getStarColorByLevel(STAR_LEVEL_1, likeCounter);
+                        star1ColorMutableLiveData.postValue(new Integer(star1Color));
+                        int star2Color = getStarColorByLevel(STAR_LEVEL_2, likeCounter);
+                        star2ColorMutableLiveData.postValue(new Integer(star2Color));
+                        int star3Color = getStarColorByLevel(STAR_LEVEL_3, likeCounter);
+                        star3ColorMutableLiveData.postValue(new Integer(star3Color));
                     }
                 });
     };
