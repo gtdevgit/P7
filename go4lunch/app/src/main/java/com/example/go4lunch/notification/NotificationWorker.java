@@ -8,11 +8,13 @@ import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import com.example.go4lunch.R;
 import com.example.go4lunch.api.firestore.ChosenHelper;
 import com.example.go4lunch.api.firestore.FailureListener;
 import com.example.go4lunch.api.firestore.UserRestaurantAssociationListListener;
 import com.example.go4lunch.api.firestore.UserRestaurantAssociationListener;
 import com.example.go4lunch.models.UserRestaurantAssociation;
+import com.example.go4lunch.repository.GooglePlacesApiRepository;
 import com.example.go4lunch.tag.Tag;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -39,6 +41,7 @@ public class NotificationWorker extends Worker {
         Log.d(Tag.TAG, "doWork() called");
         String uid = FirebaseAuth.getInstance().getUid();
         NotificationHelper.createMessage(uid,
+                new GooglePlacesApiRepository(context.getString(R.string.google_api_key)),
                 new NotificationMessageListener() {
                     @Override
                     public void onCreatedMessage(String restaurantName, String restaurantAddress, List<String> workmates) {

@@ -4,7 +4,6 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -13,11 +12,9 @@ import android.util.Log;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.work.OneTimeWorkRequest;
-import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
-import com.example.go4lunch.MainApplication;
 import com.example.go4lunch.R;
 import com.example.go4lunch.api.firestore.ChosenHelper;
 import com.example.go4lunch.api.firestore.FailureListener;
@@ -26,13 +23,19 @@ import com.example.go4lunch.api.firestore.UserListListener;
 import com.example.go4lunch.api.firestore.UserRestaurantAssociationListListener;
 import com.example.go4lunch.models.User;
 import com.example.go4lunch.models.UserRestaurantAssociation;
+import com.example.go4lunch.models.googleplaces.palcesdetails.PlaceDetails;
 import com.example.go4lunch.navigation.NavigationActivity;
+import com.example.go4lunch.repository.GooglePlacesApiRepository;
 import com.example.go4lunch.tag.Tag;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class NotificationHelper {
     private static final String DEFAULT_NOTIFICATION_CHANNEL = "go4lunch default channel";
@@ -64,7 +67,8 @@ public class NotificationHelper {
         dueDate.set(Calendar.MINUTE, 0);
         dueDate.set(Calendar.MINUTE, 0);
 
-        //dueDate.add(Calendar.SECOND, 10);
+        // for testing
+        // dueDate.add(Calendar.SECOND, 20);
 
         if (dueDate.before(currentDate)) {
             dueDate.add(Calendar.HOUR_OF_DAY, 24);
@@ -91,16 +95,8 @@ public class NotificationHelper {
      * @param workmatesName
      */
     public static void sendNotification(Context context, String restaurantName, String restaurantAddress, List<String> workmatesName) {
-
-        // nom du restaurant
-        // adresse
-        // liste des collégues
-        final String title = "restaurantName";
         StringBuilder sb = new StringBuilder();
-        // sb.append(restaurantName);
-        // sb.append(" ");
-        // sb.append(restaurantAddress);
-        // sb.append(" ");
+
         for(int i = 0; i < workmatesName.size(); i++){
             sb.append(workmatesName.get(i));
             if (i < workmatesName.size()-1){
@@ -118,7 +114,7 @@ public class NotificationHelper {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, DEFAULT_NOTIFICATION_CHANNEL)
             .setContentIntent(contentIntent)
             .setSmallIcon(R.drawable.ic_baseline_notifications_24)
-            .setContentTitle(restaurantName)
+            .setContentTitle(restaurantName + " " + restaurantAddress)
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setCategory(NotificationCompat.CATEGORY_SOCIAL)
@@ -131,10 +127,10 @@ public class NotificationHelper {
         notificationManagerCompat.notify(notificationId, notification);
     }
 
-    public static void createMessage(String uid, NotificationMessageListener notificationMessageListener, FailureListener failureListener){
-        String restaurant = "restaurant";
-        String address = "address";
-        List<String> workmatesUid = new ArrayList<>();
+    public static void createMessage(String uid,
+                                     GooglePlacesApiRepository googlePlacesApiRepository,
+                                     NotificationMessageListener notificationMessageListener,
+                                     FailureListener failureListener){
         List<String> workmatesName = new ArrayList<>();
 
         ChosenHelper.getChosenRestaurants(
@@ -142,9 +138,10 @@ public class NotificationHelper {
                 @Override
                 public void onGetUserRestaurantAssociationList(List<UserRestaurantAssociation> userRestaurantAssociations) {
                     userRestaurantAssociations = userRestaurantAssociations;
-                    // 1 find user chose and check if is valid date
+                    // 1 find valid user chose (check if is valid date)
                     String placeId = findUserPlaceId(uid, userRestaurantAssociations);
                     if (!placeId.equals("")) {
+                        // find restaurant's name and address
                         List<String> workmatesUid = findWorkmatesUid(placeId, userRestaurantAssociations);
                         if (workmatesUid.size() > 0){
                             // find user name
@@ -156,7 +153,27 @@ public class NotificationHelper {
                                                 if (!isSameUid(uid, user.getUid())){
                                                     workmatesName.add( user.getUserName());
                                                 }
-                                                notificationMessageListener.onCreatedMessage(restaurant, address, workmatesName);
+                                                // find restaurantName and restaurantAddress
+                                                Call<PlaceDetails> call = googlePlacesApiRepository.getDetails(placeId);
+                                                call.enqueue(new Callback<PlaceDetails>() {
+                                                    @Override
+                                                    public void onResponse(Call<PlaceDetails> call, Response<PlaceDetails> response) {
+                                                        Log.d(Tag.TAG, "onResponse() called with: call = [" + call + "], response = [" + response + "]");
+                                                        if (response.isSuccessful()) {
+                                                            PlaceDetails placeDetails = response.body();
+                                                            String restaurantName = placeDetails.getResult().getName();
+                                                            String restaurantAddress = placeDetails.getResult().getFormattedAddress();
+
+                                                            notificationMessageListener.onCreatedMessage(restaurantName, restaurantAddress, workmatesName);
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onFailure(Call<PlaceDetails> call, Throwable t) {
+                                                        Log.d(Tag.TAG, "onFailure() called with: call = [" + call + "], t = [" + t + "]");
+                                                        failureListener.onFailure(new Exception(t));
+                                                    }
+                                                });
                                             }
                                         }
                                     },
@@ -186,31 +203,18 @@ public class NotificationHelper {
         return firstPlaceId.equals(secondPlaceId);
     }
 
-    private static boolean isValidDate(final long firstHourOffTheDay, final long lastHourOffTheDay, final long createdTime){
-        return ((createdTime >= firstHourOffTheDay) &&
-                (createdTime <= lastHourOffTheDay));
-    }
-
+    /**
+     * Among the list of restaurant choices for all users, look for a user's choice, check that the date of this choice is still valid. The choice must be in the current day.
+     * @param uid
+     * @param userRestaurantAssociations
+     * @return
+     */
     private static String findUserPlaceId(String uid, List<UserRestaurantAssociation> userRestaurantAssociations){
-
-        Calendar firstHourOffTheDay = Calendar.getInstance();
-        // current day at 00h00
-        firstHourOffTheDay.set(Calendar.HOUR, 0);
-        firstHourOffTheDay.set(Calendar.MINUTE, 0);
-        firstHourOffTheDay.set(Calendar.SECOND, 0);
-        firstHourOffTheDay.set(Calendar.MILLISECOND, 0);
-        // current day at 23h59m59s999
-        Calendar lastHourOffTheDay = (Calendar) firstHourOffTheDay.clone();
-        lastHourOffTheDay.set(Calendar.HOUR, 23);
-        lastHourOffTheDay.set(Calendar.MINUTE, 59);
-        lastHourOffTheDay.set(Calendar.SECOND, 59);
-        lastHourOffTheDay.set(Calendar.MILLISECOND, 999);
+        CurrentTimeLimits currentTimeLimits = new CurrentTimeLimits();
 
         for (UserRestaurantAssociation userRestaurantAssociation : userRestaurantAssociations) {
             if (isSameUid(uid, userRestaurantAssociation.getUserUid()) &&
-                    (isValidDate(firstHourOffTheDay.getTimeInMillis(),
-                            lastHourOffTheDay.getTimeInMillis(),
-                            userRestaurantAssociation.getCreatedTime()))) {
+                    (currentTimeLimits.isValidDate(userRestaurantAssociation.getCreatedTime()))) {
                 return userRestaurantAssociation.getPlaceId();
             }
         }
@@ -219,25 +223,11 @@ public class NotificationHelper {
 
     private static List<String> findWorkmatesUid(String placeId, List<UserRestaurantAssociation> allUserRestaurantAssociations) {
         List<String> workmates = new ArrayList<>();
-
-        Calendar firstHourOffTheDay = Calendar.getInstance();
-        // current day at 00h00
-        firstHourOffTheDay.set(Calendar.HOUR, 0);
-        firstHourOffTheDay.set(Calendar.MINUTE, 0);
-        firstHourOffTheDay.set(Calendar.SECOND, 0);
-        firstHourOffTheDay.set(Calendar.MILLISECOND, 0);
-        // current day at 23h59m59s999
-        Calendar lastHourOffTheDay = (Calendar) firstHourOffTheDay.clone();
-        lastHourOffTheDay.set(Calendar.HOUR, 23);
-        lastHourOffTheDay.set(Calendar.MINUTE, 59);
-        lastHourOffTheDay.set(Calendar.SECOND, 59);
-        lastHourOffTheDay.set(Calendar.MILLISECOND, 999);
+        CurrentTimeLimits currentTimeLimits = new CurrentTimeLimits();
 
         for (UserRestaurantAssociation userRestaurantAssociation : allUserRestaurantAssociations){
             if (isSamePlaceId(placeId, userRestaurantAssociation.getPlaceId()) &&
-                    (isValidDate(firstHourOffTheDay.getTimeInMillis(),
-                            lastHourOffTheDay.getTimeInMillis(),
-                            userRestaurantAssociation.getCreatedTime()))){
+                    (currentTimeLimits.isValidDate(userRestaurantAssociation.getCreatedTime()))){
                 workmates.add(userRestaurantAssociation.getUserUid());
             }
         }
