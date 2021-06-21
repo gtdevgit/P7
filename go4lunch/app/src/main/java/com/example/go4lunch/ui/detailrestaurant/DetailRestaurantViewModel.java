@@ -5,6 +5,7 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
 import com.example.go4lunch.R;
@@ -109,10 +110,6 @@ public class DetailRestaurantViewModel extends ViewModel {
             simpleUserViewStateList.add(userToSimpleUserViewState(user));
         }
         return simpleUserViewStateList;
-    }
-
-    public void test(){
-//        Transformations.map(workmatesMutableLiveData, usersListToSimpleUserViewStateList(workmatesMutableLiveData.getValue()));
     }
 
     public LiveData<DetailRestaurantViewState> getDetailRestaurantLiveData() {
@@ -266,7 +263,7 @@ public class DetailRestaurantViewModel extends ViewModel {
         }
     }
 
-    public void loadIsLiked(String uid, String placeId){
+    public void loadIsLikedByUid(String uid, String placeId){
         LikeHelper.isLiked(uid, placeId, new LikeHelperListener() {
             @Override
             public void onGetLike(boolean isLiked) {
