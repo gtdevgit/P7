@@ -23,4 +23,12 @@ public class WorkmatesViewHolder extends ViewHolder {
         imageViewUserPicture = itemView.findViewById(R.id.row_workmate_user_picture);
         textViewUserInformation = itemView.findViewById(R.id.row_workmate_user_information);
     }
+
+    public ImageView getImageViewUserPicture() {
+        return imageViewUserPicture;
+    }
+
+    public TextView getTextViewUserInformation() {
+        return textViewUserInformation;
+    }
 }

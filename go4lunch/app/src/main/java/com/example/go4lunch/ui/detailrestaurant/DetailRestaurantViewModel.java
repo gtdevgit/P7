@@ -3,7 +3,6 @@ package com.example.go4lunch.ui.detailrestaurant;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -17,11 +16,12 @@ import com.example.go4lunch.api.firestore.LikeHelperListener;
 import com.example.go4lunch.api.firestore.UserHelper;
 import com.example.go4lunch.api.firestore.UserListListener;
 import com.example.go4lunch.api.firestore.UserRestaurantAssociationListListener;
-import com.example.go4lunch.models.DetailRestaurant;
-import com.example.go4lunch.models.User;
-import com.example.go4lunch.models.UserRestaurantAssociation;
+import com.example.go4lunch.models.viewstate.DetailRestaurantViewState;
+import com.example.go4lunch.models.firestore.User;
+import com.example.go4lunch.models.firestore.UserRestaurantAssociation;
 import com.example.go4lunch.models.googleplaces.Photo;
 import com.example.go4lunch.models.googleplaces.palcesdetails.PlaceDetails;
+import com.example.go4lunch.models.viewstate.SimpleUserViewState;
 import com.example.go4lunch.repository.GooglePlacesApiRepository;
 import com.example.go4lunch.tag.Tag;
 import com.google.firebase.firestore.EventListener;
@@ -45,11 +45,11 @@ public class DetailRestaurantViewModel extends ViewModel {
 
     private GooglePlacesApiRepository googlePlacesApiRepository;
 
-    private final MutableLiveData<DetailRestaurant> detailRestaurantMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<DetailRestaurantViewState> detailRestaurantMutableLiveData = new MutableLiveData<>();
     private final MutableLiveData<String> errorMutableLiveData = new MutableLiveData<String>();
     private final MutableLiveData<Boolean> likedMutableLiveData = new MutableLiveData<Boolean>();
     private final MutableLiveData<Boolean> chosenMutableLiveData = new MutableLiveData<Boolean>();
-    private final MutableLiveData<List<User>> workmatesMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<List<SimpleUserViewState>> workmatesMutableLiveData = new MutableLiveData<>();
     private final MutableLiveData<Integer> countLikedMutableLiveData = new MutableLiveData<>();
 
     private final MutableLiveData<Integer> star1ColorMutableLiveData = new MutableLiveData<>();
@@ -84,7 +84,7 @@ public class DetailRestaurantViewModel extends ViewModel {
         this.userListListener = new UserListListener() {
             @Override
             public void onGetUsers(List<User> users) {
-                workmatesMutableLiveData.postValue(users);
+                workmatesMutableLiveData.postValue(usersListToSimpleUserViewStateList(users));
             }
         };
 
@@ -99,7 +99,23 @@ public class DetailRestaurantViewModel extends ViewModel {
         };
     }
 
-    public LiveData<DetailRestaurant> getDetailRestaurantLiveData() {
+    private SimpleUserViewState userToSimpleUserViewState(User user){
+        return new SimpleUserViewState(user.getUserName(), user.getUrlPicture());
+    }
+
+    private List<SimpleUserViewState> usersListToSimpleUserViewStateList(List<User> users){
+        List<SimpleUserViewState> simpleUserViewStateList = new ArrayList<>();
+        for (User user : users){
+            simpleUserViewStateList.add(userToSimpleUserViewState(user));
+        }
+        return simpleUserViewStateList;
+    }
+
+    public void test(){
+//        Transformations.map(workmatesMutableLiveData, usersListToSimpleUserViewStateList(workmatesMutableLiveData.getValue()));
+    }
+
+    public LiveData<DetailRestaurantViewState> getDetailRestaurantLiveData() {
         return detailRestaurantMutableLiveData;
     }
 
@@ -115,7 +131,7 @@ public class DetailRestaurantViewModel extends ViewModel {
         return chosenMutableLiveData;
     }
 
-    public LiveData<List<User>> getWorkmatesLiveData() {
+    public LiveData<List<SimpleUserViewState>> getWorkmatesLiveData() {
         return workmatesMutableLiveData;
     }
 
@@ -187,10 +203,6 @@ public class DetailRestaurantViewModel extends ViewModel {
                         if (response.isSuccessful()) {
                             PlaceDetails placeDetails = response.body();
                             String placeId = placeDetails.getResult().getPlaceId();
-                            String name = placeDetails.getResult().getName();
-                            String info = findAddress(placeDetails.getResult().getFormattedAddress(), placeDetails.getResult().getVicinity());
-                            String phoneNumber = placeDetails.getResult().getInternationalPhoneNumber();
-                            String website = placeDetails.getResult().getWebsite();
                             List<String> urlPhotos = new ArrayList<>();
                             if (placeDetails.getResult().getPhotos() != null) {
                                 for (Photo photo : placeDetails.getResult().getPhotos()){
@@ -200,41 +212,33 @@ public class DetailRestaurantViewModel extends ViewModel {
                                 }
                             }
                             String urlPicture = (urlPhotos.size() > 0) ? urlPhotos.get(0) : null;
-
-                            double rating = placeDetails.getResult().getRating();
-                            boolean isLiked = false;
-                            boolean isOpen = (placeDetails.getResult().getOpeningHours() == null) ? false : placeDetails.getResult().getOpeningHours().getOpenNow();
-                            List<String> workmates = null;
-
+                            String name = placeDetails.getResult().getName();
+                            boolean isChosenByCurrentUser = false;
+                            String info = findAddress(placeDetails.getResult().getFormattedAddress(), placeDetails.getResult().getVicinity());
                             int likeCounter = likedUserRestaurants.size();
-                            boolean haveStar1 = getStarByLevel(STAR_LEVEL_1, likeCounter);
                             int star1Color = getStarColorByLevel(STAR_LEVEL_1, likeCounter);
-
-                            boolean haveStar2 = getStarByLevel(STAR_LEVEL_2, likeCounter);
                             int star2Color = getStarColorByLevel(STAR_LEVEL_2, likeCounter);
-
-                            boolean haveStar3 = getStarByLevel(STAR_LEVEL_3, likeCounter);
                             int star3Color = getStarColorByLevel(STAR_LEVEL_3, likeCounter);
+                            String phoneNumber = placeDetails.getResult().getInternationalPhoneNumber();
+                            boolean isLikedByCurrentUser = false;
+                            String website = placeDetails.getResult().getWebsite();
+                            List<SimpleUserViewState> workmates = new ArrayList<>();
 
-                            DetailRestaurant detailRestaurant = new DetailRestaurant(placeId,
+                            DetailRestaurantViewState detailRestaurantViewState = new DetailRestaurantViewState(
+                                    placeId,
+                                    urlPicture,
                                     name,
                                     info,
-                                    phoneNumber,
-                                    website,
-                                    urlPicture,
-                                    rating,
-                                    haveStar1,
-                                    haveStar2,
-                                    haveStar3,
-                                    isLiked,
-                                    isOpen,
-                                    workmates,
-                                    urlPhotos,
-                                    likeCounter,
+                                    isChosenByCurrentUser,
                                     star1Color,
                                     star2Color,
-                                    star3Color);
-                            detailRestaurantMutableLiveData.postValue(detailRestaurant);
+                                    star3Color,
+                                    phoneNumber,
+                                    isLikedByCurrentUser,
+                                    website,
+                                    workmates
+                            );
+                            detailRestaurantMutableLiveData.postValue(detailRestaurantViewState);
                         }
                     }
 

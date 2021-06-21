@@ -8,11 +8,10 @@ import android.os.Bundle;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
-import com.example.go4lunch.models.DetailRestaurant;
-import com.example.go4lunch.models.User;
+import com.example.go4lunch.models.viewstate.DetailRestaurantViewState;
+import com.example.go4lunch.models.viewstate.SimpleUserViewState;
 import com.example.go4lunch.repository.GooglePlacesApiRepository;
 import com.example.go4lunch.tag.Tag;
-import com.example.go4lunch.ui.home.WorkmatesAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.ColorRes;
@@ -38,7 +37,6 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -70,7 +68,7 @@ public class DetailRestaurantActivity extends AppCompatActivity {
     private FloatingActionButton floatingActionButton;
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
-    private WorkmatesAdapter workmatesAdapter;
+    private SimpleWorkmatesAdapter simpleWorkmatesAdapter;
 
     private DetailRestaurantViewModel detailRestaurantViewModel;
 
@@ -122,30 +120,30 @@ public class DetailRestaurantActivity extends AppCompatActivity {
             }
         });
 
-        this.detailRestaurantViewModel.getDetailRestaurantLiveData().observe(this, new Observer<DetailRestaurant>() {
+        this.detailRestaurantViewModel.getDetailRestaurantLiveData().observe(this, new Observer<DetailRestaurantViewState>() {
             @Override
-            public void onChanged(DetailRestaurant detailRestaurant) {
-                textViewName.setText(detailRestaurant.getName());
-                setStar1Color(detailRestaurant.getStar1Color());
-                setStar2Color(detailRestaurant.getStar2Color());
-                setStar3Color(detailRestaurant.getStar3Color());
+            public void onChanged(DetailRestaurantViewState detailRestaurantViewState) {
+                textViewName.setText(detailRestaurantViewState.getName());
+                setStar1Color(detailRestaurantViewState.getStar1Color());
+                setStar2Color(detailRestaurantViewState.getStar2Color());
+                setStar3Color(detailRestaurantViewState.getStar3Color());
 
-                textViewInfo.setText(detailRestaurant.getInfo());
+                textViewInfo.setText(detailRestaurantViewState.getInfo());
 
-                if (detailRestaurant.getUrlPicture() == null) {
+                if (detailRestaurantViewState.getUrlPicture() == null) {
                     Glide.with(imageView.getContext())
                             .load(R.drawable.image_floue)
                             .apply(RequestOptions.fitCenterTransform())
                             .into(imageView);
                 } else {
                     Glide.with(imageView.getContext())
-                            .load(detailRestaurant.getUrlPicture())
+                            .load(detailRestaurantViewState.getUrlPicture())
                             .apply(RequestOptions.fitCenterTransform())
                             .into(imageView);
 
                 }
-                setPhoneNumber(detailRestaurant.getPhoneNumber());
-                setWebsite(detailRestaurant.getWebsite());
+                setPhoneNumber(detailRestaurantViewState.getPhoneNumber());
+                setWebsite(detailRestaurantViewState.getWebsite());
             }
         });
         this.loadDetailRestaurant(this.placeId);
@@ -176,22 +174,22 @@ public class DetailRestaurantActivity extends AppCompatActivity {
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        workmatesAdapter = new WorkmatesAdapter();
-        recyclerView.setAdapter(workmatesAdapter);
+        simpleWorkmatesAdapter = new SimpleWorkmatesAdapter();
+        recyclerView.setAdapter(simpleWorkmatesAdapter);
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
                 DividerItemDecoration.VERTICAL);
         recyclerView.addItemDecoration(dividerItemDecoration);
 
         // workmates who chose this restaurant
-        this.detailRestaurantViewModel.getWorkmatesLiveData().observe(this, new Observer<List<User>>() {
+        this.detailRestaurantViewModel.getWorkmatesLiveData().observe(this, new Observer<List<SimpleUserViewState>>() {
             @Override
-            public void onChanged(List<User> users) {
+            public void onChanged(List<SimpleUserViewState> users) {
                 setWorkmates(users);
             }
         });
         this.detailRestaurantViewModel.loadWorkmatesByPlace(this.placeId);
-        
+
         this.detailRestaurantViewModel.getStar1ColorMutableLiveData().observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(Integer integer) {
@@ -302,9 +300,9 @@ public class DetailRestaurantActivity extends AppCompatActivity {
         }
     }
 
-    private void setWorkmates(List<User> users){
-        workmatesAdapter.updateData(users);
-        workmatesAdapter.notifyDataSetChanged();
+    private void setWorkmates(List<SimpleUserViewState> users){
+        simpleWorkmatesAdapter.updateData(users);
+        simpleWorkmatesAdapter.notifyDataSetChanged();
     }
 
     private void setStar1Color(@ColorRes int color){

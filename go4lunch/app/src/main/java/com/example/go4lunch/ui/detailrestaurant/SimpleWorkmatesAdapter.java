@@ -1,4 +1,4 @@
-package com.example.go4lunch.ui.home;
+package com.example.go4lunch.ui.detailrestaurant;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,24 +12,23 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.R;
 import com.example.go4lunch.models.firestore.User;
-import com.example.go4lunch.tag.Tag;
+import com.example.go4lunch.models.viewstate.SimpleUserViewState;
+import com.example.go4lunch.ui.home.WorkmatesViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class WorkmatesAdapter extends RecyclerView.Adapter<WorkmatesViewHolder> {
+public class SimpleWorkmatesAdapter extends RecyclerView.Adapter<WorkmatesViewHolder>{
 
-    private static final String TAG = Tag.TAG;
-    private List<User> users;
+    private List<SimpleUserViewState> users;
 
-    public WorkmatesAdapter() {
+    public SimpleWorkmatesAdapter() {
         this.users = new ArrayList<>();
     }
 
     @NonNull
     @Override
     public WorkmatesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Log.d(TAG, "onCreateViewHolder() called with: parent = [" + parent + "], viewType = [" + viewType + "]");
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_workmate, parent, false);
         WorkmatesViewHolder workmatesViewHolder = new WorkmatesViewHolder(view);
         return workmatesViewHolder;
@@ -37,34 +36,31 @@ public class WorkmatesAdapter extends RecyclerView.Adapter<WorkmatesViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull WorkmatesViewHolder holder, int position) {
-        User user = users.get(position);
-        Log.d(TAG, "onBindViewHolder() called with: holder = [" + holder + "], position = [" + position + "]");
-        Log.d(TAG, "onBindViewHolder() user.getUserName()  = [" + user.getUserName()+ "]");
-        holder.textViewUserInformation.setText(user.getUserName() + " " + user.getUserEmail() );
+        SimpleUserViewState user = users.get(position);
+        holder.getTextViewUserInformation().setText(user.getName());
 
         if (user.getUrlPicture() == null) {
             // Clear picture
-            Glide.with(holder.imageViewUserPicture.getContext())
+            Glide.with(holder.getImageViewUserPicture().getContext())
                     .load("")
                     .placeholder(R.drawable.ic_baseline_account_circle_24)
                     .apply(RequestOptions.circleCropTransform())
-                    .into(holder.imageViewUserPicture);
+                    .into(holder.getImageViewUserPicture());
         } else {
             //load user picture
-            Glide.with(holder.imageViewUserPicture.getContext())
+            Glide.with(holder.getImageViewUserPicture().getContext())
                     .load(user.getUrlPicture())
                     .apply(RequestOptions.circleCropTransform())
-                    .into(holder.imageViewUserPicture);
+                    .into(holder.getImageViewUserPicture());
         }
     }
 
     @Override
     public int getItemCount() {
-        Log.d(TAG, "WorkmatesAdapter. getItemCount() called with users.size() = " + users.size());
         return users.size();
     }
 
-    public void updateData(List<User> users){
+    public void updateData(List<SimpleUserViewState> users){
         this.users = users;
         this.notifyDataSetChanged();
     }

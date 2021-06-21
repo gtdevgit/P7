@@ -12,9 +12,8 @@ import com.example.go4lunch.api.firestore.ChosenHelper;
 import com.example.go4lunch.api.firestore.FailureListener;
 import com.example.go4lunch.api.firestore.LikeHelper;
 import com.example.go4lunch.api.firestore.UserRestaurantAssociationListListener;
-import com.example.go4lunch.models.Autocomplete;
-import com.example.go4lunch.models.Restaurant;
-import com.example.go4lunch.models.UserRestaurantAssociation;
+import com.example.go4lunch.models.viewstate.Restaurant;
+import com.example.go4lunch.models.firestore.UserRestaurantAssociation;
 import com.example.go4lunch.models.googleplaces.placesearch.Result;
 import com.example.go4lunch.models.googleplaces.placesearch.PlaceSearch;
 import com.example.go4lunch.repository.GooglePlacesApiRepository;
@@ -50,7 +49,6 @@ public class MainViewModel extends ViewModel {
      * GooglePlacesApiRepository
      */
     private GooglePlacesApiRepository googlePlacesApiRepository;
-    private final MutableLiveData<Autocomplete> autocompleteMutableLiveData = new MutableLiveData<Autocomplete>();
     private final MutableLiveData<String> errorMutableLiveData = new MutableLiveData<String>();
     private final MutableLiveData<List<Restaurant>> restaurantsMutableLiveData = new MutableLiveData<List<Restaurant>>();
     private final MutableLiveData<Location> locationMutableLiveData = new MutableLiveData<Location>();
@@ -66,12 +64,6 @@ public class MainViewModel extends ViewModel {
             }
         };
     }
-
-    /**
-     * autocompleteMutableLiveData property is exposed as livedata to prevent external modifications
-     * @return
-     */
-    public LiveData<Autocomplete> getAutocomplete(){ return autocompleteMutableLiveData; }
 
     /**
      * errorMutableLiveData property is exposed as livedata to prevent external modifications

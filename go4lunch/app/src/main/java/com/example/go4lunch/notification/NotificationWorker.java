@@ -9,21 +9,14 @@ import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import com.example.go4lunch.R;
-import com.example.go4lunch.api.firestore.ChosenHelper;
 import com.example.go4lunch.api.firestore.FailureListener;
-import com.example.go4lunch.api.firestore.UserRestaurantAssociationListListener;
-import com.example.go4lunch.api.firestore.UserRestaurantAssociationListener;
-import com.example.go4lunch.models.UserRestaurantAssociation;
 import com.example.go4lunch.repository.GooglePlacesApiRepository;
 import com.example.go4lunch.tag.Tag;
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.logging.LogManager;
 
 public class NotificationWorker extends Worker {
 

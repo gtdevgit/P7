@@ -2,7 +2,6 @@ package com.example.go4lunch.ui.home;
 
 import android.os.Bundle;
 
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -18,11 +17,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.go4lunch.R;
-import com.example.go4lunch.models.User;
+import com.example.go4lunch.models.firestore.User;
 import com.example.go4lunch.tag.Tag;
-import com.example.go4lunch.ui.logout.LogoutViewModel;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class WorkmatesFragment extends Fragment {

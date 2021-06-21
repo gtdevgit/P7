@@ -19,12 +19,11 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.example.go4lunch.R;
-import com.example.go4lunch.models.Restaurant;
+import com.example.go4lunch.models.viewstate.Restaurant;
 import com.example.go4lunch.tag.Tag;
 import com.example.go4lunch.ui.detailrestaurant.DetailRestaurantActivity;
 import com.example.go4lunch.viewmodel.MainViewModel;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ListViewRestaurantFragment extends Fragment {
