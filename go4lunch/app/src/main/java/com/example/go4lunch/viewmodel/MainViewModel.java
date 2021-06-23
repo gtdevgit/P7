@@ -45,6 +45,11 @@ public class MainViewModel extends ViewModel {
     private ListenerRegistration registrationChosenRestaurant;
     private ListenerRegistration registrationLikedRestaurant;
 
+    // for mediator
+    private List<UserRestaurantAssociation> likedCollection;
+    private List<UserRestaurantAssociation> chosenCollection;
+    private List<Result> nearbysearch;
+
     /**
      * GooglePlacesApiRepository
      */
@@ -180,13 +185,20 @@ public class MainViewModel extends ViewModel {
     }
 
     /**
-     * loadRestaurantAround
+     * loadRestaurantAround : request data acquisition then launch combine to obtain the list of restaurants
      * @param location
      */
     private void loadRestaurantAround(Location location){
         Log.d(Tag.TAG, "MainViewModel.loadRestaurantAround()");
+        // - get liked collection to count like by placeId
+        // - get chosen collection to count workmate by placeId
+        // - get detail restaurants
+        // - then combine(...)
 
-        List<UserRestaurantAssociation> likedUserRestaurants = new ArrayList<>();
+        // initialization
+        likedCollection = new ArrayList<>();
+        chosenCollection = new ArrayList<>();
+        nearbysearch = null;
 
         FailureListener failureListener = new FailureListener() {
             @Override
@@ -196,68 +208,90 @@ public class MainViewModel extends ViewModel {
             }
         };
 
-        UserRestaurantAssociationListListener chosenUserRestaurantAssociationListListener = new UserRestaurantAssociationListListener() {
-            @Override
-            public void onGetUserRestaurantAssociationList(List<UserRestaurantAssociation> userRestaurantAssociations) {
-                Call<PlaceSearch> call = googlePlacesApiRepository.getNearbysearch(location);
-                call.enqueue(new Callback<PlaceSearch>() {
-                    @Override
-                    public void onResponse(Call<PlaceSearch> call, Response<PlaceSearch> response) {
-                        Log.d(Tag.TAG, "MainViewModel.loadRestaurantAround.onResponse() response.isSuccessful=" + response.isSuccessful());
-                        if (response.isSuccessful()) {
-                            PlaceSearch placeSearch = response.body();
-                            List<Result> lstResult = placeSearch.getResults();
-                            List<Restaurant> restaurants = new ArrayList<Restaurant>();
-                            for (Result result : lstResult) {
-                                String name = result.getName();
-                                double latitude = result.getGeometry().getLocation().getLat();
-                                double longitude = result.getGeometry().getLocation().getLng();
-                                float distance = calculateDistance(latitude, longitude, location);
-                                String info = findAddress(result.getFormattedAddress(), result.getVicinity());
-                                String hours = "";
-                                double rating = result.getRating();
-                                String urlPicture = findUrlPicture(result);
-                                int workmates = countWorkmates(result.getPlaceId(), userRestaurantAssociations);
-                                int countLike = countLikeByRestaurant(result.getPlaceId(), likedUserRestaurants);
-                                Restaurant restaurant = new Restaurant(result.getPlaceId(),
-                                        name,
-                                        latitude,
-                                        longitude,
-                                        distance,
-                                        info,
-                                        hours,
-                                        workmates,
-                                        rating,
-                                        urlPicture,
-                                        countLike);
-                                restaurants.add(restaurant);
-                            }
-                            restaurantsMutableLiveData.postValue(restaurants);
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<PlaceSearch> call, Throwable t) {
-                        Log.d(Tag.TAG, "MainViewModel.loadRestaurantAround.onFailure() " + t.getMessage());
-                        errorMutableLiveData.postValue(t.getMessage());
-                    }
-                });
-            }
-        };
-
+        // get likedCollection
         UserRestaurantAssociationListListener likedUserRestaurantAssociationListListener = new UserRestaurantAssociationListListener() {
             @Override
             public void onGetUserRestaurantAssociationList(List<UserRestaurantAssociation> userRestaurantAssociations) {
-                likedUserRestaurants.addAll(userRestaurantAssociations);
-                ChosenHelper.getChosenRestaurants(chosenUserRestaurantAssociationListListener, failureListener);
+                likedCollection.addAll(userRestaurantAssociations);
+                combine(location, likedCollection, chosenCollection, nearbysearch);
             }
         };
-
-        // first : get liked collection to count like by placeId
-        // second : get chosen collection to count workmate by placeId
-        // third : get detail restaurants
         LikeHelper.getLikedRestaurants(likedUserRestaurantAssociationListListener, failureListener);
-    };
+
+        // get chosenCollection
+        UserRestaurantAssociationListListener chosenUserRestaurantAssociationListListener = new UserRestaurantAssociationListListener() {
+            @Override
+            public void onGetUserRestaurantAssociationList(List<UserRestaurantAssociation> userRestaurantAssociations) {
+                chosenCollection.addAll(userRestaurantAssociations);
+                combine(location, likedCollection, chosenCollection, nearbysearch);
+            }
+        };
+        ChosenHelper.getChosenRestaurants(chosenUserRestaurantAssociationListListener, failureListener);
+
+        // get getNearbysearch
+        Call<PlaceSearch> call = googlePlacesApiRepository.getNearbysearch(location);
+        call.enqueue(new Callback<PlaceSearch>() {
+            @Override
+            public void onFailure(Call<PlaceSearch> call, Throwable t) {
+                Log.d(Tag.TAG, "MainViewModel.loadRestaurantAround.onFailure() " + t.getMessage());
+                errorMutableLiveData.postValue(t.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call<PlaceSearch> call, Response<PlaceSearch> response) {
+                Log.d(Tag.TAG, "MainViewModel.loadRestaurantAround.onResponse() response.isSuccessful=" + response.isSuccessful());
+                if (response.isSuccessful()) {
+                    PlaceSearch placeSearch = response.body();
+                    nearbysearch = placeSearch.getResults();
+                    combine(location, likedCollection, chosenCollection, nearbysearch);
+                }
+            }
+        });
+    }
+
+    /**
+     * combine : combine wait for all data before working
+     * @param location
+     * @param likedCollection
+     * @param chosenCollection
+     * @param nearbysearch
+     */
+    private void combine(@Nullable Location location,
+                         @Nullable List<UserRestaurantAssociation> likedCollection,
+                         @Nullable List<UserRestaurantAssociation> chosenCollection,
+                         @Nullable List<Result> nearbysearch) {
+        // canot compute without data
+        if (location == null || likedCollection == null || chosenCollection == null || nearbysearch == null) {
+            return;
+        }
+
+        List<Restaurant> restaurants = new ArrayList<Restaurant>();
+        for (Result result : nearbysearch) {
+            String name = result.getName();
+            double latitude = result.getGeometry().getLocation().getLat();
+            double longitude = result.getGeometry().getLocation().getLng();
+            float distance = calculateDistance(latitude, longitude, location);
+            String info = findAddress(result.getFormattedAddress(), result.getVicinity());
+            String hours = "";
+            double rating = result.getRating();
+            String urlPicture = findUrlPicture(result);
+            int workmates = countWorkmates(result.getPlaceId(), chosenCollection);
+            int countLike = countLikeByRestaurant(result.getPlaceId(), likedCollection);
+            Restaurant restaurant = new Restaurant(result.getPlaceId(),
+                    name,
+                    latitude,
+                    longitude,
+                    distance,
+                    info,
+                    hours,
+                    workmates,
+                    rating,
+                    urlPicture,
+                    countLike);
+            restaurants.add(restaurant);
+        }
+        restaurantsMutableLiveData.postValue(restaurants);
+    }
 
     /**
      * to get real time change workmates count by restaurant
@@ -304,4 +338,70 @@ public class MainViewModel extends ViewModel {
             registrationLikedRestaurant.remove();
         }
     }
+
+    /**
+     * loadRestaurantAround
+     * @param location
+     */
+    private void loadRestaurantAround_2(Location location){
+        Log.d(Tag.TAG, "MainViewModel.loadRestaurantAround()");
+        // - get liked collection to count like by placeId
+        // - get chosen collection to count workmate by placeId
+        // - get detail restaurants
+        // conbine(...)
+
+        // raz
+        likedCollection = new ArrayList<>();
+        chosenCollection = new ArrayList<>();
+        nearbysearch = null;
+
+        FailureListener failureListener = new FailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                Log.d(Tag.TAG, "MainViewModel.loadRestaurantAround.onFailure() " + e.getMessage());
+                errorMutableLiveData.postValue(e.getMessage());
+            }
+        };
+
+        // get likedCollection
+        UserRestaurantAssociationListListener likedUserRestaurantAssociationListListener = new UserRestaurantAssociationListListener() {
+            @Override
+            public void onGetUserRestaurantAssociationList(List<UserRestaurantAssociation> userRestaurantAssociations) {
+                likedCollection.addAll(userRestaurantAssociations);
+                combine(location, likedCollection, chosenCollection, nearbysearch);
+            }
+        };
+        LikeHelper.getLikedRestaurants(likedUserRestaurantAssociationListListener, failureListener);
+
+        // get chosenCollection
+        UserRestaurantAssociationListListener chosenUserRestaurantAssociationListListener = new UserRestaurantAssociationListListener() {
+            @Override
+            public void onGetUserRestaurantAssociationList(List<UserRestaurantAssociation> userRestaurantAssociations) {
+                chosenCollection.addAll(userRestaurantAssociations);
+                combine(location, likedCollection, chosenCollection, nearbysearch);
+            }
+        };
+        ChosenHelper.getChosenRestaurants(chosenUserRestaurantAssociationListListener, failureListener);
+
+        // get getNearbysearch
+        Call<PlaceSearch> call = googlePlacesApiRepository.getNearbysearch(location);
+        call.enqueue(new Callback<PlaceSearch>() {
+            @Override
+            public void onFailure(Call<PlaceSearch> call, Throwable t) {
+                Log.d(Tag.TAG, "MainViewModel.loadRestaurantAround.onFailure() " + t.getMessage());
+                errorMutableLiveData.postValue(t.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call<PlaceSearch> call, Response<PlaceSearch> response) {
+                Log.d(Tag.TAG, "MainViewModel.loadRestaurantAround.onResponse() response.isSuccessful=" + response.isSuccessful());
+                if (response.isSuccessful()) {
+                    PlaceSearch placeSearch = response.body();
+                    nearbysearch = placeSearch.getResults();
+                    combine(location, likedCollection, chosenCollection, nearbysearch);
+                }
+            }
+        });
+    }
+
 }
