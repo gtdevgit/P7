@@ -21,8 +21,8 @@ import com.example.go4lunch.api.firestore.FailureListener;
 import com.example.go4lunch.api.firestore.UserHelper;
 import com.example.go4lunch.api.firestore.UserListListener;
 import com.example.go4lunch.api.firestore.UserRestaurantAssociationListListener;
-import com.example.go4lunch.models.firestore.User;
-import com.example.go4lunch.models.firestore.UserRestaurantAssociation;
+import com.example.go4lunch.data.firestore.model.User;
+import com.example.go4lunch.data.firestore.model.UidPlaceIdAssociation;
 import com.example.go4lunch.models.googleplaces.palcesdetails.PlaceDetails;
 import com.example.go4lunch.navigation.NavigationActivity;
 import com.example.go4lunch.repository.GooglePlacesApiRepository;
@@ -136,13 +136,13 @@ public class NotificationHelper {
         ChosenHelper.getChosenRestaurants(
             new UserRestaurantAssociationListListener() {
                 @Override
-                public void onGetUserRestaurantAssociationList(List<UserRestaurantAssociation> userRestaurantAssociations) {
-                    userRestaurantAssociations = userRestaurantAssociations;
+                public void onGetUserRestaurantAssociationList(List<UidPlaceIdAssociation> uidPlaceIdAssociations) {
+                    uidPlaceIdAssociations = uidPlaceIdAssociations;
                     // 1 find valid user chose (check if is valid date)
-                    String placeId = findUserPlaceId(uid, userRestaurantAssociations);
+                    String placeId = findUserPlaceId(uid, uidPlaceIdAssociations);
                     if (!placeId.equals("")) {
                         // find restaurant's name and address
-                        List<String> workmatesUid = findWorkmatesUid(placeId, userRestaurantAssociations);
+                        List<String> workmatesUid = findWorkmatesUid(placeId, uidPlaceIdAssociations);
                         if (workmatesUid.size() > 0){
                             // find user name
                             UserHelper.getUsersByUidList(workmatesUid,
@@ -206,29 +206,29 @@ public class NotificationHelper {
     /**
      * Among the list of restaurant choices for all users, look for a user's choice, check that the date of this choice is still valid. The choice must be in the current day.
      * @param uid
-     * @param userRestaurantAssociations
+     * @param uidPlaceIdAssociations
      * @return
      */
-    private static String findUserPlaceId(String uid, List<UserRestaurantAssociation> userRestaurantAssociations){
+    private static String findUserPlaceId(String uid, List<UidPlaceIdAssociation> uidPlaceIdAssociations){
         CurrentTimeLimits currentTimeLimits = new CurrentTimeLimits();
 
-        for (UserRestaurantAssociation userRestaurantAssociation : userRestaurantAssociations) {
-            if (isSameUid(uid, userRestaurantAssociation.getUserUid()) &&
-                    (currentTimeLimits.isValidDate(userRestaurantAssociation.getCreatedTime()))) {
-                return userRestaurantAssociation.getPlaceId();
+        for (UidPlaceIdAssociation uidPlaceIdAssociation : uidPlaceIdAssociations) {
+            if (isSameUid(uid, uidPlaceIdAssociation.getUserUid()) &&
+                    (currentTimeLimits.isValidDate(uidPlaceIdAssociation.getCreatedTime()))) {
+                return uidPlaceIdAssociation.getPlaceId();
             }
         }
         return "";
     }
 
-    private static List<String> findWorkmatesUid(String placeId, List<UserRestaurantAssociation> allUserRestaurantAssociations) {
+    private static List<String> findWorkmatesUid(String placeId, List<UidPlaceIdAssociation> allUidPlaceIdAssociations) {
         List<String> workmates = new ArrayList<>();
         CurrentTimeLimits currentTimeLimits = new CurrentTimeLimits();
 
-        for (UserRestaurantAssociation userRestaurantAssociation : allUserRestaurantAssociations){
-            if (isSamePlaceId(placeId, userRestaurantAssociation.getPlaceId()) &&
-                    (currentTimeLimits.isValidDate(userRestaurantAssociation.getCreatedTime()))){
-                workmates.add(userRestaurantAssociation.getUserUid());
+        for (UidPlaceIdAssociation uidPlaceIdAssociation : allUidPlaceIdAssociations){
+            if (isSamePlaceId(placeId, uidPlaceIdAssociation.getPlaceId()) &&
+                    (currentTimeLimits.isValidDate(uidPlaceIdAssociation.getCreatedTime()))){
+                workmates.add(uidPlaceIdAssociation.getUserUid());
             }
         }
         return workmates;

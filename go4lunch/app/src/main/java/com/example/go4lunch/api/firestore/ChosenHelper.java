@@ -4,7 +4,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.go4lunch.models.firestore.UserRestaurantAssociation;
+import com.example.go4lunch.data.firestore.model.UidPlaceIdAssociation;
 import com.example.go4lunch.tag.Tag;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -47,10 +47,10 @@ public class ChosenHelper {
                             DocumentSnapshot document = task.getResult();
                             Log.d(Tag.TAG, "ChosenHelper.isChosen()->onComplete() isSuccessful = true, document exist = [" + document.exists() + "]");
                             if (document.exists()) {
-                                UserRestaurantAssociation userRestaurantAssociation = document.toObject(UserRestaurantAssociation.class);
-                                Log.d(Tag.TAG, "ChosenHelper.isChosen()->onComplete() plaseId ok =" + (userRestaurantAssociation.getPlaceId() == placeId));
+                                UidPlaceIdAssociation uidPlaceIdAssociation = document.toObject(UidPlaceIdAssociation.class);
+                                Log.d(Tag.TAG, "ChosenHelper.isChosen()->onComplete() plaseId ok =" + (uidPlaceIdAssociation.getPlaceId() == placeId));
                                 // must check if is this the good place
-                                chosenListener.onGetChosen(userRestaurantAssociation.getPlaceId().equals(placeId));
+                                chosenListener.onGetChosen(uidPlaceIdAssociation.getPlaceId().equals(placeId));
                             } else {
                                 Log.d(Tag.TAG, "ChosenHelper.isChosen()->onComplete() false");
                                 chosenListener.onGetChosen(false);
@@ -71,8 +71,8 @@ public class ChosenHelper {
 
     public static void createChosenRestaurant(String uid, String placeId, ChosenListener chosenListener, FailureListener failureListener){
         Log.d(Tag.TAG, "createChosenRestaurant() called with: uid = [" + uid + "], placeId = [" + placeId + "]");
-        UserRestaurantAssociation userRestaurantAssociation = new UserRestaurantAssociation(uid, placeId);
-        getChosenCollection().document(uid).set(userRestaurantAssociation)
+        UidPlaceIdAssociation uidPlaceIdAssociation = new UidPlaceIdAssociation(uid, placeId);
+        getChosenCollection().document(uid).set(uidPlaceIdAssociation)
             .addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
@@ -116,7 +116,7 @@ public class ChosenHelper {
 
     public static void getUsersWhoChoseThisRestaurant(String placeId, UserRestaurantAssociationListListener userRestaurantAssociationListListener,
                                                       FailureListener failureListener) {
-        List<UserRestaurantAssociation> userRestaurantAssociations = new ArrayList<>();
+        List<UidPlaceIdAssociation> uidPlaceIdAssociations = new ArrayList<>();
         Log.d(Tag.TAG, "getUsersWhoChoseThisRestaurant: ");
         getChosenCollection()
                 .whereEqualTo("placeId", placeId)
@@ -127,11 +127,11 @@ public class ChosenHelper {
                         if (task.isSuccessful()){
                             Log.d(Tag.TAG, "getUsersWhoChoseThisRestaurant.onComplete() ");
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                UserRestaurantAssociation userRestaurantAssociation = document.toObject(UserRestaurantAssociation.class);
-                                Log.d(Tag.TAG, "getUsersWhoChoseThisRestaurant.onComplete() userRestaurantAssociation = [" + userRestaurantAssociation + "]");
-                                userRestaurantAssociations.add(document.toObject(UserRestaurantAssociation.class));
+                                UidPlaceIdAssociation uidPlaceIdAssociation = document.toObject(UidPlaceIdAssociation.class);
+                                Log.d(Tag.TAG, "getUsersWhoChoseThisRestaurant.onComplete() userRestaurantAssociation = [" + uidPlaceIdAssociation + "]");
+                                uidPlaceIdAssociations.add(document.toObject(UidPlaceIdAssociation.class));
                             }
-                            userRestaurantAssociationListListener.onGetUserRestaurantAssociationList(userRestaurantAssociations);
+                            userRestaurantAssociationListListener.onGetUserRestaurantAssociationList(uidPlaceIdAssociations);
                         } else {
                             failureListener.onFailure(task.getException());
                         }
@@ -146,7 +146,7 @@ public class ChosenHelper {
     }
 
     public static void getChosenRestaurants(UserRestaurantAssociationListListener userRestaurantAssociationListListener, FailureListener failureListener) {
-        List<UserRestaurantAssociation> userRestaurantAssociationList = new ArrayList<>();
+        List<UidPlaceIdAssociation> uidPlaceIdAssociationList = new ArrayList<>();
         Log.d(Tag.TAG, "getChosenRestaurants");
         getChosenCollection()
                 .get()
@@ -155,11 +155,11 @@ public class ChosenHelper {
                     public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()){
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                UserRestaurantAssociation userRestaurantAssociation = document.toObject(UserRestaurantAssociation.class);
-                                userRestaurantAssociationList.add(document.toObject(UserRestaurantAssociation.class));
+                                UidPlaceIdAssociation uidPlaceIdAssociation = document.toObject(UidPlaceIdAssociation.class);
+                                uidPlaceIdAssociationList.add(document.toObject(UidPlaceIdAssociation.class));
                             }
-                            Log.d(Tag.TAG, "getChosenRestaurants. successful with userRestaurantAssociationList.size()=" + userRestaurantAssociationList.size());
-                            userRestaurantAssociationListListener.onGetUserRestaurantAssociationList(userRestaurantAssociationList);
+                            Log.d(Tag.TAG, "getChosenRestaurants. successful with userRestaurantAssociationList.size()=" + uidPlaceIdAssociationList.size());
+                            userRestaurantAssociationListListener.onGetUserRestaurantAssociationList(uidPlaceIdAssociationList);
                         } else {
                             failureListener.onFailure(task.getException());
                         }
@@ -185,9 +185,9 @@ public class ChosenHelper {
                             DocumentSnapshot documentSnapshot = task.getResult();
                             Log.d(Tag.TAG, "getChosenRestaurantByUser() onComplete() documentSnapshot.exists()=" + documentSnapshot.exists());
                             if (documentSnapshot.exists()){
-                                UserRestaurantAssociation userRestaurantAssociation = documentSnapshot.toObject(UserRestaurantAssociation.class);
+                                UidPlaceIdAssociation uidPlaceIdAssociation = documentSnapshot.toObject(UidPlaceIdAssociation.class);
                                 // test la date
-                                long createdTime = userRestaurantAssociation.getCreatedTime();
+                                long createdTime = uidPlaceIdAssociation.getCreatedTime();
                                 // current time
                                 Calendar firstHourOffTheDay = Calendar.getInstance();
                                 // current day at 00h00
@@ -205,7 +205,7 @@ public class ChosenHelper {
                                 // createdTime must be in current day
                                 if ((createdTime >= firstHourOffTheDay.getTimeInMillis()) &&
                                         (createdTime <= lastHourOffTheDay.getTimeInMillis())){
-                                    userRestaurantAssociationListener.onGetUserRestaurantAssociation(userRestaurantAssociation);
+                                    userRestaurantAssociationListener.onGetUserRestaurantAssociation(uidPlaceIdAssociation);
                                 } else {
                                     Log.d(Tag.TAG, "onComplete() bad time !");
                                 }

@@ -8,8 +8,8 @@ import android.os.Bundle;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
-import com.example.go4lunch.models.viewstate.DetailRestaurantViewState;
-import com.example.go4lunch.models.viewstate.SimpleUserViewState;
+import com.example.go4lunch.ui.model.DetailRestaurantViewState;
+import com.example.go4lunch.ui.model.SimpleUserViewState;
 import com.example.go4lunch.repository.GooglePlacesApiRepository;
 import com.example.go4lunch.tag.Tag;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -161,7 +161,10 @@ public class DetailRestaurantActivity extends AppCompatActivity {
      * crete viewModel and configure observers
      */
     private void configureViewModel(){
-        this.detailRestaurantViewModel = new DetailRestaurantViewModel(new GooglePlacesApiRepository(getString(R.string.google_api_key)));
+        this.detailRestaurantViewModel = new DetailRestaurantViewModel(
+                new GooglePlacesApiRepository(getString(R.string.google_api_key)),
+                uid,
+                placeId);
 
         this.detailRestaurantViewModel.getErrorLiveData().observe(this, new Observer<String>() {
             @Override
@@ -170,17 +173,20 @@ public class DetailRestaurantActivity extends AppCompatActivity {
             }
         });
 
-        this.detailRestaurantViewModel.getDetailRestaurantLiveData().observe(this, new Observer<DetailRestaurantViewState>() {
+        detailRestaurantViewModel.getDetailRestaurantViewStateLiveData().observe(this, new Observer<DetailRestaurantViewState>() {
             @Override
             public void onChanged(DetailRestaurantViewState detailRestaurantViewState) {
                 setRestaurantName(detailRestaurantViewState.getName());
                 setInfo(detailRestaurantViewState.getInfo());
                 setUrlPicture(detailRestaurantViewState.getUrlPicture());
+                setPhoneNumber(detailRestaurantViewState.getPhoneNumber());
+                setWebsite(detailRestaurantViewState.getWebsite());
                 setStar1Color(detailRestaurantViewState.getStar1Color());
                 setStar2Color(detailRestaurantViewState.getStar2Color());
                 setStar3Color(detailRestaurantViewState.getStar3Color());
-                setPhoneNumber(detailRestaurantViewState.getPhoneNumber());
-                setWebsite(detailRestaurantViewState.getWebsite());
+                setWorkmates(detailRestaurantViewState.getWorkmates());
+                setChosen(detailRestaurantViewState.isChosenByCurrentUser());
+                setLiked(detailRestaurantViewState.isLikedByCurrentUser());
             }
         });
 
@@ -231,10 +237,7 @@ public class DetailRestaurantActivity extends AppCompatActivity {
     }
 
     private void loadViewModel(String placeId, String uid){
-        detailRestaurantViewModel.loadDetailRestaurant(placeId);
-        detailRestaurantViewModel.loadIsLikedByUid(uid, this.placeId);
-        detailRestaurantViewModel.loadIsChosen(uid, placeId);
-        detailRestaurantViewModel.loadWorkmatesByPlace(this.placeId);
+        detailRestaurantViewModel.load(placeId, uid);
     }
 
     private void setRestaurantName(String name){
@@ -321,7 +324,7 @@ public class DetailRestaurantActivity extends AppCompatActivity {
         } else {
             this.detailRestaurantViewModel.choose(this.uid, this.placeId);
         }
-        this.detailRestaurantViewModel.loadWorkmatesByPlace(this.placeId);
+        this.detailRestaurantViewModel.loadWorkmatesByPlaceId(this.placeId);
     }
 
     // state chosen and UI update

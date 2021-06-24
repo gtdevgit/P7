@@ -1,4 +1,4 @@
-package com.example.go4lunch.models.viewstate;
+package com.example.go4lunch.ui.model;
 
 /**
  * Used by detail restaurant to display the list of workmates, simple with name en picture

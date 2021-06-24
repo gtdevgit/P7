@@ -4,7 +4,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.go4lunch.models.firestore.User;
+import com.example.go4lunch.data.firestore.model.User;
 import com.example.go4lunch.tag.Tag;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;

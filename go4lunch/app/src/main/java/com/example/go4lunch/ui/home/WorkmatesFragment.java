@@ -17,7 +17,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.go4lunch.R;
-import com.example.go4lunch.models.firestore.User;
+import com.example.go4lunch.data.firestore.model.User;
 import com.example.go4lunch.tag.Tag;
 
 import java.util.List;
@@ -41,17 +41,25 @@ public class WorkmatesFragment extends Fragment {
     // Todo : Si le workmate a choisi un restaurant afficher un idicateur
     // Todo : Optionnel : Ouvrir le détail du restaurant choisi.
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.d(TAG, "WorkmatesFragment.onCreateView() called with: inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_workmates, container, false);
-        workmatesViewModel = new ViewModelProvider(this).get(WorkmatesViewModel.class);
+        workmateProgressBar = root.findViewById(R.id.fragment_workmates_progress_bar);
 
-        recyclerView = root.findViewById(R.id.fragment_workmates_recyclerview);
-        layoutManager = new LinearLayoutManager(root.getContext());
+        configureRecyclerView(root);
+        configureViewModel();
+        loadViewModel();
+
+        return root;
+    }
+
+    private void configureRecyclerView(View view){
+        recyclerView = view.findViewById(R.id.fragment_workmates_recyclerview);
+
+        layoutManager = new LinearLayoutManager(view.getContext());
         recyclerView.setLayoutManager(layoutManager);
 
         workmatesAdapter = new WorkmatesAdapter();
@@ -60,6 +68,10 @@ public class WorkmatesFragment extends Fragment {
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
                 DividerItemDecoration.VERTICAL);
         recyclerView.addItemDecoration(dividerItemDecoration);
+    }
+
+    private void configureViewModel(){
+        workmatesViewModel = new ViewModelProvider(this).get(WorkmatesViewModel.class);
 
         workmatesViewModel.getWorkmatesLiveData().observe(getViewLifecycleOwner(), new Observer<List<User>>() {
             @Override
@@ -69,12 +81,11 @@ public class WorkmatesFragment extends Fragment {
                 workmateProgressBar.setVisibility(View.INVISIBLE);
             }
         });
+    }
 
-        workmateProgressBar = root.findViewById(R.id.fragment_workmates_progress_bar);
+    private void loadViewModel(){
         workmateProgressBar.setVisibility(View.VISIBLE);
-
         workmatesViewModel.loadWorkmates();
-        return root;
     }
 
     @Override

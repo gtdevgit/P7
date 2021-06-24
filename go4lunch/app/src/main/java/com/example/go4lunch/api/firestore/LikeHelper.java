@@ -4,7 +4,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.go4lunch.models.firestore.UserRestaurantAssociation;
+import com.example.go4lunch.data.firestore.model.UidPlaceIdAssociation;
 import com.example.go4lunch.tag.Tag;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -82,8 +82,8 @@ public class LikeHelper {
 
     public static void createLike(String uid, String placeId, LikeHelperListener likeHelperListener) {
         Log.d(TAG, "createLike() called with: uid = [" + uid + "], placeId = [" + placeId + "]");
-        UserRestaurantAssociation userRestaurantAssociation = new UserRestaurantAssociation(uid, placeId);
-        getLikedCollection().document(getDocumentId(uid, placeId)).set(userRestaurantAssociation)
+        UidPlaceIdAssociation uidPlaceIdAssociation = new UidPlaceIdAssociation(uid, placeId);
+        getLikedCollection().document(getDocumentId(uid, placeId)).set(uidPlaceIdAssociation)
             .addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
@@ -117,7 +117,7 @@ public class LikeHelper {
     }
 
     public static void getLikedRestaurants(UserRestaurantAssociationListListener userRestaurantAssociationListListener, FailureListener failureListener) {
-        List<UserRestaurantAssociation> userRestaurantAssociationList = new ArrayList<>();
+        List<UidPlaceIdAssociation> uidPlaceIdAssociationList = new ArrayList<>();
         getLikedCollection()
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -126,10 +126,10 @@ public class LikeHelper {
                         if (task.isSuccessful()){
                             QuerySnapshot querySnapshot = task.getResult();
                             for (QueryDocumentSnapshot document : querySnapshot) {
-                                UserRestaurantAssociation userRestaurantAssociation = document.toObject(UserRestaurantAssociation.class);
-                                userRestaurantAssociationList.add(userRestaurantAssociation);
+                                UidPlaceIdAssociation uidPlaceIdAssociation = document.toObject(UidPlaceIdAssociation.class);
+                                uidPlaceIdAssociationList.add(uidPlaceIdAssociation);
                             }
-                            userRestaurantAssociationListListener.onGetUserRestaurantAssociationList(userRestaurantAssociationList);
+                            userRestaurantAssociationListListener.onGetUserRestaurantAssociationList(uidPlaceIdAssociationList);
                         } else {
                             failureListener.onFailure(task.getException());
                         }
@@ -145,7 +145,7 @@ public class LikeHelper {
 
     public static void getUsersWhoLikedThisRestaurant(String placeId, UserRestaurantAssociationListListener userRestaurantAssociationListListener,
                                                       FailureListener failureListener) {
-        List<UserRestaurantAssociation> userRestaurantAssociations = new ArrayList<>();
+        List<UidPlaceIdAssociation> uidPlaceIdAssociations = new ArrayList<>();
         Log.d(Tag.TAG, "getUsersWhoLikedThisRestaurant");
         getLikedCollection()
                 .whereEqualTo("placeId", placeId)
@@ -156,11 +156,11 @@ public class LikeHelper {
                         if (task.isSuccessful()){
                             Log.d(Tag.TAG, "getUsersWhoLikedThisRestaurant.onComplete() ");
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                UserRestaurantAssociation userRestaurantAssociation = document.toObject(UserRestaurantAssociation.class);
-                                Log.d(Tag.TAG, "getUsersWhoLikedThisRestaurant.onComplete() userRestaurantAssociation = [" + userRestaurantAssociation + "]");
-                                userRestaurantAssociations.add(document.toObject(UserRestaurantAssociation.class));
+                                UidPlaceIdAssociation uidPlaceIdAssociation = document.toObject(UidPlaceIdAssociation.class);
+                                Log.d(Tag.TAG, "getUsersWhoLikedThisRestaurant.onComplete() userRestaurantAssociation = [" + uidPlaceIdAssociation + "]");
+                                uidPlaceIdAssociations.add(document.toObject(UidPlaceIdAssociation.class));
                             }
-                            userRestaurantAssociationListListener.onGetUserRestaurantAssociationList(userRestaurantAssociations);
+                            userRestaurantAssociationListListener.onGetUserRestaurantAssociationList(uidPlaceIdAssociations);
                         } else {
                             failureListener.onFailure(task.getException());
                         }

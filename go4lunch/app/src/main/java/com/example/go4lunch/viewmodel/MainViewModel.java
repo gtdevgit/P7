@@ -12,8 +12,8 @@ import com.example.go4lunch.api.firestore.ChosenHelper;
 import com.example.go4lunch.api.firestore.FailureListener;
 import com.example.go4lunch.api.firestore.LikeHelper;
 import com.example.go4lunch.api.firestore.UserRestaurantAssociationListListener;
-import com.example.go4lunch.models.viewstate.Restaurant;
-import com.example.go4lunch.models.firestore.UserRestaurantAssociation;
+import com.example.go4lunch.ui.model.Restaurant;
+import com.example.go4lunch.data.firestore.model.UidPlaceIdAssociation;
 import com.example.go4lunch.models.googleplaces.placesearch.Result;
 import com.example.go4lunch.models.googleplaces.placesearch.PlaceSearch;
 import com.example.go4lunch.repository.GooglePlacesApiRepository;
@@ -32,22 +32,12 @@ import retrofit2.Response;
 
 public class MainViewModel extends ViewModel {
 
-    /**
-     * /////////////////////// nested interface ///////////////////////
-     * callback loadRestaurants
-     */
-    private interface LoadRestaurantListener{
-        void onLoadCompleted(List<Restaurant> restaurants);
-    }
-
-    private LoadRestaurantListener loadRestaurantListener;
-
     private ListenerRegistration registrationChosenRestaurant;
     private ListenerRegistration registrationLikedRestaurant;
 
     // for mediator
-    private List<UserRestaurantAssociation> likedCollection;
-    private List<UserRestaurantAssociation> chosenCollection;
+    private List<UidPlaceIdAssociation> likedCollection;
+    private List<UidPlaceIdAssociation> chosenCollection;
     private List<Result> nearbysearch;
 
     /**
@@ -61,13 +51,6 @@ public class MainViewModel extends ViewModel {
     public MainViewModel(GooglePlacesApiRepository googlePlacesApiRepository) {
         Log.d(Tag.TAG, "MainViewModel() called with: googlePlacesApiRepository = [" + googlePlacesApiRepository + "]");
         this.googlePlacesApiRepository = googlePlacesApiRepository;
-
-        loadRestaurantListener = new LoadRestaurantListener() {
-            @Override
-            public void onLoadCompleted(List<Restaurant> restaurants) {
-                restaurantsMutableLiveData.postValue(restaurants);
-            }
-        };
     }
 
     /**
@@ -157,10 +140,10 @@ public class MainViewModel extends ViewModel {
     /**
      * count placeId record in List<UserRestaurantAssociation>
      */
-    private int countUserRestaurantAssociationByPlaceId(String placeId, List<UserRestaurantAssociation> userRestaurantAssociations){
+    private int countUserRestaurantAssociationByPlaceId(String placeId, List<UidPlaceIdAssociation> uidPlaceIdAssociations){
         int result = 0;
-        for (UserRestaurantAssociation userRestaurantAssociation : userRestaurantAssociations){
-            if (userRestaurantAssociation.getPlaceId().equals(placeId)) {
+        for (UidPlaceIdAssociation uidPlaceIdAssociation : uidPlaceIdAssociations){
+            if (uidPlaceIdAssociation.getPlaceId().equals(placeId)) {
                 result++;
             }
         }
@@ -170,18 +153,18 @@ public class MainViewModel extends ViewModel {
     /**
      * count likes by restaurants
      */
-    private int countLikeByRestaurant(String placeId, List<UserRestaurantAssociation> userRestaurantAssociations){
-        return countUserRestaurantAssociationByPlaceId(placeId, userRestaurantAssociations);
+    private int countLikeByRestaurant(String placeId, List<UidPlaceIdAssociation> uidPlaceIdAssociations){
+        return countUserRestaurantAssociationByPlaceId(placeId, uidPlaceIdAssociations);
     }
 
     /**
      * count workmates who chose placeId
       * @param placeId
-     * @param userRestaurantAssociations
+     * @param uidPlaceIdAssociations
      * @return
      */
-    private int countWorkmates(String placeId, List<UserRestaurantAssociation> userRestaurantAssociations){
-        return countUserRestaurantAssociationByPlaceId(placeId, userRestaurantAssociations);
+    private int countWorkmates(String placeId, List<UidPlaceIdAssociation> uidPlaceIdAssociations){
+        return countUserRestaurantAssociationByPlaceId(placeId, uidPlaceIdAssociations);
     }
 
     /**
@@ -211,7 +194,7 @@ public class MainViewModel extends ViewModel {
         // get likedCollection
         UserRestaurantAssociationListListener likedUserRestaurantAssociationListListener = new UserRestaurantAssociationListListener() {
             @Override
-            public void onGetUserRestaurantAssociationList(List<UserRestaurantAssociation> userRestaurantAssociations) {
+            public void onGetUserRestaurantAssociationList(List<UidPlaceIdAssociation> userRestaurantAssociations) {
                 likedCollection.addAll(userRestaurantAssociations);
                 combine(location, likedCollection, chosenCollection, nearbysearch);
             }
@@ -221,7 +204,7 @@ public class MainViewModel extends ViewModel {
         // get chosenCollection
         UserRestaurantAssociationListListener chosenUserRestaurantAssociationListListener = new UserRestaurantAssociationListListener() {
             @Override
-            public void onGetUserRestaurantAssociationList(List<UserRestaurantAssociation> userRestaurantAssociations) {
+            public void onGetUserRestaurantAssociationList(List<UidPlaceIdAssociation> userRestaurantAssociations) {
                 chosenCollection.addAll(userRestaurantAssociations);
                 combine(location, likedCollection, chosenCollection, nearbysearch);
             }
@@ -250,15 +233,15 @@ public class MainViewModel extends ViewModel {
     }
 
     /**
-     * combine : combine wait for all data before working
+     * combine : combine wait for all data before compute
      * @param location
      * @param likedCollection
      * @param chosenCollection
      * @param nearbysearch
      */
     private void combine(@Nullable Location location,
-                         @Nullable List<UserRestaurantAssociation> likedCollection,
-                         @Nullable List<UserRestaurantAssociation> chosenCollection,
+                         @Nullable List<UidPlaceIdAssociation> likedCollection,
+                         @Nullable List<UidPlaceIdAssociation> chosenCollection,
                          @Nullable List<Result> nearbysearch) {
         // canot compute without data
         if (location == null || likedCollection == null || chosenCollection == null || nearbysearch == null) {
@@ -366,7 +349,7 @@ public class MainViewModel extends ViewModel {
         // get likedCollection
         UserRestaurantAssociationListListener likedUserRestaurantAssociationListListener = new UserRestaurantAssociationListListener() {
             @Override
-            public void onGetUserRestaurantAssociationList(List<UserRestaurantAssociation> userRestaurantAssociations) {
+            public void onGetUserRestaurantAssociationList(List<UidPlaceIdAssociation> userRestaurantAssociations) {
                 likedCollection.addAll(userRestaurantAssociations);
                 combine(location, likedCollection, chosenCollection, nearbysearch);
             }
@@ -376,7 +359,7 @@ public class MainViewModel extends ViewModel {
         // get chosenCollection
         UserRestaurantAssociationListListener chosenUserRestaurantAssociationListListener = new UserRestaurantAssociationListListener() {
             @Override
-            public void onGetUserRestaurantAssociationList(List<UserRestaurantAssociation> userRestaurantAssociations) {
+            public void onGetUserRestaurantAssociationList(List<UidPlaceIdAssociation> userRestaurantAssociations) {
                 chosenCollection.addAll(userRestaurantAssociations);
                 combine(location, likedCollection, chosenCollection, nearbysearch);
             }

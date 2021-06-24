@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.R;
-import com.example.go4lunch.models.firestore.User;
+import com.example.go4lunch.data.firestore.model.User;
 import com.example.go4lunch.tag.Tag;
 
 import java.util.ArrayList;

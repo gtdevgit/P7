@@ -1,6 +1,6 @@
-package com.example.go4lunch.models.viewstate;
+package com.example.go4lunch.ui.model;
 
-import androidx.annotation.ColorRes;
+import com.example.go4lunch.ui.model.SimpleUserViewState;
 
 import java.util.List;
 

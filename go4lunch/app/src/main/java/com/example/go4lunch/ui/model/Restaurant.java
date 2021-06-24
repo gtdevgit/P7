@@ -1,4 +1,4 @@
-package com.example.go4lunch.models.viewstate;
+package com.example.go4lunch.ui.model;
 
 import java.text.DecimalFormat;
 

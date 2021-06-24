@@ -1,6 +1,6 @@
 package com.example.go4lunch.ui.home;
 
-import com.example.go4lunch.models.viewstate.Restaurant;
+import com.example.go4lunch.ui.model.Restaurant;
 
 /**
  * Interface for clicking on one restaurant

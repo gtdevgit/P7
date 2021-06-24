@@ -1,6 +1,6 @@
-package com.example.go4lunch.models.firestore;
+package com.example.go4lunch.data.firestore.model;
 
-public class UserRestaurantAssociation {
+public class UidPlaceIdAssociation {
     /**
      * firebase User Id
      */
@@ -17,9 +17,9 @@ public class UserRestaurantAssociation {
     /**
      * need no-argument constructor for deserialize firestore document to object
      */
-    public UserRestaurantAssociation() {}
+    public UidPlaceIdAssociation() {}
 
-    public UserRestaurantAssociation(String userUid, String placeId) {
+    public UidPlaceIdAssociation(String userUid, String placeId) {
         this.userUid = userUid;
         this.placeId = placeId;
         createdTime = System.currentTimeMillis();

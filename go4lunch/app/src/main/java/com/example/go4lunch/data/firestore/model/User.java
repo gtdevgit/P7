@@ -1,4 +1,4 @@
-package com.example.go4lunch.models.firestore;
+package com.example.go4lunch.data.firestore.model;
 
 import com.google.firebase.firestore.ServerTimestamp;
 
