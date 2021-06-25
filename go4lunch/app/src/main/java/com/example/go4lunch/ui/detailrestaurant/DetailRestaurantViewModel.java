@@ -51,12 +51,9 @@ public class DetailRestaurantViewModel extends ViewModel {
     private final int STAR_LEVEL_3 = 3;
 
     private GooglePlacesApiRepository googlePlacesApiRepository;
-    private String currentPlaceId;
-    private String currentUid;
 
     private final MutableLiveData<String> errorMutableLiveData = new MutableLiveData<String>();
     private final MutableLiveData<Boolean> likedMutableLiveData = new MutableLiveData<Boolean>();
-    private final MutableLiveData<Boolean> chosenMutableLiveData = new MutableLiveData<Boolean>();
     private final MutableLiveData<List<SimpleUserViewState>> workmatesMutableLiveData = new MutableLiveData<>();
     private final MutableLiveData<Integer> countLikedMutableLiveData = new MutableLiveData<>();
 
@@ -67,7 +64,6 @@ public class DetailRestaurantViewModel extends ViewModel {
     private ListenerRegistration registrationChosen;
     private ListenerRegistration registrationLiked;
 
-    private final ChosenListener chosenListener;
     private final FailureListener failureListener;
     private final UserRestaurantAssociationListListener userRestaurantAssociationListListener;
     private final UserListListener userListListener;
@@ -87,25 +83,21 @@ public class DetailRestaurantViewModel extends ViewModel {
     private List<UidPlaceIdAssociation> chosenRestaurantsByPlaceId;
     private List<SimpleUserViewState> workmatesByPlaceId;
 
+    // cache
+    private CacheDetailRestaurantViewModel cache;
+
     public DetailRestaurantViewModel(GooglePlacesApiRepository googlePlacesApiRepository,
                                      String currentUid,
                                      String currentPlaceId ) {
+
         this.googlePlacesApiRepository = googlePlacesApiRepository;
-        this.currentUid = currentUid;
-        this.currentPlaceId = currentPlaceId;
+        cache = new CacheDetailRestaurantViewModel(currentUid, currentPlaceId);
 
         firestoreUsersRepository = new FirestoreUsersRepository();
         firestoreChosenRepository = new FirestoreChosenRepository();
         firestoreLikedRepository = new FirestoreLikedRepository();
 
         configureMediatorLiveData();
-
-        this.chosenListener = new ChosenListener() {
-            @Override
-            public void onGetChosen(boolean isChosen) {
-                chosenMutableLiveData.postValue(Boolean.valueOf(isChosen));
-            }
-        };
 
         this.failureListener = new FailureListener() {
             @Override
@@ -229,10 +221,6 @@ public class DetailRestaurantViewModel extends ViewModel {
         return likedMutableLiveData;
     }
 
-    public LiveData<Boolean> getChosenLiveData() {
-        return chosenMutableLiveData;
-    }
-
     public LiveData<List<SimpleUserViewState>> getWorkmatesLiveData() {
         return workmatesMutableLiveData;
     }
@@ -334,13 +322,14 @@ public class DetailRestaurantViewModel extends ViewModel {
         });
     }
 
-    /**
-     * is restaurant choose
-     * @param uid
-     * @param placeId
-     */
-    public void loadIsChosen(String uid, String placeId){
-        ChosenHelper.isChosenRestaurant(uid, placeId, this.chosenListener, this.failureListener);
+    public void changeChose(){
+        if (cache.isChosenByCurrentUser()) {
+            unchoose(cache.getUid());
+        } else {
+            choose(cache.getUid(), cache.getPlaceId());
+        }
+        // update new data
+        firestoreChosenRepository.loadChosenRestaurantsByPlaceId(cache.getPlaceId());
     }
 
     /**
@@ -348,17 +337,16 @@ public class DetailRestaurantViewModel extends ViewModel {
      * @param uid
      * @param placeId
      */
-    public void choose(String uid, String placeId){
-        ChosenHelper.createChosenRestaurant(uid, placeId, this.chosenListener, this.failureListener);
+    private void choose(String uid, String placeId){
+        firestoreChosenRepository.createChosenRestaurant(uid, placeId);
     }
 
     /**
      * user unchoose restaurant
      * @param uid
-     * @param placeId
      */
-    public void unchoose(String uid, String placeId) {
-        ChosenHelper.deleteChosenRestaurant(uid, placeId, this.chosenListener, this.failureListener);
+    private void unchoose(String uid) {
+        firestoreChosenRepository.deleteChosenRestaurant(uid);
     }
 
     public void loadWorkmatesByPlaceId(String placeId){
@@ -484,21 +472,24 @@ public class DetailRestaurantViewModel extends ViewModel {
         int star1Color = getStarColorByLevel(STAR_LEVEL_1, likeCounter);
         int star2Color = getStarColorByLevel(STAR_LEVEL_2, likeCounter);
         int star3Color = getStarColorByLevel(STAR_LEVEL_3, likeCounter);
-        boolean isLikedByCurrentUser = isContainUid(currentUid, likedRestaurantsByPlaceId);
 
-        boolean isChosenByCurrentUser = isContainUid(currentUid, chosenRestaurantsByPlaceId);
+        boolean likedByCurrentUser = isContainUid(cache.getUid(), likedRestaurantsByPlaceId);
+        boolean chosenByCurrentUser = isContainUid(cache.getUid(), chosenRestaurantsByPlaceId);
+
+        cache.setLikedByCurrentUser(likedByCurrentUser);
+        cache.setChosenByCurrentUser(chosenByCurrentUser);
 
         DetailRestaurantViewState detailRestaurantViewState = new DetailRestaurantViewState(
                 placeId,
                 urlPicture,
                 name,
                 info,
-                isChosenByCurrentUser,
+                chosenByCurrentUser,
                 star1Color,
                 star2Color,
                 star3Color,
                 phoneNumber,
-                isLikedByCurrentUser,
+                likedByCurrentUser,
                 website,
                 workmatesByPlaceId
         );

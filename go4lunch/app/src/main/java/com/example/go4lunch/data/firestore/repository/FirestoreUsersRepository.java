@@ -103,33 +103,38 @@ public class FirestoreUsersRepository {
     }
 
     public void loadUsersByUids(List<String> uids){
-        getUsersCollection()
-                .whereIn("uid", uids)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
-                        if(task.isSuccessful()){
-                            List<User> users = new ArrayList<>();
-                            QuerySnapshot querySnapshot = task.getResult();
-                            for (QueryDocumentSnapshot document : querySnapshot){
-                                User user = document.toObject(User.class);
-                                users.add(user);
-                            }
-                            usersByUidsMutableLiveData.setValue(users);
-                        } else {
-                            if (task.getException() != null) {
-                                errorMutableLiveData.setValue(task.getException().getMessage());
+        List<User> users = new ArrayList<>();
+
+        if ((uids != null) && (uids.size() > 0)) {
+            getUsersCollection()
+                    .whereIn("uid", uids)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                QuerySnapshot querySnapshot = task.getResult();
+                                for (QueryDocumentSnapshot document : querySnapshot) {
+                                    User user = document.toObject(User.class);
+                                    users.add(user);
+                                }
+                                usersByUidsMutableLiveData.setValue(users);
+                            } else {
+                                if (task.getException() != null) {
+                                    errorMutableLiveData.setValue(task.getException().getMessage());
+                                }
                             }
                         }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull @NotNull Exception e) {
-                        errorMutableLiveData.setValue(e.getMessage());
-                    }
-                });
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull @NotNull Exception e) {
+                            errorMutableLiveData.setValue(e.getMessage());
+                        }
+                    });
+        } else
+            // empty data
+            usersByUidsMutableLiveData.setValue(users);
     }
 }
 

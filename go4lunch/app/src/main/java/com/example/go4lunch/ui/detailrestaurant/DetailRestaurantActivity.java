@@ -55,7 +55,6 @@ public class DetailRestaurantActivity extends AppCompatActivity {
     private String phoneNumber;
     private String website;
     private boolean liked;
-    private boolean chosen;
 
     private ConstraintLayout constraintLayout;
     private ImageView imageView;
@@ -200,14 +199,6 @@ public class DetailRestaurantActivity extends AppCompatActivity {
             }
         });
 
-        // chosen observer
-        detailRestaurantViewModel.getChosenLiveData().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean aBoolean) {
-                setChosen(aBoolean.booleanValue());
-            }
-        });
-
         // workmates who chose this restaurant
         detailRestaurantViewModel.getWorkmatesLiveData().observe(this, new Observer<List<SimpleUserViewState>>() {
             @Override
@@ -320,19 +311,11 @@ public class DetailRestaurantActivity extends AppCompatActivity {
     }
 
     private void changeChoose(){
-        if (chosen) {
-            //remove choise
-            detailRestaurantViewModel.unchoose(uid, placeId);
-        } else {
-            detailRestaurantViewModel.choose(uid, placeId);
-        }
-        detailRestaurantViewModel.loadWorkmatesByPlaceId(placeId);
+        detailRestaurantViewModel.changeChose();
     }
 
     // state chosen and UI update
     private void setChosen(boolean isChosen){
-        Log.d(TAG, "setChosen() called with: isChosen = [" + isChosen + "]");
-        chosen = isChosen;
         if (isChosen) {
             floatingActionButton.setImageResource(R.drawable.ic_baseline_check_24);
         } else {

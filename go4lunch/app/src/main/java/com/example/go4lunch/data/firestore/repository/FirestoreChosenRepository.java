@@ -103,4 +103,47 @@ public class FirestoreChosenRepository {
                     }
                 });
     }
+
+    public void createChosenRestaurant(String uid, String placeId){
+        UidPlaceIdAssociation uidPlaceIdAssociation = new UidPlaceIdAssociation(uid, placeId);
+        getChosenCollection().document(uid).set(uidPlaceIdAssociation)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (!task.isSuccessful()) {
+                            if (task.getException() != null) {
+                                errorMutableLiveData.setValue(task.getException().getMessage());
+                            }
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(Tag.TAG, "createChosenRestaurant.onFailure() called with: e = [" + e + "]");
+                        errorMutableLiveData.setValue(e.getMessage());
+                    }
+                });
+    }
+
+    public void deleteChosenRestaurant(String uid){
+        getChosenCollection().document(uid).delete()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (!task.isSuccessful()) {
+                            if (task.getException() != null) {
+                                errorMutableLiveData.setValue(task.getException().getMessage());
+                            }
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(Tag.TAG, "deleteLike.onFailure() called with: e = [" + e + "]");
+                        errorMutableLiveData.setValue(e.getMessage());
+                    }
+                });
+    }
 }

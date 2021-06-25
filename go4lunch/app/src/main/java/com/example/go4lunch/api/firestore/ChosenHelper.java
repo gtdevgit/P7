@@ -69,51 +69,6 @@ public class ChosenHelper {
                 });
     }
 
-    public static void createChosenRestaurant(String uid, String placeId, ChosenListener chosenListener, FailureListener failureListener){
-        Log.d(Tag.TAG, "createChosenRestaurant() called with: uid = [" + uid + "], placeId = [" + placeId + "]");
-        UidPlaceIdAssociation uidPlaceIdAssociation = new UidPlaceIdAssociation(uid, placeId);
-        getChosenCollection().document(uid).set(uidPlaceIdAssociation)
-            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if (task.isSuccessful()) {
-                        chosenListener.onGetChosen(true);
-                    } else {
-                        failureListener.onFailure(task.getException());
-                    }
-                }
-            })
-            .addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.d(Tag.TAG, "createChosenRestaurant.onFailure() called with: e = [" + e + "]");
-                    failureListener.onFailure(e);
-                }
-            });
-    }
-
-    public static void deleteChosenRestaurant(String uid, String placeId, ChosenListener chosenListener, FailureListener failureListener) {
-        Log.d(Tag.TAG, "deleteLike() called with: uid = [" + uid + "], placeId = [" + placeId + "]");
-        getChosenCollection().document(uid).delete()
-            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if (task.isSuccessful()){
-                        chosenListener.onGetChosen(false);
-                    } else {
-                        failureListener.onFailure(task.getException());
-                    }
-                }
-            })
-            .addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.d(Tag.TAG, "deleteLike.onFailure() called with: e = [" + e + "]");
-                    failureListener.onFailure(e);
-                }
-            });
-    }
-
     public static void getUsersWhoChoseThisRestaurant(String placeId, UserRestaurantAssociationListListener userRestaurantAssociationListListener,
                                                       FailureListener failureListener) {
         List<UidPlaceIdAssociation> uidPlaceIdAssociations = new ArrayList<>();
