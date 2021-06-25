@@ -7,8 +7,11 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.go4lunch.api.firestore.FailureListener;
 import com.example.go4lunch.api.firestore.LikeHelper;
+import com.example.go4lunch.api.firestore.UserRestaurantAssociationListListener;
 import com.example.go4lunch.data.firestore.model.UidPlaceIdAssociation;
+import com.example.go4lunch.data.firestore.validation.CurrentTimeLimits;
 import com.example.go4lunch.tag.Tag;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -45,12 +48,13 @@ public class FirestoreChosenRepository {
     }
 
     private ListenerRegistration registrationChosenByPlaceId;
+    private ListenerRegistration registrationChosenAll;
 
     /**
      * Selected collection
      * @return
      */
-    private CollectionReference getChosenCollection() {
+    public CollectionReference getChosenCollection() {
         return FirebaseFirestore.getInstance().collection(COLLECTION_NAME_CHOSEN);
     }
 
@@ -91,9 +95,12 @@ public class FirestoreChosenRepository {
                     public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()){
                             List<UidPlaceIdAssociation> chosenRestaurants = new ArrayList<>();
+                            CurrentTimeLimits currentTimeLimits = new CurrentTimeLimits();
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 UidPlaceIdAssociation uidPlaceIdAssociation = document.toObject(UidPlaceIdAssociation.class);
-                                chosenRestaurants.add(uidPlaceIdAssociation);
+                                if (currentTimeLimits.isValidDate(uidPlaceIdAssociation.getCreatedTime())) {
+                                    chosenRestaurants.add(uidPlaceIdAssociation);
+                                }
                             }
                             chosenRestaurantsByPlaceIdMutableLiveData.setValue(chosenRestaurants);
                         } else {
@@ -154,6 +161,34 @@ public class FirestoreChosenRepository {
                 });
     }
 
+    public void getChosenRestaurants(UserRestaurantAssociationListListener userRestaurantAssociationListListener,
+                                     FailureListener failureListener) {
+        List<UidPlaceIdAssociation> uidPlaceIdAssociationList = new ArrayList<>();
+        Log.d(Tag.TAG, "getChosenRestaurants");
+        getChosenCollection()
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()){
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                uidPlaceIdAssociationList.add(document.toObject(UidPlaceIdAssociation.class));
+                            }
+                            Log.d(Tag.TAG, "getChosenRestaurants. successful with userRestaurantAssociationList.size()=" + uidPlaceIdAssociationList.size());
+                            userRestaurantAssociationListListener.onGetUserRestaurantAssociationList(uidPlaceIdAssociationList);
+                        } else {
+                            failureListener.onFailure(task.getException());
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull @NotNull Exception e) {
+                        failureListener.onFailure(e);
+                    }
+                });
+    }
+
     public void activateRealTimeChosenByPlaceListener(String placeId){
         registrationChosenByPlaceId = getChosenCollection()
                 .whereEqualTo("placeId", placeId)
@@ -178,6 +213,32 @@ public class FirestoreChosenRepository {
     public void removeRealTimeChosenByPlaceListener(){
         if (registrationChosenByPlaceId != null) {
             registrationChosenByPlaceId.remove();
+        }
+    }
+
+    public void activateRealTimeChosenListener(String placeId){
+        registrationChosenAll = getChosenCollection()
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value,
+                                        @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
+                        if (error != null){
+                            errorMutableLiveData.postValue(error.getMessage());
+                            return;
+                        }
+                        List<UidPlaceIdAssociation> uidPlaceIdAssociations = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : value){
+                            UidPlaceIdAssociation uidPlaceIdAssociation = document.toObject(UidPlaceIdAssociation.class);
+                            uidPlaceIdAssociations.add(uidPlaceIdAssociation);
+                        }
+                        chosenRestaurantsByPlaceIdMutableLiveData.setValue(uidPlaceIdAssociations);
+                    }
+                });
+    }
+
+    public void removeRealTimeChosenListener(){
+        if (registrationChosenAll != null) {
+            registrationChosenAll.remove();
         }
     }
 }

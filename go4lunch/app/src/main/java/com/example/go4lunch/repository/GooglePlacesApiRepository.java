@@ -32,7 +32,7 @@ public class GooglePlacesApiRepository {
     public GooglePlacesApiRepository(String apiKey) {
         Log.d(TAG, "GooglePlacesApiRepository() called with: apiKey = [" + apiKey + "]");
         this.apiKey = apiKey;
-        api = GooglePlacesApiClient.getClient();
+        this.api = GooglePlacesApiClient.getClient();
     }
 
     private final MutableLiveData<String> errorMutableLiveData = new MutableLiveData<>();

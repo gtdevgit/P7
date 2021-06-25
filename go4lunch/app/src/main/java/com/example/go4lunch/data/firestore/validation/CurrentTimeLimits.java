@@ -1,4 +1,4 @@
-package com.example.go4lunch.notification;
+package com.example.go4lunch.data.firestore.validation;
 
 import java.util.Calendar;
 

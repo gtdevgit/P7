@@ -16,13 +16,14 @@ import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
 import com.example.go4lunch.R;
-import com.example.go4lunch.api.firestore.ChosenHelper;
 import com.example.go4lunch.api.firestore.FailureListener;
 import com.example.go4lunch.api.firestore.UserHelper;
 import com.example.go4lunch.api.firestore.UserListListener;
 import com.example.go4lunch.api.firestore.UserRestaurantAssociationListListener;
 import com.example.go4lunch.data.firestore.model.User;
 import com.example.go4lunch.data.firestore.model.UidPlaceIdAssociation;
+import com.example.go4lunch.data.firestore.repository.FirestoreChosenRepository;
+import com.example.go4lunch.data.firestore.validation.CurrentTimeLimits;
 import com.example.go4lunch.models.googleplaces.palcesdetails.PlaceDetails;
 import com.example.go4lunch.navigation.NavigationActivity;
 import com.example.go4lunch.repository.GooglePlacesApiRepository;
@@ -133,7 +134,8 @@ public class NotificationHelper {
                                      FailureListener failureListener){
         List<String> workmatesName = new ArrayList<>();
 
-        ChosenHelper.getChosenRestaurants(
+        FirestoreChosenRepository firestoreChosenRepository = new FirestoreChosenRepository();
+        firestoreChosenRepository.getChosenRestaurants(
             new UserRestaurantAssociationListListener() {
                 @Override
                 public void onGetUserRestaurantAssociationList(List<UidPlaceIdAssociation> uidPlaceIdAssociations) {
@@ -204,7 +206,8 @@ public class NotificationHelper {
     }
 
     /**
-     * Among the list of restaurant choices for all users, look for a user's choice, check that the date of this choice is still valid. The choice must be in the current day.
+     * Among the list of restaurants chosen by users, search for the current user's choice.
+     * Check that the date is valid. The date must be within the current day.
      * @param uid
      * @param uidPlaceIdAssociations
      * @return

@@ -8,10 +8,10 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.go4lunch.api.firestore.ChosenHelper;
 import com.example.go4lunch.api.firestore.FailureListener;
 import com.example.go4lunch.api.firestore.LikeHelper;
 import com.example.go4lunch.api.firestore.UserRestaurantAssociationListListener;
+import com.example.go4lunch.data.firestore.repository.FirestoreChosenRepository;
 import com.example.go4lunch.ui.model.Restaurant;
 import com.example.go4lunch.data.firestore.model.UidPlaceIdAssociation;
 import com.example.go4lunch.models.googleplaces.placesearch.Result;
@@ -47,6 +47,8 @@ public class MainViewModel extends ViewModel {
     private final MutableLiveData<String> errorMutableLiveData = new MutableLiveData<String>();
     private final MutableLiveData<List<Restaurant>> restaurantsMutableLiveData = new MutableLiveData<List<Restaurant>>();
     private final MutableLiveData<Location> locationMutableLiveData = new MutableLiveData<Location>();
+
+    FirestoreChosenRepository firestoreChosenRepository = new FirestoreChosenRepository();
 
     public MainViewModel(GooglePlacesApiRepository googlePlacesApiRepository) {
         Log.d(Tag.TAG, "MainViewModel() called with: googlePlacesApiRepository = [" + googlePlacesApiRepository + "]");
@@ -209,7 +211,7 @@ public class MainViewModel extends ViewModel {
                 combine(location, likedCollection, chosenCollection, nearbysearch);
             }
         };
-        ChosenHelper.getChosenRestaurants(chosenUserRestaurantAssociationListListener, failureListener);
+        firestoreChosenRepository.getChosenRestaurants(chosenUserRestaurantAssociationListListener, failureListener);
 
         // get getNearbysearch
         Call<PlaceSearch> call = googlePlacesApiRepository.getNearbysearch(location);
@@ -281,7 +283,7 @@ public class MainViewModel extends ViewModel {
      */
     public void activateChosenRestaurantListener(){
         Log.d(Tag.TAG, "WorkmatesViewModel.activateUsersListener() called");
-        registrationChosenRestaurant = ChosenHelper.getChosenCollection().addSnapshotListener(new EventListener<QuerySnapshot>() {
+        registrationChosenRestaurant = firestoreChosenRepository.getChosenCollection().addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
                 if (error != null){
@@ -291,6 +293,7 @@ public class MainViewModel extends ViewModel {
                 loadRestaurantAround(getLocationLiveData().getValue());
             }
         });
+
     }
 
     public void removerChosenRestaurantListener(){
@@ -364,7 +367,7 @@ public class MainViewModel extends ViewModel {
                 combine(location, likedCollection, chosenCollection, nearbysearch);
             }
         };
-        ChosenHelper.getChosenRestaurants(chosenUserRestaurantAssociationListListener, failureListener);
+        firestoreChosenRepository.getChosenRestaurants(chosenUserRestaurantAssociationListListener, failureListener);
 
         // get getNearbysearch
         Call<PlaceSearch> call = googlePlacesApiRepository.getNearbysearch(location);
