@@ -3,16 +3,21 @@ package com.example.go4lunch.data.firestore.repository;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.go4lunch.api.firestore.LikeHelper;
 import com.example.go4lunch.data.firestore.model.UidPlaceIdAssociation;
 import com.example.go4lunch.tag.Tag;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -38,6 +43,8 @@ public class FirestoreChosenRepository {
     public LiveData<List<UidPlaceIdAssociation>> getChosenRestaurantsByPlaceIdLiveData() {
         return chosenRestaurantsByPlaceIdMutableLiveData;
     }
+
+    private ListenerRegistration registrationChosenByPlaceId;
 
     /**
      * Selected collection
@@ -145,5 +152,32 @@ public class FirestoreChosenRepository {
                         errorMutableLiveData.setValue(e.getMessage());
                     }
                 });
+    }
+
+    public void activateRealTimeChosenByPlaceListener(String placeId){
+        registrationChosenByPlaceId = getChosenCollection()
+                .whereEqualTo("placeId", placeId)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value,
+                                        @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
+                        if (error != null){
+                            errorMutableLiveData.postValue(error.getMessage());
+                            return;
+                        }
+                        List<UidPlaceIdAssociation> uidPlaceIdAssociations = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : value){
+                            UidPlaceIdAssociation uidPlaceIdAssociation = document.toObject(UidPlaceIdAssociation.class);
+                            uidPlaceIdAssociations.add(uidPlaceIdAssociation);
+                        }
+                        chosenRestaurantsByPlaceIdMutableLiveData.setValue(uidPlaceIdAssociations);
+                    }
+                });
+    }
+
+    public void removeRealTimeChosenByPlaceListener(){
+        if (registrationChosenByPlaceId != null) {
+            registrationChosenByPlaceId.remove();
+        }
     }
 }

@@ -11,18 +11,9 @@ import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
 import com.example.go4lunch.R;
-import com.example.go4lunch.api.firestore.ChosenHelper;
-import com.example.go4lunch.api.firestore.ChosenListener;
-import com.example.go4lunch.api.firestore.FailureListener;
-import com.example.go4lunch.api.firestore.LikeHelper;
-import com.example.go4lunch.api.firestore.LikeHelperListener;
-import com.example.go4lunch.api.firestore.UserHelper;
-import com.example.go4lunch.api.firestore.UserListListener;
-import com.example.go4lunch.api.firestore.UserRestaurantAssociationListListener;
 import com.example.go4lunch.data.firestore.repository.FirestoreChosenRepository;
 import com.example.go4lunch.data.firestore.repository.FirestoreLikedRepository;
 import com.example.go4lunch.data.firestore.repository.FirestoreUsersRepository;
-import com.example.go4lunch.models.googleplaces.palcesdetails.Result;
 import com.example.go4lunch.ui.model.DetailRestaurantViewState;
 import com.example.go4lunch.data.firestore.model.User;
 import com.example.go4lunch.data.firestore.model.UidPlaceIdAssociation;
@@ -30,19 +21,9 @@ import com.example.go4lunch.models.googleplaces.Photo;
 import com.example.go4lunch.models.googleplaces.palcesdetails.PlaceDetails;
 import com.example.go4lunch.ui.model.SimpleUserViewState;
 import com.example.go4lunch.repository.GooglePlacesApiRepository;
-import com.example.go4lunch.tag.Tag;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class DetailRestaurantViewModel extends ViewModel {
 
@@ -51,40 +32,22 @@ public class DetailRestaurantViewModel extends ViewModel {
     private final int STAR_LEVEL_3 = 3;
 
     private GooglePlacesApiRepository googlePlacesApiRepository;
+    // cache
+    private CacheDetailRestaurantViewModel cache;
 
     private final MutableLiveData<String> errorMutableLiveData = new MutableLiveData<String>();
-    private final MutableLiveData<Boolean> likedMutableLiveData = new MutableLiveData<Boolean>();
-    private final MutableLiveData<List<SimpleUserViewState>> workmatesMutableLiveData = new MutableLiveData<>();
-    private final MutableLiveData<Integer> countLikedMutableLiveData = new MutableLiveData<>();
-
-    private final MutableLiveData<Integer> star1ColorMutableLiveData = new MutableLiveData<>();
-    private final MutableLiveData<Integer> star2ColorMutableLiveData = new MutableLiveData<>();
-    private final MutableLiveData<Integer> star3ColorMutableLiveData = new MutableLiveData<>();
-
-    private ListenerRegistration registrationChosen;
-    private ListenerRegistration registrationLiked;
-
-    private final FailureListener failureListener;
-    private final UserRestaurantAssociationListListener userRestaurantAssociationListListener;
-    private final UserListListener userListListener;
+    public LiveData<String> getErrorLiveData(){
+        return this.errorMutableLiveData;
+    }
 
     private FirestoreUsersRepository firestoreUsersRepository;
     private FirestoreChosenRepository firestoreChosenRepository;
     private FirestoreLikedRepository firestoreLikedRepository;
-    private final MediatorLiveData<DetailRestaurantViewState> detailRestaurantViewStateMediatorLiveData = new MediatorLiveData<>();
 
+    private final MediatorLiveData<DetailRestaurantViewState> detailRestaurantViewStateMediatorLiveData = new MediatorLiveData<>();
     public LiveData<DetailRestaurantViewState> getDetailRestaurantViewStateLiveData() {
         return detailRestaurantViewStateMediatorLiveData;
     }
-
-    // for combine
-    private PlaceDetails placeDetails;
-    private List<UidPlaceIdAssociation> likedRestaurantsByPlaceId;
-    private List<UidPlaceIdAssociation> chosenRestaurantsByPlaceId;
-    private List<SimpleUserViewState> workmatesByPlaceId;
-
-    // cache
-    private CacheDetailRestaurantViewModel cache;
 
     public DetailRestaurantViewModel(GooglePlacesApiRepository googlePlacesApiRepository,
                                      String currentUid,
@@ -98,37 +61,6 @@ public class DetailRestaurantViewModel extends ViewModel {
         firestoreLikedRepository = new FirestoreLikedRepository();
 
         configureMediatorLiveData();
-
-        this.failureListener = new FailureListener() {
-            @Override
-            public void onFailure(Exception e) {
-                errorMutableLiveData.postValue(e.getMessage());
-            }
-        };
-
-        this.userListListener = new UserListListener() {
-            @Override
-            public void onGetUsers(List<User> users) {
-                workmatesMutableLiveData.postValue(usersListToSimpleUserViewStateList(users));
-            }
-        };
-
-        this.userRestaurantAssociationListListener = new UserRestaurantAssociationListListener() {
-            @Override
-            public void onGetUserRestaurantAssociationList(List<UidPlaceIdAssociation> uidPlaceIdAssociations) {
-                Log.d(Tag.TAG, "DetailRestaurantViewModel.onGetUsersWhoChoseThisRestaurant() called with: userRestaurantAssociations = [" + uidPlaceIdAssociations + "]");
-                List<String> uidList = userRestaurantAssociationListToUidList(uidPlaceIdAssociations);
-
-                UserHelper.getUsersByUidList(uidList, userListListener, failureListener);
-            }
-        };
-    }
-
-    public void load(String placeId, String uid){
-        loadDetailRestaurant(placeId);
-        //loadIsLikedByUid(uid, placeId);
-        //loadIsChosen(uid, placeId);
-        loadWorkmatesByPlaceId(placeId);
     }
 
     private void configureMediatorLiveData(){
@@ -143,12 +75,9 @@ public class DetailRestaurantViewModel extends ViewModel {
         detailRestaurantViewStateMediatorLiveData.addSource(chosenRestaurantsByPlaceIdLiveData, new Observer<List<UidPlaceIdAssociation>>() {
             @Override
             public void onChanged(List<UidPlaceIdAssociation> uidPlaceIdAssociations) {
-                // tranforme to List Uid
-                List<String> uids = new ArrayList<>();
-                for (UidPlaceIdAssociation association : uidPlaceIdAssociations){
-                    uids.add(association.getUserUid());
-                }
-                // we have uid, now we need name en url picture
+                // transform to List Uid
+                List<String> uids = UidPlaceIdAssociationListToUidList(uidPlaceIdAssociations);
+                // we have uid, now we need users objects
                 firestoreUsersRepository.loadUsersByUids(uids);
                 combine(placeDetailsLiveData.getValue(),
                         likedRestaurantsByPlaceIdLiveData.getValue(),
@@ -201,6 +130,12 @@ public class DetailRestaurantViewModel extends ViewModel {
         });
     }
 
+    public void load(){
+        firestoreChosenRepository.loadChosenRestaurantsByPlaceId(cache.getPlaceId());
+        firestoreLikedRepository.loadLikedRestaurantsByPlaceId(cache.getPlaceId());
+        googlePlacesApiRepository.loadDetails(cache.getPlaceId());
+    }
+
     private SimpleUserViewState userToSimpleUserViewState(User user){
         return new SimpleUserViewState(user.getUserName(), user.getUrlPicture());
     }
@@ -213,40 +148,12 @@ public class DetailRestaurantViewModel extends ViewModel {
         return simpleUserViewStateList;
     }
 
-    public LiveData<String> getErrorLiveData(){
-        return this.errorMutableLiveData;
-    }
-
-    public LiveData<Boolean> getLikedLiveData() {
-        return likedMutableLiveData;
-    }
-
-    public LiveData<List<SimpleUserViewState>> getWorkmatesLiveData() {
-        return workmatesMutableLiveData;
-    }
-
-    public LiveData<Integer> getCountLikedLiveData() {
-        return countLikedMutableLiveData;
-    }
-
-    public LiveData<Integer> getStar1ColorMutableLiveData() {
-        return star1ColorMutableLiveData;
-    }
-
-    public LiveData<Integer> getStar2ColorMutableLiveData() {
-        return star2ColorMutableLiveData;
-    }
-
-    public LiveData<Integer> getStar3ColorMutableLiveData() {
-        return star3ColorMutableLiveData;
-    }
-
     /**
      * transforms one List<UserRestaurantAssociation> to one List<String> containing each uid
      * @param uidPlaceIdAssociations
      * @return
      */
-    private List<String> userRestaurantAssociationListToUidList(List<UidPlaceIdAssociation> uidPlaceIdAssociations){
+    private List<String> UidPlaceIdAssociationListToUidList(List<UidPlaceIdAssociation> uidPlaceIdAssociations){
         List<String> uidList = new ArrayList<>();
         for (UidPlaceIdAssociation uidPlaceIdAssociation : uidPlaceIdAssociations) {
             uidList.add(uidPlaceIdAssociation.getUserUid());
@@ -254,72 +161,21 @@ public class DetailRestaurantViewModel extends ViewModel {
         return uidList;
     }
 
-    /**
-     * Compatibility with getTextsearch and getNearbysearch:
-     * returns the first part of the address found in formatedAddress or vicinity
-     * @param formattedAddress
-     * @param vicinity
-     * @return
-     */
-    private String findAddress(String formattedAddress, String vicinity){
-        String address = "";
-        if (formattedAddress != null) {
-            address = formattedAddress;
+    public void changeLike(){
+        if (cache.isLikedByCurrentUser()) {
+            unlike(cache.getUid(), cache.getPlaceId());
         } else {
-            if (vicinity != null)
-                address = vicinity;
+            like(cache.getUid(), cache.getPlaceId());
         }
-
-        if ((address != null) && (address.trim().length() > 0) && (address.indexOf(',') >= 0)) {
-            address = address.split(",")[0];
-        }
-        return address;
+        firestoreLikedRepository.loadLikedRestaurantsByPlaceId(cache.getPlaceId());
     }
 
-    public void loadDetailRestaurant(String placeId) {
-        Log.d(Tag.TAG, "loadDetailRestaurant() called with: placeId = [" + placeId + "]");
-        firestoreChosenRepository.loadChosenRestaurantsByPlaceId(placeId);
-        firestoreLikedRepository.loadLikedRestaurantsByPlaceId(placeId);
-        googlePlacesApiRepository.loadDetails(placeId);
+    private void like(String uid, String placeId){
+        firestoreLikedRepository.createLike(uid, placeId);
     }
 
-    private boolean getStarByLevel(int level, int likeCounter){
-        return (likeCounter >= level);
-    }
-
-    private int getStarColorByLevel(int level, int likeCounter){
-        if (getStarByLevel(level, likeCounter)) {
-            return R.color.yellow;
-        } else {
-            return R.color.white;
-        }
-    }
-
-    public void loadIsLikedByUid(String uid, String placeId){
-        LikeHelper.isLiked(uid, placeId, new LikeHelperListener() {
-            @Override
-            public void onGetLike(boolean isLiked) {
-                likedMutableLiveData.postValue(Boolean.valueOf(isLiked));
-            }
-        });
-    }
-
-    public void like(String uid, String placeId){
-        LikeHelper.createLike(uid, placeId, new LikeHelperListener() {
-            @Override
-            public void onGetLike(boolean isLiked) {
-                likedMutableLiveData.postValue(Boolean.valueOf(isLiked));
-            }
-        });
-    }
-
-    public void unlike(String uid, String placeId) {
-        LikeHelper.deleteLike(uid, placeId, new LikeHelperListener() {
-            @Override
-            public void onGetLike(boolean isLiked) {
-                likedMutableLiveData.postValue(Boolean.valueOf(isLiked));
-            }
-        });
+    private void unlike(String uid, String placeId) {
+        firestoreLikedRepository.deleteLike(uid, placeId);
     }
 
     public void changeChose(){
@@ -349,91 +205,27 @@ public class DetailRestaurantViewModel extends ViewModel {
         firestoreChosenRepository.deleteChosenRestaurant(uid);
     }
 
-    public void loadWorkmatesByPlaceId(String placeId){
-        //ChosenHelper.getUsersWhoChoseThisRestaurant(placeId, this.userRestaurantAssociationListListener, this.failureListener);
-        firestoreChosenRepository.loadChosenRestaurantsByPlaceId(placeId);
-    }
-
     /**
      * for real time workmates list
-     * @param placeId
      */
-    public void activateWormatesByPlaceListener(String placeId){
-        Log.d(Tag.TAG, "DetailRestaurantViewModel.activateUsersListener() called");
-        registrationChosen = ChosenHelper.getChosenCollection()
-            .whereEqualTo("placeId", placeId)
-            .addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value,
-                                @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
-                if (error != null){
-                    errorMutableLiveData.postValue(error.getMessage());
-                    return;
-                }
-
-                List<UidPlaceIdAssociation> uidPlaceIdAssociations = new ArrayList<>();
-                for (QueryDocumentSnapshot document : value) {
-                    if (document.exists()) {
-                        UidPlaceIdAssociation uidPlaceIdAssociation = document.toObject(UidPlaceIdAssociation.class);
-                        uidPlaceIdAssociations.add(uidPlaceIdAssociation);
-                    }
-                }
-                List<String> uidList = userRestaurantAssociationListToUidList(uidPlaceIdAssociations);
-                UserHelper.getUsersByUidList(uidList, userListListener, failureListener);
-            }
-        });
+    public void activateWormatesByPlaceListener(){
+        firestoreChosenRepository.activateRealTimeChosenByPlaceListener(cache.getPlaceId());
     };
 
     public void removeWormatesByPlaceListener(){
-        if (registrationChosen != null) {
-            Log.d(Tag.TAG, "DetailRestaurantViewModel.removeUsersListener() called");
-            registrationChosen.remove();
-        }
+        firestoreChosenRepository.removeRealTimeChosenByPlaceListener();
     };
 
     /**
-     * for real time workmates list
-     * @param placeId
+     * for real time liked
      */
-    public void activateLikedByPlaceListener(String placeId){
-        Log.d(Tag.TAG, "DetailRestaurantViewModel.activateUsersListener() called");
-        registrationLiked = LikeHelper.getLikedCollection()
-                .whereEqualTo("placeId", placeId)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value,
-                                        @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
-                        if (error != null){
-                            errorMutableLiveData.postValue(error.getMessage());
-                            return;
-                        }
-                        int likeCounter = value.size();
-                        countLikedMutableLiveData.postValue(new Integer(likeCounter));
-                        int star1Color = getStarColorByLevel(STAR_LEVEL_1, likeCounter);
-                        star1ColorMutableLiveData.postValue(new Integer(star1Color));
-                        int star2Color = getStarColorByLevel(STAR_LEVEL_2, likeCounter);
-                        star2ColorMutableLiveData.postValue(new Integer(star2Color));
-                        int star3Color = getStarColorByLevel(STAR_LEVEL_3, likeCounter);
-                        star3ColorMutableLiveData.postValue(new Integer(star3Color));
-                    }
-                });
+    public void activateLikedByPlaceListener(){
+        firestoreLikedRepository.activateRealTimeLikedByPlaceListener(cache.getPlaceId());
     };
 
     public void removeLikedByPlaceListener(){
-        if (registrationLiked != null) {
-            Log.d(Tag.TAG, "DetailRestaurantViewModel.removeUsersListener() called");
-            registrationLiked.remove();
-        }
+        firestoreLikedRepository.removeRealTimeLikedByPlaceListener();
     };
-
-    private boolean isContainPlaceid(String placeId, List<UidPlaceIdAssociation> list){
-        for (UidPlaceIdAssociation uidPlaceIdAssociation : list){
-            if (placeId.equals(uidPlaceIdAssociation.getPlaceId())) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     private boolean isContainUid(String uid, List<UidPlaceIdAssociation> list){
         for (UidPlaceIdAssociation uidPlaceIdAssociation : list){
@@ -444,6 +236,47 @@ public class DetailRestaurantViewModel extends ViewModel {
         return false;
     }
 
+    /**
+     * Compatibility with getTextsearch and getNearbysearch:
+     * returns the first part of the address found in formatedAddress or vicinity
+     * @param formattedAddress
+     * @param vicinity
+     * @return
+     */
+    private String findAddress(String formattedAddress, String vicinity){
+        String address = "";
+        if (formattedAddress != null) {
+            address = formattedAddress;
+        } else {
+            if (vicinity != null)
+                address = vicinity;
+        }
+
+        if ((address != null) && (address.trim().length() > 0) && (address.indexOf(',') >= 0)) {
+            address = address.split(",")[0];
+        }
+        return address;
+    }
+
+    private boolean getStarByLevel(int level, int likeCounter){
+        return (likeCounter >= level);
+    }
+
+    private int getStarColorByLevel(int level, int likeCounter){
+        if (getStarByLevel(level, likeCounter)) {
+            return R.color.yellow;
+        } else {
+            return R.color.white;
+        }
+    }
+
+    /**
+     * Where we get all data we can emit one detailRestaurantViewState
+     * @param placeDetails
+     * @param likedRestaurantsByPlaceId
+     * @param chosenRestaurantsByPlaceId
+     * @param workmatesByPlaceId
+     */
     private void combine(@Nullable PlaceDetails placeDetails,
                          @Nullable List<UidPlaceIdAssociation> likedRestaurantsByPlaceId,
                          @Nullable List<UidPlaceIdAssociation> chosenRestaurantsByPlaceId,

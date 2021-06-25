@@ -21,7 +21,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -40,7 +39,6 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
 
-
 public class DetailRestaurantActivity extends AppCompatActivity {
 
     // todo : Detail d'un restaurant ajouter toutes les photo. => optionel
@@ -54,7 +52,6 @@ public class DetailRestaurantActivity extends AppCompatActivity {
     private String uid;
     private String phoneNumber;
     private String website;
-    private boolean liked;
 
     private ConstraintLayout constraintLayout;
     private ImageView imageView;
@@ -102,7 +99,7 @@ public class DetailRestaurantActivity extends AppCompatActivity {
         configureFloatingActionButton();
         configureViewModel();
 
-        loadViewModel(placeId, uid);
+        loadViewModel();
     }
 
     private void configureRecyclerView(){
@@ -158,7 +155,7 @@ public class DetailRestaurantActivity extends AppCompatActivity {
     }
 
     /**
-     * crete viewModel and configure observers
+     * create viewModel and configure observers
      */
     private void configureViewModel(){
         // todo : DetailRestaurantActivity : use ViewModelProvider to create VM. Create Factory ViewModelFactory to pass arguments.
@@ -190,57 +187,23 @@ public class DetailRestaurantActivity extends AppCompatActivity {
                 setLiked(detailRestaurantViewState.isLikedByCurrentUser());
             }
         });
-
-        // liked restaurant observer
-        detailRestaurantViewModel.getLikedLiveData().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean aBoolean) {
-                setLiked(aBoolean.booleanValue());
-            }
-        });
-
-        // workmates who chose this restaurant
-        detailRestaurantViewModel.getWorkmatesLiveData().observe(this, new Observer<List<SimpleUserViewState>>() {
-            @Override
-            public void onChanged(List<SimpleUserViewState> users) {
-                setWorkmates(users);
-            }
-        });
-
-        detailRestaurantViewModel.getStar1ColorMutableLiveData().observe(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                setStar1Color(integer.intValue());
-            }
-        });
-
-        detailRestaurantViewModel.getStar2ColorMutableLiveData().observe(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                setStar2Color(integer.intValue());
-            }
-        });
-
-        detailRestaurantViewModel.getStar3ColorMutableLiveData().observe(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                setStar3Color(integer.intValue());
-            }
-        });
     }
 
-    private void loadViewModel(String placeId, String uid){
-        detailRestaurantViewModel.load(placeId, uid);
+    private void loadViewModel(){
+        detailRestaurantViewModel.load();
     }
 
+    // Update UI
     private void setRestaurantName(String name){
         textViewName.setText(name);
     }
 
+    // Update UI
     private void setInfo(String info){
         textViewInfo.setText(info);
     }
 
+    // Update UI
     private void setUrlPicture(String urlPicture){
         if (urlPicture == null) {
             Glide.with(imageView.getContext())
@@ -255,23 +218,28 @@ public class DetailRestaurantActivity extends AppCompatActivity {
         }
     }
 
+    // Update UI
     private void setStar1Color(@ColorRes int color){
         imageViewStar1.setColorFilter(ContextCompat.getColor(this, color));
     }
 
+    // Update UI
     private void setStar2Color(@ColorRes int color){
         imageViewStar2.setColorFilter(ContextCompat.getColor(this, color));
     }
 
+    // Update UI
     private void setStar3Color(@ColorRes int color){
         imageViewStar3.setColorFilter(ContextCompat.getColor(this, color));
     }
 
+    // Update UI
     private void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
         menuItemCall.setVisible((telephonySupported) && (phoneNumber != null));
     }
 
+    // Update UI
     private void setWebsite(String website) {
         this.website = website;
         menuItemWebsite.setVisible(website != null);
@@ -286,21 +254,12 @@ public class DetailRestaurantActivity extends AppCompatActivity {
     }
 
     private void changeLike(){
-        if (liked) {
-            // remove like
-            Log.d(TAG, "delete like");
-            detailRestaurantViewModel.unlike(uid, placeId);
-        } else {
-            // like
-            Log.d(TAG, "create like");
-            detailRestaurantViewModel.like(uid, placeId);
-        }
+        detailRestaurantViewModel.changeLike();
     }
 
-    // state liked and UI update
+    // Update UI
     private void setLiked(boolean isliked){
         Log.d(TAG, "setLiked() called with: isliked = [" + isliked + "]");
-        liked = isliked;
         menuItemLike.setChecked(isliked);
 
         if (isliked){
@@ -314,7 +273,7 @@ public class DetailRestaurantActivity extends AppCompatActivity {
         detailRestaurantViewModel.changeChose();
     }
 
-    // state chosen and UI update
+    // Update UI
     private void setChosen(boolean isChosen){
         if (isChosen) {
             floatingActionButton.setImageResource(R.drawable.ic_baseline_check_24);
@@ -332,16 +291,10 @@ public class DetailRestaurantActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        Log.d(TAG, "DetailRestaurantActivity.onStart() called");
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
-        detailRestaurantViewModel.activateWormatesByPlaceListener(placeId);
-        detailRestaurantViewModel.activateLikedByPlaceListener(placeId);
+        detailRestaurantViewModel.activateWormatesByPlaceListener();
+        detailRestaurantViewModel.activateLikedByPlaceListener();
         Log.d(TAG, "DetailRestaurantActivity.onResume() called");
     }
 
@@ -351,18 +304,6 @@ public class DetailRestaurantActivity extends AppCompatActivity {
         detailRestaurantViewModel.removeWormatesByPlaceListener();
         detailRestaurantViewModel.removeLikedByPlaceListener();
         super.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        Log.d(TAG, "DetailRestaurantActivity.onStop() called");
-        super.onStop();
-    }
-
-    @Override
-    protected void onDestroy() {
-        Log.d(TAG, "DetailRestaurantActivity.onDestroy() called");
-        super.onDestroy();
     }
 
     private void showSnackBar(String message){
