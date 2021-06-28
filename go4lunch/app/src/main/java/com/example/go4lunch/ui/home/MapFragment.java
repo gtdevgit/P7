@@ -81,7 +81,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private void configureViewModel(){
-        mainViewModel.getMainViewStateMediatorLiveData().observe(this, new Observer<MainViewState>() {
+        mainViewModel.getMainViewStateMediatorLiveData().observe(getViewLifecycleOwner(), new Observer<MainViewState>() {
             @Override
             public void onChanged(MainViewState mainViewState) {
                 setLocation(mainViewState.getLocation());
