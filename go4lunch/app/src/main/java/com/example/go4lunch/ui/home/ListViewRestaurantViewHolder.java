@@ -26,16 +26,16 @@ public class ListViewRestaurantViewHolder extends RecyclerView.ViewHolder {
 
     public ListViewRestaurantViewHolder(@NonNull View itemView) {
         super(itemView);
-        cardViewRestaurant = itemView.findViewById(R.id.row_restaurant_card_view);
-        textViewRestaurantName = itemView.findViewById(R.id.row_restaurant_name);
-        textViewRestaurantInfo = itemView.findViewById(R.id.row_restaurant_info);
-        textViewRestaurantHours = itemView.findViewById(R.id.row_restaurant_hours) ;
-        textViewRestaurantDistance = itemView.findViewById(R.id.row_restaurant_distance);
-        textViewRestaurantWorkmate = itemView.findViewById(R.id.row_restaurant_workmate);
-        imageViewRestaurantStar1 = itemView.findViewById(R.id.row_restaurant_star1);
-        imageViewRestaurantStar2 = itemView.findViewById(R.id.row_restaurant_star2);
-        imageViewRestaurantStar3 = itemView.findViewById(R.id.row_restaurant_star3);
+        cardViewRestaurant = itemView.findViewById(R.id.row_list_view_restaurant_card_view);
+        textViewRestaurantName = itemView.findViewById(R.id.row_list_view_restaurant_name);
+        textViewRestaurantInfo = itemView.findViewById(R.id.row_list_view_restaurant_info);
+        textViewRestaurantHours = itemView.findViewById(R.id.row_list_view_restaurant_hours) ;
+        textViewRestaurantDistance = itemView.findViewById(R.id.row_list_view_restaurant_distance);
+        textViewRestaurantWorkmate = itemView.findViewById(R.id.row_list_view_restaurant_workmate);
+        imageViewRestaurantStar1 = itemView.findViewById(R.id.row_list_view_restaurant_star1);
+        imageViewRestaurantStar2 = itemView.findViewById(R.id.row_list_view_restaurant_star2);
+        imageViewRestaurantStar3 = itemView.findViewById(R.id.row_list_view_restaurant_star3);
 
-        imageViewRestaurant = itemView.findViewById(R.id.row_restaurant_picture);
+        imageViewRestaurant = itemView.findViewById(R.id.row_list_view_restaurant_picture);
     }
 }

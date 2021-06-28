@@ -30,7 +30,7 @@ public class ListViewRestaurantAdapter extends RecyclerView.Adapter<ListViewRest
     @NonNull
     @Override
     public ListViewRestaurantViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_restaurant, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_list_view_restaurant, parent, false);
         ListViewRestaurantViewHolder listViewRestaurantViewHolder = new ListViewRestaurantViewHolder(view);
 
         listViewRestaurantViewHolder.cardViewRestaurant.setOnClickListener(new View.OnClickListener() {
