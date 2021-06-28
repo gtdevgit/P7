@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,6 +24,7 @@ import com.example.go4lunch.ui.model.Restaurant;
 import com.example.go4lunch.tag.Tag;
 import com.example.go4lunch.ui.detailrestaurant.DetailRestaurantActivity;
 import com.example.go4lunch.viewmodel.MainViewModel;
+import com.example.go4lunch.viewmodel.MainViewModelFactory;
 
 import java.util.List;
 
@@ -40,6 +42,7 @@ public class ListViewRestaurantFragment extends Fragment {
     public ListViewRestaurantFragment(MainViewModel mainViewModel) {
         // Required empty public constructor
         this.mainViewModel = mainViewModel;
+
     }
 
     @Override
@@ -50,8 +53,15 @@ public class ListViewRestaurantFragment extends Fragment {
         progressBar = root.findViewById(R.id.fragment_list_view_retaurants_progress_bar);
         progressBar.setVisibility(View.VISIBLE);
 
-        recyclerView = root.findViewById(R.id.fragment_list_view_retaurants_recyclerview);
-        layoutManager = new LinearLayoutManager(root.getContext());
+        configureViewModel();
+        configureRecyclerView(root);
+
+        return root;
+    }
+
+    private void configureRecyclerView(View view){
+        recyclerView = view.findViewById(R.id.fragment_list_view_retaurants_recyclerview);
+        layoutManager = new LinearLayoutManager(view.getContext());
         recyclerView.setLayoutManager(layoutManager);
 
         listViewRestaurantAdapter = new ListViewRestaurantAdapter(new OnClickListenerRestaurant() {
@@ -65,40 +75,9 @@ public class ListViewRestaurantFragment extends Fragment {
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
                 DividerItemDecoration.VERTICAL);
         recyclerView.addItemDecoration(dividerItemDecoration);
-
-        return root;
     }
 
-    private void setLocation(Location location) {
-        this.location = location;
-    }
-
-    private void setRestaurants(List<Restaurant> restaurants){
-        Log.d(Tag.TAG, "ListViewRestaurantFragment.setRestaurants(restaurants) restaurants.size()=" + restaurants.size());
-        progressBar.setVisibility(View.VISIBLE);
-        listViewRestaurantAdapter.updateData(restaurants);
-        progressBar.setVisibility(View.INVISIBLE);
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        Log.d(Tag.TAG, "ListViewRestaurantFragment.onViewCreated() called");
-    }
-
-    private void showDetailRestaurant(String placeId){
-        Intent intent;
-        intent = new Intent(this.getActivity(), DetailRestaurantActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putString("placeid", placeId);
-        intent.putExtras(bundle);
-        startActivity(intent);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        Log.d(Tag.TAG, "ListViewRestaurantFragment.onStart() called");
+    private void configureViewModel(){
         mainViewModel.getLocationLiveData().observe(getViewLifecycleOwner(), new Observer<Location>() {
             @Override
             public void onChanged(Location location) {
@@ -116,6 +95,26 @@ public class ListViewRestaurantFragment extends Fragment {
         });
     }
 
+    private void setLocation(Location location) {
+        this.location = location;
+    }
+
+    private void setRestaurants(List<Restaurant> restaurants){
+        Log.d(Tag.TAG, "ListViewRestaurantFragment.setRestaurants(restaurants) restaurants.size()=" + restaurants.size());
+        progressBar.setVisibility(View.VISIBLE);
+        listViewRestaurantAdapter.updateData(restaurants);
+        progressBar.setVisibility(View.INVISIBLE);
+    }
+
+    private void showDetailRestaurant(String placeId){
+        Intent intent;
+        intent = new Intent(this.getActivity(), DetailRestaurantActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("placeid", placeId);
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -130,17 +129,5 @@ public class ListViewRestaurantFragment extends Fragment {
         this.mainViewModel.removerChosenRestaurantListener();
         this.mainViewModel.removeLikedRestaurantListener();
         super.onPause();
-    }
-
-    @Override
-    public void onStop() {
-        Log.d(Tag.TAG, "ListViewRestaurantFragment.onStop() called");
-        super.onStop();
-    }
-
-    @Override
-    public void onDestroy() {
-        Log.d(Tag.TAG, "ListViewRestaurantFragment.onDestroy() called");
-        super.onDestroy();
     }
 }

@@ -88,10 +88,7 @@ public class GooglePlacesApiRepository {
         }
     }
 
-    private MutableLiveData<PlaceDetails> placeDetailsMutableLiveData = new MutableLiveData<>();
-    public LiveData<PlaceDetails> getPlaceDetailsLiveData() {
-        return placeDetailsMutableLiveData;
-    }
+
 
     public Call<PlaceDetails> getDetails(String placeId) {
         Log.d(TAG, "getDetails() called with: placeId = [" + placeId + "]");
@@ -101,6 +98,11 @@ public class GooglePlacesApiRepository {
             Log.d(TAG, "GooglePlacesApiRepository.getDetails(). Exception = [" + e.getMessage() + "]");
             return null;
         }
+    }
+
+    private MutableLiveData<PlaceDetails> placeDetailsMutableLiveData = new MutableLiveData<>();
+    public LiveData<PlaceDetails> getPlaceDetailsLiveData() {
+        return placeDetailsMutableLiveData;
     }
 
     public void loadDetails(String placeId) {
@@ -130,6 +132,30 @@ public class GooglePlacesApiRepository {
             return null;
         }
     }
+
+    private MutableLiveData<PlaceSearch> nearbysearchMutableLiveData = new MutableLiveData<>();
+    public LiveData<PlaceSearch> getNearbysearchLiveData() {
+        return nearbysearchMutableLiveData;
+    }
+
+    public void loadNearbysearch(Location location) {
+        Call<PlaceSearch> call = getNearbysearch(location);
+        call.enqueue(new Callback<PlaceSearch>() {
+            @Override
+            public void onResponse(Call<PlaceSearch> call, Response<PlaceSearch> response) {
+                if (response.isSuccessful()) {
+                    PlaceSearch placeSearch = response.body();
+                    nearbysearchMutableLiveData.setValue(placeSearch);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PlaceSearch> call, Throwable t) {
+                errorMutableLiveData.postValue(t.getMessage());
+            }
+        });
+    }
+
 
     /**
      * Google place photos service

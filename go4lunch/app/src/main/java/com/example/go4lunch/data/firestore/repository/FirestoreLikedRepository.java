@@ -32,20 +32,22 @@ public class FirestoreLikedRepository {
     private static final String COLLECTION_NAME_LIKE = "liked_restaurants";
 
     private final MutableLiveData<String> errorMutableLiveData = new MutableLiveData<>();
-    private final MutableLiveData<List<UidPlaceIdAssociation>> likedRestaurantsMutableLiveData = new MutableLiveData<>();
-    private final MutableLiveData<List<UidPlaceIdAssociation>> LikedRestaurantsByPlaceIdMutableLiveData = new MutableLiveData<>();
-
     public LiveData<String> getErrorLiveData() {
         return errorMutableLiveData;
     }
+
+    private final MutableLiveData<List<UidPlaceIdAssociation>> likedRestaurantsMutableLiveData = new MutableLiveData<>();
     public LiveData<List<UidPlaceIdAssociation>> getLikedRestaurantsLiveData() {
         return likedRestaurantsMutableLiveData;
     }
+
+    private final MutableLiveData<List<UidPlaceIdAssociation>> LikedRestaurantsByPlaceIdMutableLiveData = new MutableLiveData<>();
     public LiveData<List<UidPlaceIdAssociation>> getLikedRestaurantsByPlaceIdLiveData() {
         return LikedRestaurantsByPlaceIdMutableLiveData;
     }
 
     private ListenerRegistration registrationLikedByPlaceId;
+    private ListenerRegistration registrationLikedAll;
 
     /**
      * Liked collection
@@ -187,8 +189,34 @@ public class FirestoreLikedRepository {
     }
 
     public void removeRealTimeLikedByPlaceListener(){
-        if (registrationLikedByPlaceId != null) {
-            registrationLikedByPlaceId.remove();
+        if (registrationLikedAll != null) {
+            registrationLikedAll.remove();
+        }
+    }
+
+    public void activateRealTimeLikedListener(){
+        registrationLikedByPlaceId = getLikedCollection()
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value,
+                                        @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
+                        if (error != null){
+                            errorMutableLiveData.postValue(error.getMessage());
+                            return;
+                        }
+                        List<UidPlaceIdAssociation> uidPlaceIdAssociations = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : value){
+                            UidPlaceIdAssociation uidPlaceIdAssociation = document.toObject(UidPlaceIdAssociation.class);
+                            uidPlaceIdAssociations.add(uidPlaceIdAssociation);
+                        }
+                        likedRestaurantsMutableLiveData.setValue(uidPlaceIdAssociations);
+                    }
+                });
+    }
+
+    public void removeRealTimeLikedListener(){
+        if (registrationLikedAll != null) {
+            registrationLikedAll.remove();
         }
     }
 }

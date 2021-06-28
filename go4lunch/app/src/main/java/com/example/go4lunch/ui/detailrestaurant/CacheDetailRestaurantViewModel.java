@@ -6,9 +6,8 @@ public class CacheDetailRestaurantViewModel {
     private boolean chosenByCurrentUser = false;
     private boolean likedByCurrentUser = false;
 
-    public CacheDetailRestaurantViewModel(String uid, String placeId) {
+    public CacheDetailRestaurantViewModel(String uid) {
         this.uid = uid;
-        this.placeId = placeId;
     }
 
     public String getUid() {
@@ -17,6 +16,10 @@ public class CacheDetailRestaurantViewModel {
 
     public String getPlaceId() {
         return placeId;
+    }
+
+    public void setPlaceId(String placeId) {
+        this.placeId = placeId;
     }
 
     public boolean isChosenByCurrentUser() {

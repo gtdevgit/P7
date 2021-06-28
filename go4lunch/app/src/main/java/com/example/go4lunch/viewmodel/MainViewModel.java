@@ -1,23 +1,34 @@
 package com.example.go4lunch.viewmodel;
 
+import android.annotation.SuppressLint;
 import android.location.Location;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
 import com.example.go4lunch.api.firestore.FailureListener;
 import com.example.go4lunch.api.firestore.LikeHelper;
 import com.example.go4lunch.api.firestore.UserRestaurantAssociationListListener;
+import com.example.go4lunch.data.firestore.model.User;
 import com.example.go4lunch.data.firestore.repository.FirestoreChosenRepository;
+import com.example.go4lunch.data.firestore.repository.FirestoreLikedRepository;
+import com.example.go4lunch.data.firestore.repository.FirestoreUsersRepository;
+import com.example.go4lunch.data.location.LocationRepository;
+import com.example.go4lunch.data.permission_checker.PermissionChecker;
+import com.example.go4lunch.models.googleplaces.palcesdetails.PlaceDetails;
 import com.example.go4lunch.ui.model.Restaurant;
 import com.example.go4lunch.data.firestore.model.UidPlaceIdAssociation;
 import com.example.go4lunch.models.googleplaces.placesearch.Result;
 import com.example.go4lunch.models.googleplaces.placesearch.PlaceSearch;
 import com.example.go4lunch.repository.GooglePlacesApiRepository;
 import com.example.go4lunch.tag.Tag;
+import com.example.go4lunch.ui.model.SimpleUserViewState;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
@@ -35,57 +46,144 @@ public class MainViewModel extends ViewModel {
     private ListenerRegistration registrationChosenRestaurant;
     private ListenerRegistration registrationLikedRestaurant;
 
-    // for mediator
-    private List<UidPlaceIdAssociation> likedCollection;
-    private List<UidPlaceIdAssociation> chosenCollection;
-    private List<Result> nearbysearch;
-
     /**
      * GooglePlacesApiRepository
      */
+    @NonNull
     private GooglePlacesApiRepository googlePlacesApiRepository;
-    private final MutableLiveData<String> errorMutableLiveData = new MutableLiveData<String>();
-    private final MutableLiveData<List<Restaurant>> restaurantsMutableLiveData = new MutableLiveData<List<Restaurant>>();
-    private final MutableLiveData<Location> locationMutableLiveData = new MutableLiveData<Location>();
 
-    FirestoreChosenRepository firestoreChosenRepository = new FirestoreChosenRepository();
+    @NonNull
+    private final PermissionChecker permissionChecker;
 
-    public MainViewModel(GooglePlacesApiRepository googlePlacesApiRepository) {
-        Log.d(Tag.TAG, "MainViewModel() called with: googlePlacesApiRepository = [" + googlePlacesApiRepository + "]");
-        this.googlePlacesApiRepository = googlePlacesApiRepository;
-    }
+    @NonNull
+    private final LocationRepository locationRepository;
 
     /**
-     * errorMutableLiveData property is exposed as livedata to prevent external modifications
-     * @return
+     * MutableLiveData properties are exposed as livedata to prevent external modifications
      */
     public LiveData<String> getErrorLiveData(){
         return this.errorMutableLiveData;
     }
+    private final MutableLiveData<String> errorMutableLiveData = new MutableLiveData<String>();
 
-    /**
-     * locationMutableLiveData property is exposed as livedata to prevent external modifications
-     * @return
-     */
     public LiveData<List<Restaurant>> getRestaurantsLiveData() {return  this.restaurantsMutableLiveData; }
+    private final MutableLiveData<List<Restaurant>> restaurantsMutableLiveData = new MutableLiveData<List<Restaurant>>();
 
-    /**
-     * locationMutableLiveData property is exposed as livedata to prevent external modifications
-     * @return
-     */
     public LiveData<Location> getLocationLiveData() {
         return locationMutableLiveData;
     }
+    private final MutableLiveData<Location> locationMutableLiveData = new MutableLiveData<Location>();
 
     /**
-     * setLocation notify the view model that the GPS location has changed
-     * @param location
+     * Mediator expose MainViewState
      */
-    public void setLocation(Location location){
-        Log.d(Tag.TAG, "MainViewModel.setLocation(location) " + location.getLatitude() + ", " + location.getLongitude());
-        this.locationMutableLiveData.postValue(location);
-        // reload restaurants
-        this.loadRestaurantAround(location);
+    private final MediatorLiveData<MainViewState> mainViewStateMediatorLiveData = new MediatorLiveData<>();
+    public MediatorLiveData<MainViewState> getMainViewStateMediatorLiveData() { return mainViewStateMediatorLiveData; }
+
+    /**
+     * repositories
+     */
+    FirestoreChosenRepository firestoreChosenRepository = new FirestoreChosenRepository();
+    FirestoreUsersRepository firestoreUsersRepository = new FirestoreUsersRepository();
+    FirestoreLikedRepository firestoreLikedRepository = new FirestoreLikedRepository();
+
+    public MainViewModel(
+            GooglePlacesApiRepository googlePlacesApiRepository,
+            PermissionChecker permissionChecker,
+            LocationRepository locationRepository) {
+        Log.d(Tag.TAG, "MainViewModel() called with: googlePlacesApiRepository = [" + googlePlacesApiRepository + "]");
+        this.googlePlacesApiRepository = googlePlacesApiRepository;
+        this.permissionChecker = permissionChecker;
+        this.locationRepository = locationRepository;
+
+        configureMediatorLiveData();
+    }
+
+    private void configureMediatorLiveData(){
+        LiveData<Location> locationLiveData = locationRepository.getLocationLiveData();
+        LiveData<List<UidPlaceIdAssociation>> chosenRestaurantsLiveData = firestoreChosenRepository.getChosenRestaurantsLiveData();
+        LiveData<List<User>> usersLiveData = firestoreUsersRepository.getUsersLiveData();
+        LiveData<List<UidPlaceIdAssociation>> likedRestaurantsLiveData = firestoreLikedRepository.getLikedRestaurantsLiveData();
+        LiveData<PlaceSearch> placeSearchLiveData = googlePlacesApiRepository.getNearbysearchLiveData();
+
+        mainViewStateMediatorLiveData.addSource(locationLiveData, new Observer<Location>() {
+            @Override
+            public void onChanged(Location location) {
+                if (location != null) {
+                    googlePlacesApiRepository.loadNearbysearch(location);
+                    combine(location,
+                            placeSearchLiveData.getValue(),
+                            likedRestaurantsLiveData.getValue(),
+                            chosenRestaurantsLiveData.getValue(),
+                            usersLiveData.getValue());
+                }
+            }
+        });
+
+        mainViewStateMediatorLiveData.addSource(chosenRestaurantsLiveData, new Observer<List<UidPlaceIdAssociation>>() {
+            @Override
+            public void onChanged(List<UidPlaceIdAssociation> uidPlaceIdAssociations) {
+                combine(locationLiveData.getValue(),
+                        placeSearchLiveData.getValue(),
+                        likedRestaurantsLiveData.getValue(),
+                        uidPlaceIdAssociations,
+                        usersLiveData.getValue());
+            }
+        });
+
+        // all users collection
+        mainViewStateMediatorLiveData.addSource(usersLiveData, new Observer<List<User>>() {
+            @Override
+            public void onChanged(List<User> users) {
+                combine(locationLiveData.getValue(),
+                        placeSearchLiveData.getValue(),
+                        likedRestaurantsLiveData.getValue(),
+                        chosenRestaurantsLiveData.getValue(),
+                        users);
+            }
+        });
+
+        // liked_restaurants collection for this restaurants
+        mainViewStateMediatorLiveData.addSource(likedRestaurantsLiveData, new Observer<List<UidPlaceIdAssociation>>() {
+            @Override
+            public void onChanged(List<UidPlaceIdAssociation> uidPlaceIdAssociations) {
+                combine(locationLiveData.getValue(),
+                        placeSearchLiveData.getValue(),
+                        uidPlaceIdAssociations,
+                        chosenRestaurantsLiveData.getValue(),
+                        usersLiveData.getValue());
+            }
+        });
+
+        //place search
+        mainViewStateMediatorLiveData.addSource(placeSearchLiveData, new Observer<PlaceSearch>() {
+            @Override
+            public void onChanged(PlaceSearch placeSearch) {
+                combine(locationLiveData.getValue(),
+                        placeSearch,
+                        likedRestaurantsLiveData.getValue(),
+                        chosenRestaurantsLiveData.getValue(),
+                        usersLiveData.getValue());
+            }
+        });
+    }
+
+    public void load(){
+        refreshLocation();
+        firestoreChosenRepository.loadAllChosenRestaurants();
+        firestoreLikedRepository.loadLikedRestaurants();
+        firestoreUsersRepository.loadAllUsers();
+
+    }
+
+    @SuppressLint("MissingPermission")
+    private void refreshLocation() {
+        // No GPS permission
+        if (!permissionChecker.hasLocationPermission()) {
+            locationRepository.stopLocationRequest();
+        } else {
+            locationRepository.startLocationRequest();
+        }
     }
 
     /**
@@ -144,9 +242,11 @@ public class MainViewModel extends ViewModel {
      */
     private int countUserRestaurantAssociationByPlaceId(String placeId, List<UidPlaceIdAssociation> uidPlaceIdAssociations){
         int result = 0;
-        for (UidPlaceIdAssociation uidPlaceIdAssociation : uidPlaceIdAssociations){
-            if (uidPlaceIdAssociation.getPlaceId().equals(placeId)) {
-                result++;
+        if (uidPlaceIdAssociations != null){
+            for (UidPlaceIdAssociation uidPlaceIdAssociation : uidPlaceIdAssociations){
+                if (uidPlaceIdAssociation.getPlaceId().equals(placeId)) {
+                    result++;
+                }
             }
         }
         return result;
@@ -170,88 +270,26 @@ public class MainViewModel extends ViewModel {
     }
 
     /**
-     * loadRestaurantAround : request data acquisition then launch combine to obtain the list of restaurants
+     *  combine : combine wait for all data before compute
      * @param location
-     */
-    private void loadRestaurantAround(Location location){
-        Log.d(Tag.TAG, "MainViewModel.loadRestaurantAround()");
-        // - get liked collection to count like by placeId
-        // - get chosen collection to count workmate by placeId
-        // - get detail restaurants
-        // - then combine(...)
-
-        // initialization
-        likedCollection = new ArrayList<>();
-        chosenCollection = new ArrayList<>();
-        nearbysearch = null;
-
-        FailureListener failureListener = new FailureListener() {
-            @Override
-            public void onFailure(Exception e) {
-                Log.d(Tag.TAG, "MainViewModel.loadRestaurantAround.onFailure() " + e.getMessage());
-                errorMutableLiveData.postValue(e.getMessage());
-            }
-        };
-
-        // get likedCollection
-        UserRestaurantAssociationListListener likedUserRestaurantAssociationListListener = new UserRestaurantAssociationListListener() {
-            @Override
-            public void onGetUserRestaurantAssociationList(List<UidPlaceIdAssociation> userRestaurantAssociations) {
-                likedCollection.addAll(userRestaurantAssociations);
-                combine(location, likedCollection, chosenCollection, nearbysearch);
-            }
-        };
-        LikeHelper.getLikedRestaurants(likedUserRestaurantAssociationListListener, failureListener);
-
-        // get chosenCollection
-        UserRestaurantAssociationListListener chosenUserRestaurantAssociationListListener = new UserRestaurantAssociationListListener() {
-            @Override
-            public void onGetUserRestaurantAssociationList(List<UidPlaceIdAssociation> userRestaurantAssociations) {
-                chosenCollection.addAll(userRestaurantAssociations);
-                combine(location, likedCollection, chosenCollection, nearbysearch);
-            }
-        };
-        firestoreChosenRepository.getChosenRestaurants(chosenUserRestaurantAssociationListListener, failureListener);
-
-        // get getNearbysearch
-        Call<PlaceSearch> call = googlePlacesApiRepository.getNearbysearch(location);
-        call.enqueue(new Callback<PlaceSearch>() {
-            @Override
-            public void onFailure(Call<PlaceSearch> call, Throwable t) {
-                Log.d(Tag.TAG, "MainViewModel.loadRestaurantAround.onFailure() " + t.getMessage());
-                errorMutableLiveData.postValue(t.getMessage());
-            }
-
-            @Override
-            public void onResponse(Call<PlaceSearch> call, Response<PlaceSearch> response) {
-                Log.d(Tag.TAG, "MainViewModel.loadRestaurantAround.onResponse() response.isSuccessful=" + response.isSuccessful());
-                if (response.isSuccessful()) {
-                    PlaceSearch placeSearch = response.body();
-                    nearbysearch = placeSearch.getResults();
-                    combine(location, likedCollection, chosenCollection, nearbysearch);
-                }
-            }
-        });
-    }
-
-    /**
-     * combine : combine wait for all data before compute
-     * @param location
-     * @param likedCollection
-     * @param chosenCollection
-     * @param nearbysearch
+     * @param placesearch
+     * @param likedRestaurants
+     * @param chosenRestaurants
+     * @param workmates
      */
     private void combine(@Nullable Location location,
-                         @Nullable List<UidPlaceIdAssociation> likedCollection,
-                         @Nullable List<UidPlaceIdAssociation> chosenCollection,
-                         @Nullable List<Result> nearbysearch) {
+                         @Nullable PlaceSearch placesearch,
+                         @Nullable List<UidPlaceIdAssociation> likedRestaurants,
+                         @Nullable List<UidPlaceIdAssociation> chosenRestaurants,
+                         @Nullable List<User> workmates){
         // canot compute without data
-        if (location == null || likedCollection == null || chosenCollection == null || nearbysearch == null) {
+        if (location == null || placesearch == null || likedRestaurants == null || chosenRestaurants == null || workmates == null) {
             return;
         }
 
-        List<Restaurant> restaurants = new ArrayList<Restaurant>();
-        for (Result result : nearbysearch) {
+        List<Restaurant> restaurants = new ArrayList<>();
+        for (Result result : placesearch.getResults()) {
+            String palceId = result.getPlaceId();
             String name = result.getName();
             double latitude = result.getGeometry().getLocation().getLat();
             double longitude = result.getGeometry().getLocation().getLng();
@@ -260,134 +298,42 @@ public class MainViewModel extends ViewModel {
             String hours = "";
             double rating = result.getRating();
             String urlPicture = findUrlPicture(result);
-            int workmates = countWorkmates(result.getPlaceId(), chosenCollection);
-            int countLike = countLikeByRestaurant(result.getPlaceId(), likedCollection);
-            Restaurant restaurant = new Restaurant(result.getPlaceId(),
+            int workmatesCount = countWorkmates(palceId, chosenRestaurants);
+            int countLike = countLikeByRestaurant(palceId, likedRestaurants);
+            Restaurant restaurant = new Restaurant(
+                    palceId,
                     name,
                     latitude,
                     longitude,
                     distance,
                     info,
                     hours,
-                    workmates,
+                    workmatesCount,
                     rating,
                     urlPicture,
                     countLike);
             restaurants.add(restaurant);
         }
-        restaurantsMutableLiveData.postValue(restaurants);
+        //restaurantsMutableLiveData.postValue(restaurants);
+        mainViewStateMediatorLiveData.setValue(new MainViewState(location, restaurants, workmates));
     }
 
     /**
      * to get real time change workmates count by restaurant
      */
     public void activateChosenRestaurantListener(){
-        Log.d(Tag.TAG, "WorkmatesViewModel.activateUsersListener() called");
-        registrationChosenRestaurant = firestoreChosenRepository.getChosenCollection().addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
-                if (error != null){
-                    errorMutableLiveData.postValue(error.getMessage());
-                    return;
-                }
-                loadRestaurantAround(getLocationLiveData().getValue());
-            }
-        });
-
+        firestoreChosenRepository.activateRealTimeChosenListener();
     }
 
     public void removerChosenRestaurantListener(){
-        if (registrationChosenRestaurant != null) {
-            Log.d(Tag.TAG, "WorkmatesViewModel.removeUsersListener() called");
-            registrationChosenRestaurant.remove();
-        }
+        firestoreChosenRepository.removeRealTimeChosenListener();
     }
 
     public void activateLikedRestaurantListener(){
-        Log.d(Tag.TAG, "activateLikedRestaurantListener() called");
-        registrationLikedRestaurant = LikeHelper.getLikedCollection()
-            .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                @Override
-                public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
-                    if (error != null){
-                        errorMutableLiveData.postValue(error.getMessage());
-                        return;
-                    }
-                    loadRestaurantAround(getLocationLiveData().getValue());
-                }
-            });
+        firestoreLikedRepository.activateRealTimeLikedListener();
     }
 
     public void removeLikedRestaurantListener(){
-        if (registrationLikedRestaurant != null) {
-            Log.d(Tag.TAG, "WorkmatesViewModel.removeUsersListener() called");
-            registrationLikedRestaurant.remove();
-        }
+        firestoreLikedRepository.removeRealTimeLikedListener();
     }
-
-    /**
-     * loadRestaurantAround
-     * @param location
-     */
-    private void loadRestaurantAround_2(Location location){
-        Log.d(Tag.TAG, "MainViewModel.loadRestaurantAround()");
-        // - get liked collection to count like by placeId
-        // - get chosen collection to count workmate by placeId
-        // - get detail restaurants
-        // conbine(...)
-
-        // raz
-        likedCollection = new ArrayList<>();
-        chosenCollection = new ArrayList<>();
-        nearbysearch = null;
-
-        FailureListener failureListener = new FailureListener() {
-            @Override
-            public void onFailure(Exception e) {
-                Log.d(Tag.TAG, "MainViewModel.loadRestaurantAround.onFailure() " + e.getMessage());
-                errorMutableLiveData.postValue(e.getMessage());
-            }
-        };
-
-        // get likedCollection
-        UserRestaurantAssociationListListener likedUserRestaurantAssociationListListener = new UserRestaurantAssociationListListener() {
-            @Override
-            public void onGetUserRestaurantAssociationList(List<UidPlaceIdAssociation> userRestaurantAssociations) {
-                likedCollection.addAll(userRestaurantAssociations);
-                combine(location, likedCollection, chosenCollection, nearbysearch);
-            }
-        };
-        LikeHelper.getLikedRestaurants(likedUserRestaurantAssociationListListener, failureListener);
-
-        // get chosenCollection
-        UserRestaurantAssociationListListener chosenUserRestaurantAssociationListListener = new UserRestaurantAssociationListListener() {
-            @Override
-            public void onGetUserRestaurantAssociationList(List<UidPlaceIdAssociation> userRestaurantAssociations) {
-                chosenCollection.addAll(userRestaurantAssociations);
-                combine(location, likedCollection, chosenCollection, nearbysearch);
-            }
-        };
-        firestoreChosenRepository.getChosenRestaurants(chosenUserRestaurantAssociationListListener, failureListener);
-
-        // get getNearbysearch
-        Call<PlaceSearch> call = googlePlacesApiRepository.getNearbysearch(location);
-        call.enqueue(new Callback<PlaceSearch>() {
-            @Override
-            public void onFailure(Call<PlaceSearch> call, Throwable t) {
-                Log.d(Tag.TAG, "MainViewModel.loadRestaurantAround.onFailure() " + t.getMessage());
-                errorMutableLiveData.postValue(t.getMessage());
-            }
-
-            @Override
-            public void onResponse(Call<PlaceSearch> call, Response<PlaceSearch> response) {
-                Log.d(Tag.TAG, "MainViewModel.loadRestaurantAround.onResponse() response.isSuccessful=" + response.isSuccessful());
-                if (response.isSuccessful()) {
-                    PlaceSearch placeSearch = response.body();
-                    nearbysearch = placeSearch.getResults();
-                    combine(location, likedCollection, chosenCollection, nearbysearch);
-                }
-            }
-        });
-    }
-
 }

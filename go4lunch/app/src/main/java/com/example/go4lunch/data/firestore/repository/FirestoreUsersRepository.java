@@ -30,15 +30,16 @@ public class FirestoreUsersRepository {
     private static final String COLLECTION_NAME = "users";
 
     private final MutableLiveData<String> errorMutableLiveData = new MutableLiveData<>();
-    private final MutableLiveData<List<User>> usersMutableLiveData = new MutableLiveData<>();
-    private final MutableLiveData<List<User>> usersByUidsMutableLiveData = new MutableLiveData<>();
-
     public LiveData<String> getErrorLiveData() {
         return errorMutableLiveData;
     }
+
+    private final MutableLiveData<List<User>> usersMutableLiveData = new MutableLiveData<>();
     public LiveData<List<User>> getUsersLiveData() {
         return usersMutableLiveData;
     }
+
+    private final MutableLiveData<List<User>> usersByUidsMutableLiveData = new MutableLiveData<>();
     public LiveData<List<User>> getUsersByUidsMutableLiveData() { return usersByUidsMutableLiveData; }
 
     private ListenerRegistration registrationUsers;

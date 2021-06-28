@@ -39,6 +39,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
+import java.util.logging.LogManager;
 
 public class DetailRestaurantActivity extends AppCompatActivity {
 
@@ -160,8 +161,9 @@ public class DetailRestaurantActivity extends AppCompatActivity {
      */
     private void configureViewModel(){
         // todo : DetailRestaurantActivity : use ViewModelProvider to create VM. Create Factory ViewModelFactory to pass arguments.
+        Log.d(TAG, "configureViewModel() called " + placeId);
         detailRestaurantViewModel = new ViewModelProvider(this,
-                DetailRestaurantViewModelFactory.getInstance(uid, placeId))
+                DetailRestaurantViewModelFactory.getInstance(uid))
                 .get(DetailRestaurantViewModel.class);
 
         detailRestaurantViewModel.getErrorLiveData().observe(this, new Observer<String>() {
@@ -190,7 +192,7 @@ public class DetailRestaurantActivity extends AppCompatActivity {
     }
 
     private void loadViewModel(){
-        detailRestaurantViewModel.load();
+        detailRestaurantViewModel.load(placeId);
     }
 
     // Update UI

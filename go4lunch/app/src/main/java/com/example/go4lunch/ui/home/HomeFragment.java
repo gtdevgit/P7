@@ -51,7 +51,6 @@ public class HomeFragment extends Fragment {
         });
 
         initViewModel();
-        initGPS();
         //load map
         loadFragmentMap();
         return root;
@@ -80,7 +79,7 @@ public class HomeFragment extends Fragment {
 
     private void loadFragmentMap(){
         Log.d(TAG, "HomeFragment.loadFragmentMap() called");
-        MapFragment mapFragment = new MapFragment(this.mainViewModel);
+        MapFragment mapFragment = new MapFragment(mainViewModel);
         loadFragment(mapFragment);
     }
 
@@ -102,23 +101,11 @@ public class HomeFragment extends Fragment {
 
     public void initViewModel(){
         Log.d(TAG, "HomeFragment.initViewModel() called");
-        mainViewModel = new ViewModelProvider(this, MainViewModelFactory.getInstance()).get(MainViewModel.class);
-        this.mainViewModel.getErrorLiveData().observe(getViewLifecycleOwner(), new Observer<String>() {
+        mainViewModel = new ViewModelProvider(getActivity(), MainViewModelFactory.getInstance()).get(MainViewModel.class);
+        mainViewModel.getErrorLiveData().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(String s) {
                 showSnackBar(s);
-            }
-        });
-    }
-
-    public void initGPS(){
-        Log.d(TAG, "HomeFragment.initGPS() called");
-        this.gps = new GPS((LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE));
-        this.gps.getLocationMutableLiveData().observe(getViewLifecycleOwner(), new Observer<Location>() {
-            @Override
-            public void onChanged(Location location) {
-                Log.d(TAG, "HomeFragment.initGPS.onChanged(location) lat="+ location.getLatitude() + ", long=" + location.getLongitude());
-                mainViewModel.setLocation(location);
             }
         });
     }
@@ -133,13 +120,11 @@ public class HomeFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Log.d(TAG, "HomeFragment.onResume() called");
-        gps.startLocalization();
     }
 
     @Override
     public void onPause() {
         Log.d(TAG, "HomeFragment.onPause() called");
-        gps.stopLocalization();
         super.onPause();
     }
 

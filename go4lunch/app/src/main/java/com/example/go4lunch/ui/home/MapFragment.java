@@ -24,6 +24,7 @@ import com.example.go4lunch.ui.model.Restaurant;
 import com.example.go4lunch.tag.Tag;
 import com.example.go4lunch.ui.detailrestaurant.DetailRestaurantActivity;
 import com.example.go4lunch.viewmodel.MainViewModel;
+import com.example.go4lunch.viewmodel.MainViewState;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -36,6 +37,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
+import java.util.logging.LogManager;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
@@ -44,7 +46,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private FloatingActionButton floatingActionButton;
 
     private Location location;
-    private List<Restaurant> restaurants;
 
     private MainViewModel mainViewModel;
 
@@ -74,26 +75,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             }
         });
 
-        // location observer
-        this.mainViewModel.getLocationLiveData().observe(getViewLifecycleOwner(), new Observer<Location>() {
-            @Override
-            public void onChanged(Location location) {
-                Log.d(Tag.TAG, "MapFragment.onChanged(location)");
-                setLocation(location);
-            }
-        });
-
-        // restaurants observer
-        mainViewModel.getRestaurantsLiveData().observe(getViewLifecycleOwner(), new Observer<List<Restaurant>>() {
-            @Override
-            public void onChanged(List<Restaurant> restaurants) {
-                Log.d(Tag.TAG, "MapFragment.onChanged(restaurants)");
-                setRestaurants(restaurants);
-            }
-        });
+        configureViewModel();
 
         return view;
     }
+
+    private void configureViewModel(){
+        mainViewModel.getMainViewStateMediatorLiveData().observe(this, new Observer<MainViewState>() {
+            @Override
+            public void onChanged(MainViewState mainViewState) {
+                setLocation(mainViewState.getLocation());
+                setRestaurants(mainViewState.getRestaurants());
+            }
+        });
+    };
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -108,10 +103,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         if (this.location != null) {
             this.setLocation(this.location);
         }
-        if (this.restaurants != null) {
-            this.setRestaurants(restaurants);
-        }
-    }
+     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -133,7 +125,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             mMap.addMarker(new MarkerOptions().position(latlng).title("You position"));
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, 14));
         }
-        //mainViewModel.setLocation(location);
         progressBar.setVisibility(View.INVISIBLE);
         }
         catch (Exception e) {
@@ -142,6 +133,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private void openDetailRestaurantActivity(String placeId){
+        Log.d(Tag.TAG, "openDetailRestaurantActivity() called with: placeId = [" + placeId + "]");
         Intent intent = new Intent(getContext(), DetailRestaurantActivity.class);
         Bundle bundle = new Bundle();
         bundle.putString("placeid", placeId);
@@ -152,6 +144,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     @Override
     public boolean onMarkerClick(Marker marker) {
         String placeId = (String) marker.getTag();
+        Log.d(Tag.TAG, "onMarkerClick() placeId = [" + placeId + "]");
         openDetailRestaurantActivity(placeId);
         return false;
     }
@@ -180,7 +173,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     public void setRestaurants(List<Restaurant> restaurants){
         Log.d(Tag.TAG, "MapFragment.setRestaurants(restaurants) (mMap==null) = " + (mMap==null));
-        this.restaurants = restaurants;
         if(mMap!=null) {
             progressBar.setVisibility(View.VISIBLE);
             // todo : this Bitmap must be in ressources
@@ -193,7 +185,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                                 .title(restaurant.getName())
                                 .icon(BitmapDescriptorFactory.fromBitmap((restaurant.getWorkmatesCount() > 0 ? bitmapSelected : bitmapUnselected)))
                 );
-                marker.setTag(restaurant.getPlaceId());
+                String placeId = restaurant.getPlaceId();
+                marker.setTag(placeId);
                 mMap.setOnMarkerClickListener(this::onMarkerClick);
             }
             //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, 14));
@@ -216,6 +209,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         Log.d(Tag.TAG, "MapFragment.onStart() called");
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        mainViewModel.load();
     }
 
     @Override
@@ -223,7 +217,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         super.onResume();
         Log.d(Tag.TAG, "MapFragment.onResume()");
         if ((mMap != null) && (this.location != null)) {
-            this.mainViewModel.activateChosenRestaurantListener();
+            mainViewModel.load();
+            mainViewModel.activateChosenRestaurantListener();
         }
     }
 

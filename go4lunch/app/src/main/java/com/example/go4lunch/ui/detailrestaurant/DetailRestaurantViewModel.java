@@ -50,11 +50,10 @@ public class DetailRestaurantViewModel extends ViewModel {
     }
 
     public DetailRestaurantViewModel(GooglePlacesApiRepository googlePlacesApiRepository,
-                                     String currentUid,
-                                     String currentPlaceId ) {
+                                     String currentUid) {
 
         this.googlePlacesApiRepository = googlePlacesApiRepository;
-        cache = new CacheDetailRestaurantViewModel(currentUid, currentPlaceId);
+        cache = new CacheDetailRestaurantViewModel(currentUid);
 
         firestoreUsersRepository = new FirestoreUsersRepository();
         firestoreChosenRepository = new FirestoreChosenRepository();
@@ -130,7 +129,8 @@ public class DetailRestaurantViewModel extends ViewModel {
         });
     }
 
-    public void load(){
+    public void load(String placeId){
+        cache.setPlaceId(placeId);
         firestoreChosenRepository.loadChosenRestaurantsByPlaceId(cache.getPlaceId());
         firestoreLikedRepository.loadLikedRestaurantsByPlaceId(cache.getPlaceId());
         googlePlacesApiRepository.loadDetails(cache.getPlaceId());

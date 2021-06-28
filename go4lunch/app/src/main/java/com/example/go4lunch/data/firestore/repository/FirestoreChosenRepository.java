@@ -33,16 +33,16 @@ public class FirestoreChosenRepository {
     private static final String COLLECTION_NAME_CHOSEN = "chosen_restaurants";
 
     private final MutableLiveData<String> errorMutableLiveData = new MutableLiveData<>();
-    private final MutableLiveData<List<UidPlaceIdAssociation>> chosenRestaurantsMutableLiveData = new MutableLiveData<>();
-    private final MutableLiveData<List<UidPlaceIdAssociation>> chosenRestaurantsByPlaceIdMutableLiveData = new MutableLiveData<>();
-
     public LiveData<String> getErrorLiveData() {
         return errorMutableLiveData;
     }
+
+    private final MutableLiveData<List<UidPlaceIdAssociation>> chosenRestaurantsMutableLiveData = new MutableLiveData<>();
     public LiveData<List<UidPlaceIdAssociation>> getChosenRestaurantsLiveData() {
         return chosenRestaurantsMutableLiveData;
     }
 
+    private final MutableLiveData<List<UidPlaceIdAssociation>> chosenRestaurantsByPlaceIdMutableLiveData = new MutableLiveData<>();
     public LiveData<List<UidPlaceIdAssociation>> getChosenRestaurantsByPlaceIdLiveData() {
         return chosenRestaurantsByPlaceIdMutableLiveData;
     }
@@ -216,7 +216,7 @@ public class FirestoreChosenRepository {
         }
     }
 
-    public void activateRealTimeChosenListener(String placeId){
+    public void activateRealTimeChosenListener(){
         registrationChosenAll = getChosenCollection()
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
@@ -231,7 +231,7 @@ public class FirestoreChosenRepository {
                             UidPlaceIdAssociation uidPlaceIdAssociation = document.toObject(UidPlaceIdAssociation.class);
                             uidPlaceIdAssociations.add(uidPlaceIdAssociation);
                         }
-                        chosenRestaurantsByPlaceIdMutableLiveData.setValue(uidPlaceIdAssociations);
+                        chosenRestaurantsMutableLiveData.setValue(uidPlaceIdAssociations);
                     }
                 });
     }
