@@ -1,5 +1,6 @@
 package com.example.go4lunch.ui.home;
 
+import android.opengl.Visibility;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -19,13 +20,15 @@ import android.widget.TextView;
 import com.example.go4lunch.R;
 import com.example.go4lunch.data.firestore.model.User;
 import com.example.go4lunch.tag.Tag;
+import com.example.go4lunch.viewmodel.MainViewModel;
+import com.example.go4lunch.viewmodel.MainViewState;
 
 import java.util.List;
 
 public class WorkmatesFragment extends Fragment {
     private static final String TAG = Tag.TAG;
 
-    private WorkmatesViewModel workmatesViewModel;
+    private MainViewModel mainViewModel;
 
     TextView TextViewUserList;
     private RecyclerView recyclerView;
@@ -33,8 +36,10 @@ public class WorkmatesFragment extends Fragment {
     private WorkmatesAdapter workmatesAdapter;
     private ProgressBar workmateProgressBar;
 
-    public WorkmatesFragment() {
+    public WorkmatesFragment(MainViewModel mainViewModel) {
         // Required empty public constructor
+        this.mainViewModel = mainViewModel;
+
     }
 
     // Todo: Workmates, adapter le style du texte en fonction du choix ou non d'un restaurant par le workmate. Utiliser Body1 quand un choix n'a pas été fait et Body 2 quand un restaurant à été choisi (android:textAppearance="@style/TextAppearance.AppCompat.Body1")
@@ -51,7 +56,6 @@ public class WorkmatesFragment extends Fragment {
 
         configureRecyclerView(root);
         configureViewModel();
-        loadViewModel();
 
         return root;
     }
@@ -71,35 +75,25 @@ public class WorkmatesFragment extends Fragment {
     }
 
     private void configureViewModel(){
-        workmatesViewModel = new ViewModelProvider(this).get(WorkmatesViewModel.class);
-
-        workmatesViewModel.getWorkmatesLiveData().observe(getViewLifecycleOwner(), new Observer<List<User>>() {
+        mainViewModel.getMainViewStateMediatorLiveData().observe(getViewLifecycleOwner(), new Observer<MainViewState>() {
             @Override
-            public void onChanged(List<User> users) {
-                Log.d(TAG, "WorkmatesFragment: onChanged() users.size() = [" + users.size() + "]");
-                workmatesAdapter.updateData(users);
+            public void onChanged(MainViewState mainViewState) {
+                workmatesAdapter.updateData(mainViewState.getWorkmates());
                 workmateProgressBar.setVisibility(View.INVISIBLE);
             }
         });
     }
-
-    private void loadViewModel(){
-        workmateProgressBar.setVisibility(View.VISIBLE);
-        workmatesViewModel.loadWorkmates();
-    }
-
     @Override
     public void onResume() {
         super.onResume();
-        workmatesViewModel.activateWorkmatesListener();
-        Log.d(TAG, "WorkmatesFragment.onResume() called");
-
+        Log.d(Tag.TAG, "ListViewRestaurantFragment.onResume() called");
+        mainViewModel.activateUsersRealTimeListener();
     }
 
     @Override
     public void onPause() {
-        Log.d(TAG, "WorkmatesFragment.onPause() called");
-        workmatesViewModel.removeWorkmatesListener();
+        Log.d(Tag.TAG, "ListViewRestaurantFragment.onPause() called");
+        mainViewModel.removeUsersRealTimeListener();
         super.onPause();
     }
 }

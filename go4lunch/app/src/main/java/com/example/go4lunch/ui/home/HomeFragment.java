@@ -88,7 +88,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void loadFragmentWorkmates(){
-        loadFragment(new WorkmatesFragment());
+        loadFragment(new WorkmatesFragment(mainViewModel));
     }
 
     private void loadFragment(Fragment fragment){

@@ -336,4 +336,12 @@ public class MainViewModel extends ViewModel {
     public void removeLikedRestaurantListener(){
         firestoreLikedRepository.removeRealTimeLikedListener();
     }
+
+    public void activateUsersRealTimeListener(){
+        firestoreUsersRepository.activeRealTimeListener();
+    }
+
+    public void removeUsersRealTimeListener(){
+        firestoreUsersRepository.removeRealTimeListener();
+    }
 }
