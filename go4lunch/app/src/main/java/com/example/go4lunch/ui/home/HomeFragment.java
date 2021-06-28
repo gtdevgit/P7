@@ -24,6 +24,7 @@ import com.example.go4lunch.GPS.GPS;
 import com.example.go4lunch.repository.GooglePlacesApiRepository;
 import com.example.go4lunch.tag.Tag;
 import com.example.go4lunch.viewmodel.MainViewModel;
+import com.example.go4lunch.viewmodel.MainViewModelFactory;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -101,8 +102,7 @@ public class HomeFragment extends Fragment {
 
     public void initViewModel(){
         Log.d(TAG, "HomeFragment.initViewModel() called");
-        this.mainViewModel = new MainViewModel(
-                new GooglePlacesApiRepository(getString(R.string.google_api_key)));
+        mainViewModel = new ViewModelProvider(this, MainViewModelFactory.getInstance()).get(MainViewModel.class);
         this.mainViewModel.getErrorLiveData().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(String s) {
