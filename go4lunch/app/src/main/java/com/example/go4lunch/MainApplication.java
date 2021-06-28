@@ -10,11 +10,13 @@ import com.example.go4lunch.notification.NotificationHelper;
 public class MainApplication extends Application {
 
     private static String googleApiKey;
+    private static Application application;
 
     @Override
     public void onCreate() {
         super.onCreate();
         googleApiKey = this.getString(R.string.google_api_key);
+        application = this;
         NotificationHelper.createNotificationChannels(this);
     }
 
@@ -22,5 +24,9 @@ public class MainApplication extends Application {
 
     public static String getGoogleApiKey() {
         return googleApiKey;
+    }
+
+    public static Application getApplication() {
+        return application;
     }
 }

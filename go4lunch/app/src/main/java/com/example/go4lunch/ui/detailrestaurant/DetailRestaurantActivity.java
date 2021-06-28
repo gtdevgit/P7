@@ -21,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -159,10 +160,9 @@ public class DetailRestaurantActivity extends AppCompatActivity {
      */
     private void configureViewModel(){
         // todo : DetailRestaurantActivity : use ViewModelProvider to create VM. Create Factory ViewModelFactory to pass arguments.
-        detailRestaurantViewModel = new DetailRestaurantViewModel(
-                new GooglePlacesApiRepository(getString(R.string.google_api_key)),
-                uid,
-                placeId);
+        detailRestaurantViewModel = new ViewModelProvider(this,
+                DetailRestaurantViewModelFactory.getInstance(uid, placeId))
+                .get(DetailRestaurantViewModel.class);
 
         detailRestaurantViewModel.getErrorLiveData().observe(this, new Observer<String>() {
             @Override
