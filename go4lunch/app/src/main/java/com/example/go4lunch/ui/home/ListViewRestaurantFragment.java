@@ -25,6 +25,7 @@ import com.example.go4lunch.tag.Tag;
 import com.example.go4lunch.ui.detailrestaurant.DetailRestaurantActivity;
 import com.example.go4lunch.viewmodel.MainViewModel;
 import com.example.go4lunch.viewmodel.MainViewModelFactory;
+import com.example.go4lunch.viewmodel.MainViewState;
 
 import java.util.List;
 
@@ -36,13 +37,11 @@ public class ListViewRestaurantFragment extends Fragment {
 
     private MainViewModel mainViewModel;
 
-    private Location location;
     ListViewRestaurantAdapter listViewRestaurantAdapter;
 
     public ListViewRestaurantFragment(MainViewModel mainViewModel) {
         // Required empty public constructor
         this.mainViewModel = mainViewModel;
-
     }
 
     @Override
@@ -78,25 +77,12 @@ public class ListViewRestaurantFragment extends Fragment {
     }
 
     private void configureViewModel(){
-        mainViewModel.getLocationLiveData().observe(getViewLifecycleOwner(), new Observer<Location>() {
+        mainViewModel.getMainViewStateMediatorLiveData().observe(getViewLifecycleOwner(), new Observer<MainViewState>() {
             @Override
-            public void onChanged(Location location) {
-                Log.d(Tag.TAG, "ListViewRestaurantFragment: getLocationLiveData.onChanged(location)");
-                setLocation(location);
+            public void onChanged(MainViewState mainViewState) {
+                setRestaurants(mainViewState.getRestaurants());
             }
         });
-
-        mainViewModel.getRestaurantsLiveData().observe(getViewLifecycleOwner(), new Observer<List<Restaurant>>() {
-            @Override
-            public void onChanged(List<Restaurant> restaurants) {
-                Log.d(Tag.TAG, "ListViewRestaurantFragment: getRestaurantsLiveData.onChanged(restaurants)");
-                setRestaurants(restaurants);
-            }
-        });
-    }
-
-    private void setLocation(Location location) {
-        this.location = location;
     }
 
     private void setRestaurants(List<Restaurant> restaurants){
