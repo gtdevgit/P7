@@ -16,7 +16,6 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.go4lunch.MainActivity;
 import com.example.go4lunch.R;
-import com.example.go4lunch.GPS.GPS;
 import com.example.go4lunch.tag.Tag;
 import com.example.go4lunch.viewmodel.MainViewModel;
 import com.example.go4lunch.viewmodel.MainViewModelFactory;
@@ -28,7 +27,6 @@ public class HomeFragment extends Fragment {
     private static final String TAG = Tag.TAG;
     private BottomNavigationView bottomNavigationView;
 
-    private GPS gps;
     private MainViewModel mainViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
