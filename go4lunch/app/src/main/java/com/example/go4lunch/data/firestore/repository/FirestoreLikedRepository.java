@@ -7,10 +7,7 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.go4lunch.api.firestore.LikeHelper;
-import com.example.go4lunch.api.firestore.LikeHelperListener;
 import com.example.go4lunch.data.firestore.model.UidPlaceIdAssociation;
-import com.example.go4lunch.data.firestore.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;

@@ -7,13 +7,11 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.example.go4lunch.MainActivity;
 import com.example.go4lunch.PermissionActivity;
 import com.example.go4lunch.firebase.Authentication;
-import com.example.go4lunch.firebase.LoginActivity;
-import com.example.go4lunch.ui.SettingActivity;
+import com.example.go4lunch.ui.login.LoginActivity;
 
 public class NavigationActivity extends AppCompatActivity {
 

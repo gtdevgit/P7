@@ -10,7 +10,6 @@ public class User {
     private String userEmail;
     private String urlPicture;
     private Date dateCreated;
-    private Boolean isLogout;
 
     public User() {}
 
@@ -19,7 +18,6 @@ public class User {
         this.userName = userName;
         this.userEmail = userEmail;
         this.urlPicture = urlPicture;
-        this.isLogout = false;
     }
 
     public String getUid() {
@@ -61,13 +59,5 @@ public class User {
 
     public void setDateCreated(Date dateCreated) {
         this.dateCreated = dateCreated;
-    }
-
-    public Boolean getLogout() {
-        return isLogout;
-    }
-
-    public void setLogout(Boolean logout) {
-        isLogout = logout;
     }
 }

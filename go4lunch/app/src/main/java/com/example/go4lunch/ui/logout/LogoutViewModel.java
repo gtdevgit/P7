@@ -9,7 +9,10 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.go4lunch.MainApplication;
+import com.example.go4lunch.R;
 import com.example.go4lunch.api.firestore.UserHelper;
+import com.example.go4lunch.data.firestore.repository.FirestoreUsersRepository;
 import com.example.go4lunch.tag.Tag;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -28,16 +31,16 @@ public class LogoutViewModel extends ViewModel {
 
     private ListenerLogoutUser listenerLogoutUser;
 
-    private MutableLiveData<String> userEmail;
-    private MutableLiveData<String> userName;
-    private MutableLiveData<Uri> userPictureUri;
+    FirestoreUsersRepository firestoreUsersRepository = new FirestoreUsersRepository();
+    public LiveData<String> getErrorLiveData() { return firestoreUsersRepository.getErrorLiveData(); }
+    public LiveData<Boolean> getDeletedUserWithSuccessLiveData() {return  firestoreUsersRepository.getDeletedUserWithSuccessLiveData();}
+
+    private MutableLiveData<LogoutViewState> logoutViewStateMutableLiveData = new MutableLiveData<>();
+    public LiveData<LogoutViewState> getLogoutViewStateLiveData() {
+        return logoutViewStateMutableLiveData;
+    }
 
     public LogoutViewModel() {
-        userEmail = new MutableLiveData<>();
-        userName = new MutableLiveData<>();
-        userPictureUri = new MutableLiveData<>();
-
-        loadData();
     }
 
     public void setListenerLogoutUser(ListenerLogoutUser listenerLogoutUser) {
@@ -52,48 +55,31 @@ public class LogoutViewModel extends ViewModel {
             // use postValue instead of setValue to avoid error
             // "IllegalStateException: Cannot invoke setValue on a background thread"
             // when logout callback
-            userEmail.postValue("");
-            userName.postValue("");
-            this.userPictureUri.postValue(Uri.EMPTY);
+            logoutViewStateMutableLiveData.postValue(new LogoutViewState(
+                    MainApplication.getApplication().getString(R.string.no_user_email),
+                    MainApplication.getApplication().getString(R.string.no_user_name_found),
+                    Uri.EMPTY,
+                    false,
+                    false));
         } else {
             //Get email & username from Firebase
             Log.d(TAG, "loadData() current user = " + currentUser);
-            String email = currentUser.getEmail();
-            this.userEmail.setValue(email);
-            String name = currentUser.getDisplayName();
-            this.userName.setValue(name);
-            this.userPictureUri.setValue(currentUser.getPhotoUrl());
+            logoutViewStateMutableLiveData.setValue(new LogoutViewState(
+                    currentUser.getEmail(),
+                    currentUser.getDisplayName(),
+                    currentUser.getPhotoUrl(),
+                    true,
+                    true));
         }
     }
-
-    public LiveData<String> getUserEmail() {
-        return userEmail;
-    }
-    public LiveData<String> getUserName() {
-        return userName;
-    }
-    public LiveData<Uri> getUserPictureUri() { return userPictureUri; }
 
     public void signOutUserFromFirebase(Context context){
         Executor executor = Executors.newSingleThreadExecutor();
 
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            UserHelper.logoutUser(FirebaseAuth.getInstance().getCurrentUser().getUid())
-            .addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    listenerLogoutUser.onFailureLogout(e.getMessage());
-                }
-            })
-            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                    public void onSuccess(Void aVoid) {
-                        AuthUI.getInstance()
-                            .signOut(context)
-                            .addOnSuccessListener(executor, updateUIAfterRESTRequestsCompleted(SIGN_OUT_TASK));
-
-                    }
-            });
+            AuthUI.getInstance()
+                    .signOut(context)
+                    .addOnSuccessListener(executor, updateUIAfterRESTRequestsCompleted(SIGN_OUT_TASK));
         }
     }
 
@@ -101,21 +87,10 @@ public class LogoutViewModel extends ViewModel {
         Log.d(TAG, "deleteUserFromFirebase() called with: context = [" + context + "]");
         Executor executor = Executors.newSingleThreadExecutor();
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-
-            UserHelper.deleteUser(FirebaseAuth.getInstance().getCurrentUser().getUid()).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    listenerLogoutUser.onFailureDelete(e.getMessage());
-                }
-            })
-            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    AuthUI.getInstance()
-                            .delete(context)
-                            .addOnSuccessListener(executor, updateUIAfterRESTRequestsCompleted(DELETE_USER_TASK));
-                }
-            });
+            firestoreUsersRepository.deleteUser(FirebaseAuth.getInstance().getCurrentUser().getUid());
+            AuthUI.getInstance()
+                    .delete(context)
+                    .addOnSuccessListener(executor, updateUIAfterRESTRequestsCompleted(DELETE_USER_TASK));
         }
     }
 

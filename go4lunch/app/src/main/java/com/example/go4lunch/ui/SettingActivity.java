@@ -1,29 +1,19 @@
 package com.example.go4lunch.ui;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.go4lunch.MainActivity;
 import com.example.go4lunch.firebase.Authentication;
-import com.example.go4lunch.firebase.LoginActivity;
-import com.example.go4lunch.navigation.NavigationActivity;
+import com.example.go4lunch.ui.login.LoginActivity;
 import com.example.go4lunch.tag.Tag;
 import com.firebase.ui.auth.AuthUI;
-import com.firebase.ui.auth.ErrorCodes;
-import com.firebase.ui.auth.FirebaseUiException;
-import com.firebase.ui.auth.IdpResponse;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -34,17 +24,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.go4lunch.R;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserInfo;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class SettingActivity extends AppCompatActivity {
 

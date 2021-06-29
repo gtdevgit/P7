@@ -8,7 +8,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.go4lunch.api.firestore.FailureListener;
-import com.example.go4lunch.api.firestore.LikeHelper;
 import com.example.go4lunch.api.firestore.UserRestaurantAssociationListListener;
 import com.example.go4lunch.data.firestore.model.UidPlaceIdAssociation;
 import com.example.go4lunch.data.firestore.validation.CurrentTimeLimits;

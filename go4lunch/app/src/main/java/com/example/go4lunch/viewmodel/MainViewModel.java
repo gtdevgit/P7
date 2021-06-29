@@ -12,39 +12,24 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
-import com.example.go4lunch.api.firestore.FailureListener;
-import com.example.go4lunch.api.firestore.LikeHelper;
-import com.example.go4lunch.api.firestore.UserRestaurantAssociationListListener;
 import com.example.go4lunch.data.firestore.model.User;
 import com.example.go4lunch.data.firestore.repository.FirestoreChosenRepository;
 import com.example.go4lunch.data.firestore.repository.FirestoreLikedRepository;
 import com.example.go4lunch.data.firestore.repository.FirestoreUsersRepository;
 import com.example.go4lunch.data.location.LocationRepository;
 import com.example.go4lunch.data.permission_checker.PermissionChecker;
-import com.example.go4lunch.models.googleplaces.palcesdetails.PlaceDetails;
 import com.example.go4lunch.ui.model.Restaurant;
 import com.example.go4lunch.data.firestore.model.UidPlaceIdAssociation;
 import com.example.go4lunch.models.googleplaces.placesearch.Result;
 import com.example.go4lunch.models.googleplaces.placesearch.PlaceSearch;
 import com.example.go4lunch.repository.GooglePlacesApiRepository;
 import com.example.go4lunch.tag.Tag;
-import com.example.go4lunch.ui.model.SimpleUserViewState;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 public class MainViewModel extends ViewModel {
-
-    private ListenerRegistration registrationChosenRestaurant;
-    private ListenerRegistration registrationLikedRestaurant;
 
     /**
      * GooglePlacesApiRepository

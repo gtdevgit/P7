@@ -35,6 +35,8 @@
     <string name="facebook_login_protocol_scheme" translatable="false" tools:ignore="UnusedResources">fb757140525003096</string>
     <string name="logout_user">logout</string>
     <string name="delete_user">delete user</string>
+    <string name="user_deleted">The user was deleted</string>
+
     <string name="sign_in_with_google">Sign in with Google</string>
     <string name="sign_in_with_facebook">Login with Facebook</string>
     <string name="login_subtitle">Find a nice restaurant and invite you co-workers for lunch !</string>

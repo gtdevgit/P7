@@ -1,17 +1,14 @@
 package com.example.go4lunch.data.firestore.repository;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.go4lunch.api.firestore.UserHelper;
 import com.example.go4lunch.data.firestore.model.User;
-import com.example.go4lunch.tag.Tag;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.EventListener;
@@ -34,6 +31,16 @@ public class FirestoreUsersRepository {
         return errorMutableLiveData;
     }
 
+    private final MutableLiveData<Boolean> createdUserWithSuccessMutableLiveData = new MutableLiveData<>();
+    public LiveData<Boolean> getCreatedUserWithSuccessLiveData() {
+        return createdUserWithSuccessMutableLiveData;
+    }
+
+    private final MutableLiveData<Boolean> deletedUserWithSuccessMutableLiveData = new MutableLiveData<>();
+    public LiveData<Boolean> getDeletedUserWithSuccessLiveData() {
+        return deletedUserWithSuccessMutableLiveData;
+    }
+
     private final MutableLiveData<List<User>> usersMutableLiveData = new MutableLiveData<>();
     public LiveData<List<User>> getUsersLiveData() {
         return usersMutableLiveData;
@@ -46,6 +53,40 @@ public class FirestoreUsersRepository {
 
     private CollectionReference getUsersCollection() {
         return FirebaseFirestore.getInstance().collection(COLLECTION_NAME);
+    }
+
+    public void createUser(String uid, String userName, String userEmail, String urlPicture) {
+        // 1 - Create Obj
+        User userToCreate = new User(uid, userName, userEmail, urlPicture);
+        getUsersCollection().document(uid).set(userToCreate)
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull @NotNull Exception e) {
+                        errorMutableLiveData.setValue(e.getMessage());
+                    }
+                })
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        createdUserWithSuccessMutableLiveData.setValue(Boolean.TRUE);
+                    }
+                });
+    }
+
+    public void deleteUser(String uid) {
+        getUsersCollection().document(uid).delete()
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull @NotNull Exception e) {
+                    errorMutableLiveData.setValue(e.getMessage());
+                }
+            })
+            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void unused) {
+                    deletedUserWithSuccessMutableLiveData.setValue(Boolean.TRUE);
+                }
+            });
     }
 
     public void loadAllUsers(){
