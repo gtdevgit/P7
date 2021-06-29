@@ -1,14 +1,10 @@
 package com.example.go4lunch.ui.home;
 
 import android.content.Intent;
-import android.location.Location;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,9 +18,8 @@ import android.widget.ProgressBar;
 import com.example.go4lunch.R;
 import com.example.go4lunch.ui.model.Restaurant;
 import com.example.go4lunch.tag.Tag;
-import com.example.go4lunch.ui.detailrestaurant.DetailRestaurantActivity;
+import com.example.go4lunch.ui.detailrestaurant.view.DetailRestaurantActivity;
 import com.example.go4lunch.viewmodel.MainViewModel;
-import com.example.go4lunch.viewmodel.MainViewModelFactory;
 import com.example.go4lunch.viewmodel.MainViewState;
 
 import java.util.List;

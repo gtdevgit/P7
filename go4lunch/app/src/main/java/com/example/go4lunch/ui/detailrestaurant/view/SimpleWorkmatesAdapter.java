@@ -1,4 +1,4 @@
-package com.example.go4lunch.ui.detailrestaurant;
+package com.example.go4lunch.ui.detailrestaurant.view;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.R;
-import com.example.go4lunch.ui.model.SimpleUserViewState;
+import com.example.go4lunch.ui.detailrestaurant.viewstate.SimpleUserViewState;
 import com.example.go4lunch.ui.home.WorkmatesViewHolder;
 
 import java.util.ArrayList;

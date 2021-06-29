@@ -1,4 +1,4 @@
-package com.example.go4lunch.ui.detailrestaurant;
+package com.example.go4lunch.ui.detailrestaurant.view;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -8,8 +8,10 @@ import android.os.Bundle;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
-import com.example.go4lunch.ui.model.DetailRestaurantViewState;
-import com.example.go4lunch.ui.model.SimpleUserViewState;
+import com.example.go4lunch.ui.detailrestaurant.viewmodel.DetailRestaurantViewModel;
+import com.example.go4lunch.ui.detailrestaurant.viewmodel.DetailRestaurantViewModelFactory;
+import com.example.go4lunch.ui.detailrestaurant.viewstate.DetailRestaurantViewState;
+import com.example.go4lunch.ui.detailrestaurant.viewstate.SimpleUserViewState;
 import com.example.go4lunch.tag.Tag;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 

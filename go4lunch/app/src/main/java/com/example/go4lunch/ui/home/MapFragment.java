@@ -22,7 +22,7 @@ import android.widget.ProgressBar;
 import com.example.go4lunch.R;
 import com.example.go4lunch.ui.model.Restaurant;
 import com.example.go4lunch.tag.Tag;
-import com.example.go4lunch.ui.detailrestaurant.DetailRestaurantActivity;
+import com.example.go4lunch.ui.detailrestaurant.view.DetailRestaurantActivity;
 import com.example.go4lunch.viewmodel.MainViewModel;
 import com.example.go4lunch.viewmodel.MainViewState;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -37,7 +37,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
-import java.util.logging.LogManager;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 

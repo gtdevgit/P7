@@ -1,4 +1,4 @@
-package com.example.go4lunch.ui.detailrestaurant;
+package com.example.go4lunch.ui.detailrestaurant.viewmodel;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;

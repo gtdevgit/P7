@@ -1,4 +1,4 @@
-package com.example.go4lunch.ui.detailrestaurant;
+package com.example.go4lunch.ui.detailrestaurant.viewmodel;
 
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
@@ -12,12 +12,12 @@ import com.example.go4lunch.R;
 import com.example.go4lunch.data.firestore.repository.FirestoreChosenRepository;
 import com.example.go4lunch.data.firestore.repository.FirestoreLikedRepository;
 import com.example.go4lunch.data.firestore.repository.FirestoreUsersRepository;
-import com.example.go4lunch.ui.model.DetailRestaurantViewState;
+import com.example.go4lunch.ui.detailrestaurant.viewstate.DetailRestaurantViewState;
 import com.example.go4lunch.data.firestore.model.User;
 import com.example.go4lunch.data.firestore.model.UidPlaceIdAssociation;
 import com.example.go4lunch.data.googleplace.model.Photo;
 import com.example.go4lunch.data.googleplace.model.placedetails.PlaceDetails;
-import com.example.go4lunch.ui.model.SimpleUserViewState;
+import com.example.go4lunch.ui.detailrestaurant.viewstate.SimpleUserViewState;
 import com.example.go4lunch.data.googleplace.repository.GooglePlacesApiRepository;
 
 import java.util.ArrayList;

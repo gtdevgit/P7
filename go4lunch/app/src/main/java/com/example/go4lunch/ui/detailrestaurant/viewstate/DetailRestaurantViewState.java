@@ -1,6 +1,4 @@
-package com.example.go4lunch.ui.model;
-
-import com.example.go4lunch.ui.model.SimpleUserViewState;
+package com.example.go4lunch.ui.detailrestaurant.viewstate;
 
 import java.util.List;
 
