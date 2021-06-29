@@ -24,7 +24,7 @@ import com.example.go4lunch.data.firestore.model.UidPlaceIdAssociation;
 import com.example.go4lunch.data.firestore.repository.FirestoreChosenRepository;
 import com.example.go4lunch.data.firestore.repository.FirestoreUsersRepository;
 import com.example.go4lunch.data.firestore.validation.CurrentTimeLimits;
-import com.example.go4lunch.models.googleplaces.palcesdetails.PlaceDetails;
+import com.example.go4lunch.data.googleplace.model.placedetails.PlaceDetails;
 import com.example.go4lunch.navigation.NavigationActivity;
 import com.example.go4lunch.repository.GooglePlacesApiRepository;
 import com.example.go4lunch.tag.Tag;

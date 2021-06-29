@@ -1,9 +1,9 @@
-package com.example.go4lunch.models.googleplaces.placesearch;
+package com.example.go4lunch.data.googleplace.model.placesearch;
 
-import com.example.go4lunch.models.googleplaces.Geometry;
-import com.example.go4lunch.models.googleplaces.OpeningHours;
-import com.example.go4lunch.models.googleplaces.Photo;
-import com.example.go4lunch.models.googleplaces.PlusCode;
+import com.example.go4lunch.data.googleplace.model.Geometry;
+import com.example.go4lunch.data.googleplace.model.OpeningHours;
+import com.example.go4lunch.data.googleplace.model.Photo;
+import com.example.go4lunch.data.googleplace.model.PlusCode;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 

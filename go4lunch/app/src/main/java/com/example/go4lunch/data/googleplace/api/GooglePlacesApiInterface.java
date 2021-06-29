@@ -1,7 +1,7 @@
-package com.example.go4lunch.api.googleplaces;
+package com.example.go4lunch.data.googleplace.api;
 
-import com.example.go4lunch.models.googleplaces.palcesdetails.PlaceDetails;
-import com.example.go4lunch.models.googleplaces.placesearch.PlaceSearch;
+import com.example.go4lunch.data.googleplace.model.placedetails.PlaceDetails;
+import com.example.go4lunch.data.googleplace.model.placesearch.PlaceSearch;
 import com.google.gson.JsonObject;
 
 import retrofit2.Call;

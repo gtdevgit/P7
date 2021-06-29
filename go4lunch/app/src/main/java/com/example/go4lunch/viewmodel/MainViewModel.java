@@ -20,11 +20,10 @@ import com.example.go4lunch.data.location.LocationRepository;
 import com.example.go4lunch.data.permission_checker.PermissionChecker;
 import com.example.go4lunch.ui.model.Restaurant;
 import com.example.go4lunch.data.firestore.model.UidPlaceIdAssociation;
-import com.example.go4lunch.models.googleplaces.placesearch.Result;
-import com.example.go4lunch.models.googleplaces.placesearch.PlaceSearch;
+import com.example.go4lunch.data.googleplace.model.placesearch.Result;
+import com.example.go4lunch.data.googleplace.model.placesearch.PlaceSearch;
 import com.example.go4lunch.repository.GooglePlacesApiRepository;
 import com.example.go4lunch.tag.Tag;
-import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
 import java.util.List;

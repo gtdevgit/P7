@@ -1,7 +1,5 @@
 package com.example.go4lunch.ui.detailrestaurant;
 
-import android.util.Log;
-
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
@@ -17,8 +15,8 @@ import com.example.go4lunch.data.firestore.repository.FirestoreUsersRepository;
 import com.example.go4lunch.ui.model.DetailRestaurantViewState;
 import com.example.go4lunch.data.firestore.model.User;
 import com.example.go4lunch.data.firestore.model.UidPlaceIdAssociation;
-import com.example.go4lunch.models.googleplaces.Photo;
-import com.example.go4lunch.models.googleplaces.palcesdetails.PlaceDetails;
+import com.example.go4lunch.data.googleplace.model.Photo;
+import com.example.go4lunch.data.googleplace.model.placedetails.PlaceDetails;
 import com.example.go4lunch.ui.model.SimpleUserViewState;
 import com.example.go4lunch.repository.GooglePlacesApiRepository;
 

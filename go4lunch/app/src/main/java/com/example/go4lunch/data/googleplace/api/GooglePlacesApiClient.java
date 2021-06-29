@@ -1,8 +1,8 @@
-package com.example.go4lunch.api.googleplaces;
+package com.example.go4lunch.data.googleplace.api;
 
 import android.util.Log;
 
-import com.example.go4lunch.api.googleplaces.GooglePlacesApiInterface;
+import com.example.go4lunch.data.googleplace.api.GooglePlacesApiInterface;
 import com.example.go4lunch.tag.Tag;
 
 import okhttp3.OkHttpClient;
