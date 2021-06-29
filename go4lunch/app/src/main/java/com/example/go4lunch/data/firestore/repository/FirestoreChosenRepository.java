@@ -7,8 +7,8 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.go4lunch.api.firestore.FailureListener;
-import com.example.go4lunch.api.firestore.UserRestaurantAssociationListListener;
+import com.example.go4lunch.data.firestore.callback_interface.FailureListener;
+import com.example.go4lunch.data.firestore.callback_interface.UserRestaurantAssociationListListener;
 import com.example.go4lunch.data.firestore.model.UidPlaceIdAssociation;
 import com.example.go4lunch.data.firestore.validation.CurrentTimeLimits;
 import com.example.go4lunch.tag.Tag;

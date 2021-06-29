@@ -1,4 +1,4 @@
-package com.example.go4lunch.api.firestore;
+package com.example.go4lunch.data.firestore.callback_interface;
 
 import com.example.go4lunch.data.firestore.model.UidPlaceIdAssociation;
 

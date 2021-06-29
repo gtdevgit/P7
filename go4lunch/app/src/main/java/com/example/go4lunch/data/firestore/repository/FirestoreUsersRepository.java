@@ -5,6 +5,8 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.go4lunch.data.firestore.callback_interface.FailureListener;
+import com.example.go4lunch.data.firestore.callback_interface.UserListListener;
 import com.example.go4lunch.data.firestore.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -177,6 +179,37 @@ public class FirestoreUsersRepository {
         } else
             // empty data
             usersByUidsMutableLiveData.setValue(users);
+    }
+
+    public void getUsersByUidList(List<String> uidList, UserListListener userListListener, FailureListener failureListener){
+        List<User> users = new ArrayList<>();
+        if ((uidList != null) && (uidList.size() > 0)){
+            getUsersCollection()
+                    .whereIn("uid", uidList)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()){
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    User user = document.toObject(User.class);
+                                    users.add(user);
+                                }
+                                userListListener.onGetUsers(users);
+                            } else {
+                                failureListener.onFailure(task.getException());
+                            }
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull @NotNull Exception e) {
+                            failureListener.onFailure(e);
+                        }
+                    });
+        } else {
+            userListListener.onGetUsers(users);
+        }
     }
 }
 

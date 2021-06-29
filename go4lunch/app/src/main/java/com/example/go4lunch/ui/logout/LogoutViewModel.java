@@ -11,7 +11,6 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.go4lunch.MainApplication;
 import com.example.go4lunch.R;
-import com.example.go4lunch.api.firestore.UserHelper;
 import com.example.go4lunch.data.firestore.repository.FirestoreUsersRepository;
 import com.example.go4lunch.tag.Tag;
 import com.firebase.ui.auth.AuthUI;

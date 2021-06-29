@@ -8,9 +8,8 @@ import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import com.example.go4lunch.MainApplication;
 import com.example.go4lunch.R;
-import com.example.go4lunch.api.firestore.FailureListener;
+import com.example.go4lunch.data.firestore.callback_interface.FailureListener;
 import com.example.go4lunch.repository.GooglePlacesApiRepository;
 import com.example.go4lunch.tag.Tag;
 import com.google.firebase.auth.FirebaseAuth;

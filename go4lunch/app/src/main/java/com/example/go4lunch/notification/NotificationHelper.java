@@ -16,13 +16,13 @@ import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
 import com.example.go4lunch.R;
-import com.example.go4lunch.api.firestore.FailureListener;
-import com.example.go4lunch.api.firestore.UserHelper;
-import com.example.go4lunch.api.firestore.UserListListener;
-import com.example.go4lunch.api.firestore.UserRestaurantAssociationListListener;
+import com.example.go4lunch.data.firestore.callback_interface.FailureListener;
+import com.example.go4lunch.data.firestore.callback_interface.UserListListener;
+import com.example.go4lunch.data.firestore.callback_interface.UserRestaurantAssociationListListener;
 import com.example.go4lunch.data.firestore.model.User;
 import com.example.go4lunch.data.firestore.model.UidPlaceIdAssociation;
 import com.example.go4lunch.data.firestore.repository.FirestoreChosenRepository;
+import com.example.go4lunch.data.firestore.repository.FirestoreUsersRepository;
 import com.example.go4lunch.data.firestore.validation.CurrentTimeLimits;
 import com.example.go4lunch.models.googleplaces.palcesdetails.PlaceDetails;
 import com.example.go4lunch.navigation.NavigationActivity;
@@ -135,6 +135,7 @@ public class NotificationHelper {
         List<String> workmatesName = new ArrayList<>();
 
         FirestoreChosenRepository firestoreChosenRepository = new FirestoreChosenRepository();
+        FirestoreUsersRepository firestoreUsersRepository = new FirestoreUsersRepository();
         firestoreChosenRepository.getChosenRestaurants(
             new UserRestaurantAssociationListListener() {
                 @Override
@@ -147,7 +148,7 @@ public class NotificationHelper {
                         List<String> workmatesUid = findWorkmatesUid(placeId, uidPlaceIdAssociations);
                         if (workmatesUid.size() > 0){
                             // find user name
-                            UserHelper.getUsersByUidList(workmatesUid,
+                            firestoreUsersRepository.getUsersByUidList(workmatesUid,
                                     new UserListListener() {
                                         @Override
                                         public void onGetUsers(List<User> users) {
