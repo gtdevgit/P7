@@ -1,14 +1,11 @@
 package com.example.go4lunch.ui.detailrestaurant;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.go4lunch.MainApplication;
-import com.example.go4lunch.repository.GooglePlacesApiRepository;
-import com.example.go4lunch.tag.Tag;
+import com.example.go4lunch.data.googleplace.repository.GooglePlacesApiRepository;
 
 public class DetailRestaurantViewModelFactory implements ViewModelProvider.Factory{
     private volatile static DetailRestaurantViewModelFactory sInstance;

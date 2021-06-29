@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.go4lunch.MainApplication;
 import com.example.go4lunch.data.location.LocationRepository;
 import com.example.go4lunch.data.permission_checker.PermissionChecker;
-import com.example.go4lunch.repository.GooglePlacesApiRepository;
+import com.example.go4lunch.data.googleplace.repository.GooglePlacesApiRepository;
 import com.google.android.gms.location.LocationServices;
 
 public class MainViewModelFactory implements ViewModelProvider.Factory {

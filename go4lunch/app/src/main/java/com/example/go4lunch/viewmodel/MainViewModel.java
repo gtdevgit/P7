@@ -22,7 +22,7 @@ import com.example.go4lunch.ui.model.Restaurant;
 import com.example.go4lunch.data.firestore.model.UidPlaceIdAssociation;
 import com.example.go4lunch.data.googleplace.model.placesearch.Result;
 import com.example.go4lunch.data.googleplace.model.placesearch.PlaceSearch;
-import com.example.go4lunch.repository.GooglePlacesApiRepository;
+import com.example.go4lunch.data.googleplace.repository.GooglePlacesApiRepository;
 import com.example.go4lunch.tag.Tag;
 
 import java.util.ArrayList;

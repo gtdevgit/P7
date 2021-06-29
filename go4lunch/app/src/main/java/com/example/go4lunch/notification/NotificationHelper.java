@@ -26,7 +26,7 @@ import com.example.go4lunch.data.firestore.repository.FirestoreUsersRepository;
 import com.example.go4lunch.data.firestore.validation.CurrentTimeLimits;
 import com.example.go4lunch.data.googleplace.model.placedetails.PlaceDetails;
 import com.example.go4lunch.navigation.NavigationActivity;
-import com.example.go4lunch.repository.GooglePlacesApiRepository;
+import com.example.go4lunch.data.googleplace.repository.GooglePlacesApiRepository;
 import com.example.go4lunch.tag.Tag;
 
 import java.util.ArrayList;

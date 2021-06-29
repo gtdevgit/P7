@@ -18,7 +18,7 @@ import com.example.go4lunch.data.firestore.model.UidPlaceIdAssociation;
 import com.example.go4lunch.data.googleplace.model.Photo;
 import com.example.go4lunch.data.googleplace.model.placedetails.PlaceDetails;
 import com.example.go4lunch.ui.model.SimpleUserViewState;
-import com.example.go4lunch.repository.GooglePlacesApiRepository;
+import com.example.go4lunch.data.googleplace.repository.GooglePlacesApiRepository;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -10,7 +10,6 @@ import com.bumptech.glide.request.RequestOptions;
 
 import com.example.go4lunch.ui.model.DetailRestaurantViewState;
 import com.example.go4lunch.ui.model.SimpleUserViewState;
-import com.example.go4lunch.repository.GooglePlacesApiRepository;
 import com.example.go4lunch.tag.Tag;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -39,7 +38,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
-import java.util.logging.LogManager;
 
 public class DetailRestaurantActivity extends AppCompatActivity {
 

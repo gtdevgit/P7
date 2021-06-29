@@ -1,4 +1,4 @@
-package com.example.go4lunch.repository;
+package com.example.go4lunch.data.googleplace.repository;
 
 import android.location.Location;
 import android.util.Log;
