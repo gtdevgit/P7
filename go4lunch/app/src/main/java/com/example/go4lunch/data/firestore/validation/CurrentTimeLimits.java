@@ -23,4 +23,12 @@ public class CurrentTimeLimits {
     public boolean isValidDate(long timeMillis){
         return ((timeMillis >= lowLimit) && (timeMillis <= highLimit));
     }
+
+    public long getLowLimit() {
+        return lowLimit;
+    }
+
+    public long getHighLimit() {
+        return highLimit;
+    }
 }

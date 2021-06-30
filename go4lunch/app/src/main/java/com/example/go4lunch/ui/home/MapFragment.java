@@ -217,8 +217,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         Log.d(Tag.TAG, "MapFragment.onResume()");
         if ((mMap != null) && (this.location != null)) {
             mainViewModel.load();
-            mainViewModel.activateChosenRestaurantListener();
         }
+        mainViewModel.activateChosenRestaurantListener();
     }
 
     @Override

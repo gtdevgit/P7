@@ -58,7 +58,10 @@ public class FirestoreChosenRepository {
     }
 
     public void loadAllChosenRestaurants(){
+        CurrentTimeLimits currentTimeLimits = new CurrentTimeLimits();
         getChosenCollection()
+                .whereGreaterThanOrEqualTo("createdTime", currentTimeLimits.getLowLimit())
+                .whereLessThanOrEqualTo("createdTime", currentTimeLimits.getHighLimit())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -170,8 +173,12 @@ public class FirestoreChosenRepository {
                     @Override
                     public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()){
+                            CurrentTimeLimits currentTimeLimits = new CurrentTimeLimits();
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                uidPlaceIdAssociationList.add(document.toObject(UidPlaceIdAssociation.class));
+                                UidPlaceIdAssociation uidPlaceIdAssociation = document.toObject(UidPlaceIdAssociation.class);
+                                if (currentTimeLimits.isValidDate(uidPlaceIdAssociation.getCreatedTime())) {
+                                    uidPlaceIdAssociationList.add(uidPlaceIdAssociation);
+                                }
                             }
                             Log.d(Tag.TAG, "getChosenRestaurants. successful with userRestaurantAssociationList.size()=" + uidPlaceIdAssociationList.size());
                             userRestaurantAssociationListListener.onGetUserRestaurantAssociationList(uidPlaceIdAssociationList);
@@ -200,9 +207,12 @@ public class FirestoreChosenRepository {
                             return;
                         }
                         List<UidPlaceIdAssociation> uidPlaceIdAssociations = new ArrayList<>();
+                        CurrentTimeLimits currentTimeLimits = new CurrentTimeLimits();
                         for (QueryDocumentSnapshot document : value){
                             UidPlaceIdAssociation uidPlaceIdAssociation = document.toObject(UidPlaceIdAssociation.class);
-                            uidPlaceIdAssociations.add(uidPlaceIdAssociation);
+                            if (currentTimeLimits.isValidDate(uidPlaceIdAssociation.getCreatedTime())){
+                                uidPlaceIdAssociations.add(uidPlaceIdAssociation);
+                            }
                         }
                         chosenRestaurantsByPlaceIdMutableLiveData.setValue(uidPlaceIdAssociations);
                     }
@@ -216,7 +226,10 @@ public class FirestoreChosenRepository {
     }
 
     public void activateRealTimeChosenListener(){
+        CurrentTimeLimits currentTimeLimits = new CurrentTimeLimits();
         registrationChosenAll = getChosenCollection()
+                .whereGreaterThanOrEqualTo("createdTime", currentTimeLimits.getLowLimit())
+                .whereLessThanOrEqualTo("createdTime", currentTimeLimits.getHighLimit())
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value,

@@ -29,6 +29,4 @@ public class LoginViewModel extends ViewModel {
             firestoreUsersRepository.createUser(uid, userName, userEmail, urlPicture);
         }
     }
-
-
 }
