@@ -1,11 +1,9 @@
-package com.example.go4lunch.ui.home;
+package com.example.go4lunch.ui.home.workmates;
 
-import android.opengl.Visibility;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,12 +16,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.go4lunch.R;
-import com.example.go4lunch.data.firestore.model.User;
 import com.example.go4lunch.tag.Tag;
-import com.example.go4lunch.viewmodel.MainViewModel;
-import com.example.go4lunch.viewmodel.MainViewState;
-
-import java.util.List;
+import com.example.go4lunch.ui.main.viewmodel.MainViewModel;
+import com.example.go4lunch.ui.main.viewstate.MainViewState;
 
 public class WorkmatesFragment extends Fragment {
     private static final String TAG = Tag.TAG;

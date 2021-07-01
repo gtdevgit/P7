@@ -18,6 +18,7 @@ public class MainApplication extends Application {
         googleApiKey = this.getString(R.string.google_api_key);
         application = this;
         NotificationHelper.createNotificationChannels(this);
+
     }
 
     //public Application getApplication() {return this;}

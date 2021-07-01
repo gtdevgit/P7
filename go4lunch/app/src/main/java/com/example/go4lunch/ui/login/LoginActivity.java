@@ -12,9 +12,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.example.go4lunch.MainActivity;
+import com.example.go4lunch.ui.main.view.MainActivity;
 import com.example.go4lunch.R;
-import com.example.go4lunch.data.firestore.repository.FirestoreUsersRepository;
 import com.example.go4lunch.firebase.Authentication;
 import com.example.go4lunch.firebase.SupportedProvider;
 import com.example.go4lunch.tag.Tag;
@@ -24,8 +23,6 @@ import com.firebase.ui.auth.FirebaseUiException;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
 

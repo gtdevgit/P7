@@ -1,4 +1,4 @@
-package com.example.go4lunch.ui.home;
+package com.example.go4lunch.ui.home.listview;
 
 import android.view.View;
 import android.widget.ImageView;

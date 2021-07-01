@@ -9,6 +9,7 @@ import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import com.example.go4lunch.R;
+import com.example.go4lunch.data.applicationsettings.SettingRepository;
 import com.example.go4lunch.data.firestore.callback_interface.FailureListener;
 import com.example.go4lunch.data.googleplace.repository.GooglePlacesApiRepository;
 import com.example.go4lunch.tag.Tag;
@@ -31,24 +32,26 @@ public class NotificationWorker extends Worker {
     @NotNull
     @Override
     public Result doWork() {
-        Log.d(Tag.TAG, "doWork() called");
-        String uid = FirebaseAuth.getInstance().getUid();
-        NotificationHelper.createMessage(uid,
-                new GooglePlacesApiRepository(context.getString(R.string.google_api_key)),
-                new NotificationMessageListener() {
-                    @Override
-                    public void onCreatedMessage(String restaurantName, String restaurantAddress, List<String> workmates) {
-                        NotificationHelper.sendNotification(context, restaurantName, restaurantAddress, workmates);
-                    }
-                },
-                new FailureListener() {
-                    @Override
-                    public void onFailure(Exception e) {
+        SettingRepository settingRepository = new SettingRepository();
+        if (settingRepository.getAuthorisationNotification()) {
+            String uid = FirebaseAuth.getInstance().getUid();
+            NotificationHelper.createMessage(uid,
+                    new GooglePlacesApiRepository(context.getString(R.string.google_api_key)),
+                    new NotificationMessageListener() {
+                        @Override
+                        public void onCreatedMessage(String restaurantName, String restaurantAddress, List<String> workmates) {
+                            NotificationHelper.sendNotification(context, restaurantName, restaurantAddress, workmates);
+                        }
+                    },
+                    new FailureListener() {
+                        @Override
+                        public void onFailure(Exception e) {
 
-                    }
-                });
-
-        NotificationHelper.startNotificationWorker(this.context);
+                        }
+                    });
+            // restart for next day
+            NotificationHelper.startNotificationWorker(this.context);
+        }
         return Result.success();
     }
 }

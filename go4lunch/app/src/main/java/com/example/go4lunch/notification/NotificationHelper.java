@@ -40,6 +40,9 @@ import retrofit2.Response;
 
 public class NotificationHelper {
     private static final String DEFAULT_NOTIFICATION_CHANNEL = "go4lunch default channel";
+    private static final int DEFAULT_NOTIFICATION_ID = 1;
+    private static final String DEFAULT_WORKREQUEST_TAG = "go4lunch_workrequest_tag";
+
 
     /**
      * createNotificationChannels
@@ -64,12 +67,14 @@ public class NotificationHelper {
 
         Calendar dueDate = Calendar.getInstance();
         // Set Execution around hour:
+/*
         dueDate.set(Calendar.HOUR_OF_DAY, 12);
         dueDate.set(Calendar.MINUTE, 0);
         dueDate.set(Calendar.MINUTE, 0);
+*/
 
         // for testing
-        // dueDate.add(Calendar.SECOND, 20);
+        dueDate.add(Calendar.SECOND, 30);
 
         if (dueDate.before(currentDate)) {
             dueDate.add(Calendar.HOUR_OF_DAY, 24);
@@ -78,6 +83,7 @@ public class NotificationHelper {
 
         WorkRequest dailyWorkRequest = new OneTimeWorkRequest.Builder(NotificationWorker.class)
                 .setInitialDelay(timeDiff, TimeUnit.MILLISECONDS)
+                .addTag(DEFAULT_WORKREQUEST_TAG)
                 .build();
 
         WorkManager.getInstance(context)
@@ -85,7 +91,9 @@ public class NotificationHelper {
     }
 
     public static void stopNotificationWorker(Context context){
-        // todo : stopNotificationWorker à faire
+        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
+        notificationManagerCompat.cancel(DEFAULT_NOTIFICATION_ID);
+        WorkManager.getInstance(context).cancelAllWorkByTag(DEFAULT_WORKREQUEST_TAG);
     }
 
     /**
@@ -117,15 +125,14 @@ public class NotificationHelper {
             .setSmallIcon(R.drawable.ic_baseline_notifications_24)
             .setContentTitle(restaurantName + " " + restaurantAddress)
             .setContentText(message)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_SOCIAL)
             .setAutoCancel(true);
 
         Notification notification = builder.build();
 
-        int notificationId = 1;
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
-        notificationManagerCompat.notify(notificationId, notification);
+        notificationManagerCompat.notify(DEFAULT_NOTIFICATION_ID, notification);
     }
 
     public static void createMessage(String uid,

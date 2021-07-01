@@ -8,7 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
-import com.example.go4lunch.MainActivity;
+import com.example.go4lunch.ui.main.view.MainActivity;
 import com.example.go4lunch.PermissionActivity;
 import com.example.go4lunch.firebase.Authentication;
 import com.example.go4lunch.ui.login.LoginActivity;

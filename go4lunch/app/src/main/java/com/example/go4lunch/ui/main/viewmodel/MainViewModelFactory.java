@@ -1,4 +1,4 @@
-package com.example.go4lunch.viewmodel;
+package com.example.go4lunch.ui.main.viewmodel;
 
 import android.app.Application;
 

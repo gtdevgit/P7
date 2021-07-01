@@ -11,7 +11,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.R;
 import com.example.go4lunch.ui.detailrestaurant.viewstate.SimpleUserViewState;
-import com.example.go4lunch.ui.home.WorkmatesViewHolder;
+import com.example.go4lunch.ui.home.workmates.WorkmatesViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;

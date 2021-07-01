@@ -1,4 +1,4 @@
-package com.example.go4lunch.ui.home;
+package com.example.go4lunch.ui.home.map;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -20,11 +20,11 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.example.go4lunch.R;
-import com.example.go4lunch.ui.model.Restaurant;
+import com.example.go4lunch.ui.main.model.Restaurant;
 import com.example.go4lunch.tag.Tag;
 import com.example.go4lunch.ui.detailrestaurant.view.DetailRestaurantActivity;
-import com.example.go4lunch.viewmodel.MainViewModel;
-import com.example.go4lunch.viewmodel.MainViewState;
+import com.example.go4lunch.ui.main.viewmodel.MainViewModel;
+import com.example.go4lunch.ui.main.viewstate.MainViewState;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;

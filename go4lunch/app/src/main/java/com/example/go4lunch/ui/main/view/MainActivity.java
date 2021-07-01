@@ -1,4 +1,4 @@
-package com.example.go4lunch;
+package com.example.go4lunch.ui.main.view;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.go4lunch.R;
 import com.example.go4lunch.notification.NotificationHelper;
 import com.example.go4lunch.ui.SettingActivity;
 import com.example.go4lunch.notification.NotificationWorker;
@@ -82,8 +83,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         constraintLayout = findViewById(R.id.activity_main_constraint_layout);
-
-        NotificationHelper.startNotificationWorker(this);
     }
 
     public MenuItem getMenuItemSearch(){

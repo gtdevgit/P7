@@ -14,11 +14,14 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.go4lunch.MainActivity;
+import com.example.go4lunch.ui.home.listview.ListViewRestaurantFragment;
+import com.example.go4lunch.ui.home.map.MapFragment;
+import com.example.go4lunch.ui.home.workmates.WorkmatesFragment;
+import com.example.go4lunch.ui.main.view.MainActivity;
 import com.example.go4lunch.R;
 import com.example.go4lunch.tag.Tag;
-import com.example.go4lunch.viewmodel.MainViewModel;
-import com.example.go4lunch.viewmodel.MainViewModelFactory;
+import com.example.go4lunch.ui.main.viewmodel.MainViewModel;
+import com.example.go4lunch.ui.main.viewmodel.MainViewModelFactory;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
 

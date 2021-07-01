@@ -1,4 +1,4 @@
-package com.example.go4lunch.ui.home;
+package com.example.go4lunch.ui.home.workmates;
 
 import android.util.Log;
 import android.view.LayoutInflater;

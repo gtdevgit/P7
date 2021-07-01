@@ -1,9 +1,9 @@
-package com.example.go4lunch.viewmodel;
+package com.example.go4lunch.ui.main.viewstate;
 
 import android.location.Location;
 
 import com.example.go4lunch.data.firestore.model.User;
-import com.example.go4lunch.ui.model.Restaurant;
+import com.example.go4lunch.ui.main.model.Restaurant;
 
 import java.util.List;
 

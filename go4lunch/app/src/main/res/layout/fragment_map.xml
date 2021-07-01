@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ui.home.MapFragment">
+    tools:context=".ui.home.map.MapFragment">
 
     <TextView
         android:layout_width="match_parent"
@@ -18,7 +18,7 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".MainActivity" />
+        tools:context=".ui.main.view.MainActivity" />
 
     <ProgressBar
         android:id="@+id/fragment_map_progress_bar"

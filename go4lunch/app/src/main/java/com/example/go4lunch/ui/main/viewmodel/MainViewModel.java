@@ -1,4 +1,4 @@
-package com.example.go4lunch.viewmodel;
+package com.example.go4lunch.ui.main.viewmodel;
 
 import android.annotation.SuppressLint;
 import android.location.Location;
@@ -18,12 +18,13 @@ import com.example.go4lunch.data.firestore.repository.FirestoreLikedRepository;
 import com.example.go4lunch.data.firestore.repository.FirestoreUsersRepository;
 import com.example.go4lunch.data.location.LocationRepository;
 import com.example.go4lunch.data.permission_checker.PermissionChecker;
-import com.example.go4lunch.ui.model.Restaurant;
+import com.example.go4lunch.ui.main.model.Restaurant;
 import com.example.go4lunch.data.firestore.model.UidPlaceIdAssociation;
 import com.example.go4lunch.data.googleplace.model.placesearch.Result;
 import com.example.go4lunch.data.googleplace.model.placesearch.PlaceSearch;
 import com.example.go4lunch.data.googleplace.repository.GooglePlacesApiRepository;
 import com.example.go4lunch.tag.Tag;
+import com.example.go4lunch.ui.main.viewstate.MainViewState;
 
 import java.util.ArrayList;
 import java.util.List;
