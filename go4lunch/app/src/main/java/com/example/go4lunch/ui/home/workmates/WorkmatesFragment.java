@@ -87,12 +87,14 @@ public class WorkmatesFragment extends Fragment {
         super.onResume();
         Log.d(Tag.TAG, "ListViewRestaurantFragment.onResume() called");
         mainViewModel.activateUsersRealTimeListener();
+        mainViewModel.activateChosenRestaurantListener();
     }
 
     @Override
     public void onPause() {
         Log.d(Tag.TAG, "ListViewRestaurantFragment.onPause() called");
         mainViewModel.removeUsersRealTimeListener();
+        mainViewModel.removerChosenRestaurantListener();
         super.onPause();
     }
 }
