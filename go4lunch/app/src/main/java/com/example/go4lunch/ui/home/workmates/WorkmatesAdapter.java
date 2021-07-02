@@ -13,6 +13,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.R;
 import com.example.go4lunch.data.firestore.model.User;
 import com.example.go4lunch.tag.Tag;
+import com.example.go4lunch.ui.main.model.Workmate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,10 +21,10 @@ import java.util.List;
 public class WorkmatesAdapter extends RecyclerView.Adapter<WorkmatesViewHolder> {
 
     private static final String TAG = Tag.TAG;
-    private List<User> users;
+    private List<Workmate> workmates;
 
     public WorkmatesAdapter() {
-        this.users = new ArrayList<>();
+        this.workmates = new ArrayList<>();
     }
 
     @NonNull
@@ -37,12 +38,10 @@ public class WorkmatesAdapter extends RecyclerView.Adapter<WorkmatesViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull WorkmatesViewHolder holder, int position) {
-        User user = users.get(position);
-        Log.d(TAG, "onBindViewHolder() called with: holder = [" + holder + "], position = [" + position + "]");
-        Log.d(TAG, "onBindViewHolder() user.getUserName()  = [" + user.getUserName()+ "]");
-        holder.textViewUserInformation.setText(user.getUserName() + " " + user.getUserEmail() );
+        Workmate workmate = workmates.get(position);
+        holder.textViewUserInformation.setText(workmate.getText());
 
-        if (user.getUrlPicture() == null) {
+        if (workmate.getUserUrlPicture() == null) {
             // Clear picture
             Glide.with(holder.imageViewUserPicture.getContext())
                     .load("")
@@ -52,7 +51,7 @@ public class WorkmatesAdapter extends RecyclerView.Adapter<WorkmatesViewHolder> 
         } else {
             //load user picture
             Glide.with(holder.imageViewUserPicture.getContext())
-                    .load(user.getUrlPicture())
+                    .load(workmate.getUserUrlPicture())
                     .apply(RequestOptions.circleCropTransform())
                     .into(holder.imageViewUserPicture);
         }
@@ -60,12 +59,12 @@ public class WorkmatesAdapter extends RecyclerView.Adapter<WorkmatesViewHolder> 
 
     @Override
     public int getItemCount() {
-        Log.d(TAG, "WorkmatesAdapter. getItemCount() called with users.size() = " + users.size());
-        return users.size();
+        Log.d(TAG, "WorkmatesAdapter. getItemCount() called with users.size() = " + workmates.size());
+        return workmates.size();
     }
 
-    public void updateData(List<User> users){
-        this.users = users;
+    public void updateData(List<Workmate> workmates){
+        this.workmates = workmates;
         this.notifyDataSetChanged();
     }
 }

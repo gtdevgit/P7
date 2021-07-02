@@ -16,6 +16,7 @@ import com.example.go4lunch.data.firestore.model.User;
 import com.example.go4lunch.data.firestore.repository.FirestoreChosenRepository;
 import com.example.go4lunch.data.firestore.repository.FirestoreLikedRepository;
 import com.example.go4lunch.data.firestore.repository.FirestoreUsersRepository;
+import com.example.go4lunch.data.googleplace.model.placedetails.PlaceDetails;
 import com.example.go4lunch.data.location.LocationRepository;
 import com.example.go4lunch.data.permission_checker.PermissionChecker;
 import com.example.go4lunch.ui.main.model.Restaurant;
@@ -24,6 +25,8 @@ import com.example.go4lunch.data.googleplace.model.placesearch.Result;
 import com.example.go4lunch.data.googleplace.model.placesearch.PlaceSearch;
 import com.example.go4lunch.data.googleplace.repository.GooglePlacesApiRepository;
 import com.example.go4lunch.tag.Tag;
+import com.example.go4lunch.ui.main.model.SimpleRestaurant;
+import com.example.go4lunch.ui.main.model.Workmate;
 import com.example.go4lunch.ui.main.viewstate.MainViewState;
 
 import java.util.ArrayList;
@@ -72,6 +75,8 @@ public class MainViewModel extends ViewModel {
     FirestoreUsersRepository firestoreUsersRepository = new FirestoreUsersRepository();
     FirestoreLikedRepository firestoreLikedRepository = new FirestoreLikedRepository();
 
+    GetPlaceDetailsByPlaceIds getPlaceDetailsByPlaceIds;
+
     public MainViewModel(
             GooglePlacesApiRepository googlePlacesApiRepository,
             PermissionChecker permissionChecker,
@@ -80,6 +85,7 @@ public class MainViewModel extends ViewModel {
         this.googlePlacesApiRepository = googlePlacesApiRepository;
         this.permissionChecker = permissionChecker;
         this.locationRepository = locationRepository;
+        getPlaceDetailsByPlaceIds = new GetPlaceDetailsByPlaceIds(googlePlacesApiRepository);
 
         configureMediatorLiveData();
     }
@@ -90,6 +96,7 @@ public class MainViewModel extends ViewModel {
         LiveData<List<User>> usersLiveData = firestoreUsersRepository.getUsersLiveData();
         LiveData<List<UidPlaceIdAssociation>> likedRestaurantsLiveData = firestoreLikedRepository.getLikedRestaurantsLiveData();
         LiveData<PlaceSearch> placeSearchLiveData = googlePlacesApiRepository.getNearbysearchLiveData();
+        final LiveData<List<SimpleRestaurant>>[] simpleRestaurantsLiveData = new LiveData[]{null};
 
         mainViewStateMediatorLiveData.addSource(locationLiveData, new Observer<Location>() {
             @Override
@@ -100,19 +107,38 @@ public class MainViewModel extends ViewModel {
                             placeSearchLiveData.getValue(),
                             likedRestaurantsLiveData.getValue(),
                             chosenRestaurantsLiveData.getValue(),
-                            usersLiveData.getValue());
+                            usersLiveData.getValue(),
+                            (simpleRestaurantsLiveData[0] == null) ? null : simpleRestaurantsLiveData[0].getValue());
                 }
             }
         });
 
+        // prepare Observer
+        Observer<List<SimpleRestaurant>> simpleRestaurantsObserver = new Observer<List<SimpleRestaurant>>() {
+            @Override
+            public void onChanged(List<SimpleRestaurant> simpleRestaurants) {
+                combine(locationLiveData.getValue(),
+                        placeSearchLiveData.getValue(),
+                        likedRestaurantsLiveData.getValue(),
+                        chosenRestaurantsLiveData.getValue(),
+                        usersLiveData.getValue(),
+                        simpleRestaurants);
+            }
+        };
+
         mainViewStateMediatorLiveData.addSource(chosenRestaurantsLiveData, new Observer<List<UidPlaceIdAssociation>>() {
             @Override
             public void onChanged(List<UidPlaceIdAssociation> uidPlaceIdAssociations) {
+                List<String> placeIds = UidPlaceIdAssociationListToPlaceIdList(uidPlaceIdAssociations);
+                simpleRestaurantsLiveData[0] = getPlaceDetailsByPlaceIds.get(placeIds);
+                mainViewStateMediatorLiveData.addSource(simpleRestaurantsLiveData[0], simpleRestaurantsObserver);
+
                 combine(locationLiveData.getValue(),
                         placeSearchLiveData.getValue(),
                         likedRestaurantsLiveData.getValue(),
                         uidPlaceIdAssociations,
-                        usersLiveData.getValue());
+                        usersLiveData.getValue(),
+                        (simpleRestaurantsLiveData[0] == null) ? null : simpleRestaurantsLiveData[0].getValue());
             }
         });
 
@@ -124,7 +150,8 @@ public class MainViewModel extends ViewModel {
                         placeSearchLiveData.getValue(),
                         likedRestaurantsLiveData.getValue(),
                         chosenRestaurantsLiveData.getValue(),
-                        users);
+                        users,
+                        (simpleRestaurantsLiveData[0] == null) ? null : simpleRestaurantsLiveData[0].getValue());
             }
         });
 
@@ -136,7 +163,8 @@ public class MainViewModel extends ViewModel {
                         placeSearchLiveData.getValue(),
                         uidPlaceIdAssociations,
                         chosenRestaurantsLiveData.getValue(),
-                        usersLiveData.getValue());
+                        usersLiveData.getValue(),
+                        (simpleRestaurantsLiveData[0] == null) ? null : simpleRestaurantsLiveData[0].getValue());
             }
         });
 
@@ -148,7 +176,8 @@ public class MainViewModel extends ViewModel {
                         placeSearch,
                         likedRestaurantsLiveData.getValue(),
                         chosenRestaurantsLiveData.getValue(),
-                        usersLiveData.getValue());
+                        usersLiveData.getValue(),
+                        (simpleRestaurantsLiveData[0] == null) ? null : simpleRestaurantsLiveData[0].getValue());
             }
         });
     }
@@ -254,21 +283,78 @@ public class MainViewModel extends ViewModel {
         return countUserRestaurantAssociationByPlaceId(placeId, uidPlaceIdAssociations);
     }
 
+    private int indexOfUid(String uid, List<UidPlaceIdAssociation> uidPlaceIdAssociations){
+        for (int i=0; i<uidPlaceIdAssociations.size(); i++){
+            UidPlaceIdAssociation uidPlaceIdAssociation = uidPlaceIdAssociations.get(i);
+            if (uid.equals(uidPlaceIdAssociation.getUserUid())) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private List<String> UidPlaceIdAssociationListToPlaceIdList(List<UidPlaceIdAssociation> uidPlaceIdAssociations){
+        List<String> placeIds = new ArrayList<>();
+        for (UidPlaceIdAssociation uidPlaceIdAssociation : uidPlaceIdAssociations) {
+            placeIds.add(uidPlaceIdAssociation.getPlaceId());
+        }
+        return placeIds;
+    }
+
+    private String findPlaceId(String uid, List<UidPlaceIdAssociation> chosenRestaurants){
+        int idx = indexOfUid(uid, chosenRestaurants);
+        if (idx == -1) return "";
+        return chosenRestaurants.get(idx).getPlaceId();
+    }
+
+    private int indexOfplaceId(String placeId, List<SimpleRestaurant> simpleRestaurants){
+        for (int i=0; i<simpleRestaurants.size(); i++){
+            SimpleRestaurant simpleRestaurant = simpleRestaurants.get(i);
+            if (placeId.equals(simpleRestaurant.getPlaceId())) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private String findPlaceIdName(String placeId, List<SimpleRestaurant> simpleRestaurants){
+        int idx = indexOfplaceId(placeId, simpleRestaurants);
+        if (idx == -1) return "";
+        return simpleRestaurants.get(idx).getName();
+    }
+
+
+    private List<Workmate> createWorkmatesList(List<User> users,
+                                               List<UidPlaceIdAssociation> chosenRestaurants,
+                                               List<SimpleRestaurant> simpleRestaurants){
+        List<Workmate> workmates = new ArrayList<>();
+        for (User user : users){
+            String userName = user.getUserName();
+            String userUrlPicture = user.getUrlPicture();
+            String placeId = findPlaceId(user.getUid(), chosenRestaurants);
+            String restaurantName = findPlaceIdName(placeId, simpleRestaurants);
+            workmates.add(new Workmate(userName, userUrlPicture, placeId, restaurantName));
+        }
+        return workmates;
+    }
+
     /**
      *  combine : combine wait for all data before compute
      * @param location
      * @param placesearch
      * @param likedRestaurants
      * @param chosenRestaurants
-     * @param workmates
+     * @param simpleRestaurants
      */
     private void combine(@Nullable Location location,
                          @Nullable PlaceSearch placesearch,
                          @Nullable List<UidPlaceIdAssociation> likedRestaurants,
                          @Nullable List<UidPlaceIdAssociation> chosenRestaurants,
-                         @Nullable List<User> workmates){
+                         @Nullable List<User> users,
+                         @Nullable List<SimpleRestaurant> simpleRestaurants){
         // canot compute without data
-        if (location == null || placesearch == null || likedRestaurants == null || chosenRestaurants == null || workmates == null) {
+        if (location == null || placesearch == null || likedRestaurants == null ||
+                chosenRestaurants == null || users == null || simpleRestaurants == null) {
             return;
         }
 
@@ -299,8 +385,9 @@ public class MainViewModel extends ViewModel {
                     countLike);
             restaurants.add(restaurant);
         }
+        List<Workmate> workmates = createWorkmatesList(users, chosenRestaurants, simpleRestaurants);
         //restaurantsMutableLiveData.postValue(restaurants);
-        mainViewStateMediatorLiveData.setValue(new MainViewState(location, restaurants, workmates));
+        mainViewStateMediatorLiveData.setValue(new MainViewState(location, restaurants, users, workmates));
     }
 
     /**

@@ -12,6 +12,8 @@ import com.example.go4lunch.data.googleplace.model.placedetails.PlaceDetails;
 import com.example.go4lunch.data.googleplace.model.placesearch.PlaceSearch;
 import com.google.gson.JsonObject;
 
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -119,6 +121,25 @@ public class GooglePlacesApiRepository {
                 errorMutableLiveData.postValue(t.getMessage());
             }
         });
+    }
+
+    public LiveData<PlaceDetails> getPaceDetails(String placeId){
+        MutableLiveData<PlaceDetails> resultMutableLiveData = new MutableLiveData<>();
+        Call<PlaceDetails> call = getDetails(placeId);
+        call.enqueue(new Callback<PlaceDetails>(){
+            @Override
+            public void onResponse (Call < PlaceDetails > call, Response< PlaceDetails > response){
+                if (response.isSuccessful()) {
+                    PlaceDetails placeDetails = response.body();
+                    resultMutableLiveData.setValue(placeDetails);
+                }
+            }
+            @Override
+            public void onFailure (Call < PlaceDetails > call, Throwable t){
+                errorMutableLiveData.postValue(t.getMessage());
+            }
+        });
+        return resultMutableLiveData;
     }
 
     public Call<PlaceSearch> getNearbysearch(Location location){

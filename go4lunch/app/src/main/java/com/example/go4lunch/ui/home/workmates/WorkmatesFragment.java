@@ -17,8 +17,12 @@ import android.widget.TextView;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.tag.Tag;
+import com.example.go4lunch.ui.main.model.SimpleRestaurant;
 import com.example.go4lunch.ui.main.viewmodel.MainViewModel;
 import com.example.go4lunch.ui.main.viewstate.MainViewState;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class WorkmatesFragment extends Fragment {
     private static final String TAG = Tag.TAG;
@@ -34,7 +38,6 @@ public class WorkmatesFragment extends Fragment {
     public WorkmatesFragment(MainViewModel mainViewModel) {
         // Required empty public constructor
         this.mainViewModel = mainViewModel;
-
     }
 
     // Todo: Workmates, adapter le style du texte en fonction du choix ou non d'un restaurant par le workmate. Utiliser Body1 quand un choix n'a pas été fait et Body 2 quand un restaurant à été choisi (android:textAppearance="@style/TextAppearance.AppCompat.Body1")
@@ -78,6 +81,7 @@ public class WorkmatesFragment extends Fragment {
             }
         });
     }
+
     @Override
     public void onResume() {
         super.onResume();
