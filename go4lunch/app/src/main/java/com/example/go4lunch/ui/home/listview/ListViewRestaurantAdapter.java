@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.R;
+import com.example.go4lunch.ui.home.listener.OnClickListenerRestaurant;
 import com.example.go4lunch.ui.main.model.Restaurant;
 
 import java.util.ArrayList;
@@ -37,8 +38,8 @@ public class ListViewRestaurantAdapter extends RecyclerView.Adapter<ListViewRest
             @Override
             public void onClick(View v) {
                 int position = listViewRestaurantViewHolder.getAdapterPosition();
-                Restaurant restaurant = restaurants.get(position);
-                onClickListenerRestaurant.onCLickRestaurant(restaurant);
+                String placeId = restaurants.get(position).getPlaceId();
+                onClickListenerRestaurant.onCLickRestaurant(placeId);
             }
         });
         return listViewRestaurantViewHolder;

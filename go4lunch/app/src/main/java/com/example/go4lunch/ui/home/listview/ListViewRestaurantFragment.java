@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.example.go4lunch.R;
+import com.example.go4lunch.ui.home.listener.OnClickListenerRestaurant;
 import com.example.go4lunch.ui.main.model.Restaurant;
 import com.example.go4lunch.tag.Tag;
 import com.example.go4lunch.ui.detailrestaurant.view.DetailRestaurantActivity;
@@ -60,8 +61,8 @@ public class ListViewRestaurantFragment extends Fragment {
 
         listViewRestaurantAdapter = new ListViewRestaurantAdapter(new OnClickListenerRestaurant() {
             @Override
-            public void onCLickRestaurant(Restaurant restaurant) {
-                showDetailRestaurant(restaurant.getPlaceId());
+            public void onCLickRestaurant(String placeId) {
+                showDetailRestaurant(placeId);
             }
         });
         recyclerView.setAdapter(listViewRestaurantAdapter);

@@ -11,8 +11,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.R;
-import com.example.go4lunch.data.firestore.model.User;
 import com.example.go4lunch.tag.Tag;
+import com.example.go4lunch.ui.home.listener.OnClickListenerRestaurant;
 import com.example.go4lunch.ui.main.model.Workmate;
 
 import java.util.ArrayList;
@@ -21,10 +21,13 @@ import java.util.List;
 public class WorkmatesAdapter extends RecyclerView.Adapter<WorkmatesViewHolder> {
 
     private static final String TAG = Tag.TAG;
-    private List<Workmate> workmates;
 
-    public WorkmatesAdapter() {
+    private List<Workmate> workmates;
+    private OnClickListenerRestaurant onClickListenerRestaurant;
+
+    public WorkmatesAdapter(OnClickListenerRestaurant onClickListenerRestaurant) {
         this.workmates = new ArrayList<>();
+        this.onClickListenerRestaurant = onClickListenerRestaurant;
     }
 
     @NonNull
@@ -33,6 +36,15 @@ public class WorkmatesAdapter extends RecyclerView.Adapter<WorkmatesViewHolder> 
         Log.d(TAG, "onCreateViewHolder() called with: parent = [" + parent + "], viewType = [" + viewType + "]");
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_workmate, parent, false);
         WorkmatesViewHolder workmatesViewHolder = new WorkmatesViewHolder(view);
+
+        workmatesViewHolder.cardViewRestaurant.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int position = workmatesViewHolder.getAdapterPosition();
+                String placeId = workmates.get(position).getPlaceId();
+                onClickListenerRestaurant.onCLickRestaurant(placeId);
+            }
+        });
         return workmatesViewHolder;
     }
 

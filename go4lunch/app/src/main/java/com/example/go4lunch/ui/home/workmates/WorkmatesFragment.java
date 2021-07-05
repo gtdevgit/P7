@@ -1,5 +1,6 @@
 package com.example.go4lunch.ui.home.workmates;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -17,12 +18,10 @@ import android.widget.TextView;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.tag.Tag;
-import com.example.go4lunch.ui.main.model.SimpleRestaurant;
+import com.example.go4lunch.ui.detailrestaurant.view.DetailRestaurantActivity;
+import com.example.go4lunch.ui.home.listener.OnClickListenerRestaurant;
 import com.example.go4lunch.ui.main.viewmodel.MainViewModel;
 import com.example.go4lunch.ui.main.viewstate.MainViewState;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class WorkmatesFragment extends Fragment {
     private static final String TAG = Tag.TAG;
@@ -64,7 +63,12 @@ public class WorkmatesFragment extends Fragment {
         layoutManager = new LinearLayoutManager(view.getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        workmatesAdapter = new WorkmatesAdapter();
+        workmatesAdapter = new WorkmatesAdapter(new OnClickListenerRestaurant() {
+            @Override
+            public void onCLickRestaurant(String placeId) {
+                showDetailRestaurant(placeId);
+            }
+        });
         recyclerView.setAdapter(workmatesAdapter);
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
@@ -80,6 +84,15 @@ public class WorkmatesFragment extends Fragment {
                 workmateProgressBar.setVisibility(View.INVISIBLE);
             }
         });
+    }
+
+    private void showDetailRestaurant(String placeId){
+        Intent intent;
+        intent = new Intent(this.getActivity(), DetailRestaurantActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("placeid", placeId);
+        intent.putExtras(bundle);
+        startActivity(intent);
     }
 
     @Override
