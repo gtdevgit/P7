@@ -67,14 +67,13 @@ public class NotificationHelper {
 
         Calendar dueDate = Calendar.getInstance();
         // Set Execution around hour:
-/*
+
         dueDate.set(Calendar.HOUR_OF_DAY, 12);
         dueDate.set(Calendar.MINUTE, 0);
         dueDate.set(Calendar.MINUTE, 0);
-*/
 
         // for testing
-        dueDate.add(Calendar.SECOND, 30);
+        //dueDate.add(Calendar.SECOND, 30);
 
         if (dueDate.before(currentDate)) {
             dueDate.add(Calendar.HOUR_OF_DAY, 24);
