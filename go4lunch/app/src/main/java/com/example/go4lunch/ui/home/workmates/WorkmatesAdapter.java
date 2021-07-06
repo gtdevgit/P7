@@ -40,9 +40,11 @@ public class WorkmatesAdapter extends RecyclerView.Adapter<WorkmatesViewHolder> 
         workmatesViewHolder.cardViewRestaurant.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int position = workmatesViewHolder.getAdapterPosition();
-                String placeId = workmates.get(position).getPlaceId();
-                onClickListenerRestaurant.onCLickRestaurant(placeId);
+                final int position = workmatesViewHolder.getAdapterPosition();
+                final Workmate workmate = workmates.get(position);
+                final String placeId = workmate.getPlaceId();
+                if ((placeId != null) && (!placeId.isEmpty()))
+                    onClickListenerRestaurant.onCLickRestaurant(placeId);
             }
         });
         return workmatesViewHolder;

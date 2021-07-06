@@ -1,10 +1,10 @@
 package com.example.go4lunch.ui.main.model;
 
 public class Workmate {
-    private String userName;
-    private String userUrlPicture;
-    private String placeId;
-    private String restaurantName;
+    private final String userName;
+    private final String userUrlPicture;
+    private final String placeId;
+    private final String restaurantName;
 
     public Workmate(String userName, String userUrlPicture, String placeId, String restaurantName) {
         this.userName = userName;
@@ -26,6 +26,6 @@ public class Workmate {
     }
 
     public String getPlaceId() {
-        return placeId;
+        return this.placeId;
     }
 }

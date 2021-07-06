@@ -284,46 +284,48 @@ public class DetailRestaurantViewModel extends ViewModel {
             return;
         }
 
-        String placeId = placeDetails.getResult().getPlaceId();
-        List<String> urlPhotos = new ArrayList<>();
-        if (placeDetails.getResult().getPhotos() != null) {
-            for (Photo photo : placeDetails.getResult().getPhotos()){
-                if ((photo.getPhotoReference() != null) && (photo.getPhotoReference().trim().length() > 0)) {
-                    urlPhotos.add(googlePlacesApiRepository.getUrlPlacePhoto(photo.getPhotoReference()));
+        if (placeDetails.getResult() != null){
+            String placeId = placeDetails.getResult().getPlaceId();
+            List<String> urlPhotos = new ArrayList<>();
+            if (placeDetails.getResult().getPhotos() != null) {
+                for (Photo photo : placeDetails.getResult().getPhotos()){
+                    if ((photo.getPhotoReference() != null) && (photo.getPhotoReference().trim().length() > 0)) {
+                        urlPhotos.add(googlePlacesApiRepository.getUrlPlacePhoto(photo.getPhotoReference()));
+                    }
                 }
             }
+            String urlPicture = (urlPhotos.size() > 0) ? urlPhotos.get(0) : null;
+            String name = placeDetails.getResult().getName();
+            String info = findAddress(placeDetails.getResult().getFormattedAddress(), placeDetails.getResult().getVicinity());
+            String phoneNumber = placeDetails.getResult().getInternationalPhoneNumber();
+            String website = placeDetails.getResult().getWebsite();
+
+            int likeCounter = likedRestaurantsByPlaceId.size();
+            int star1Color = getStarColorByLevel(STAR_LEVEL_1, likeCounter);
+            int star2Color = getStarColorByLevel(STAR_LEVEL_2, likeCounter);
+            int star3Color = getStarColorByLevel(STAR_LEVEL_3, likeCounter);
+
+            boolean likedByCurrentUser = isContainUid(cache.getUid(), likedRestaurantsByPlaceId);
+            boolean chosenByCurrentUser = isContainUid(cache.getUid(), chosenRestaurantsByPlaceId);
+
+            cache.setLikedByCurrentUser(likedByCurrentUser);
+            cache.setChosenByCurrentUser(chosenByCurrentUser);
+
+            DetailRestaurantViewState detailRestaurantViewState = new DetailRestaurantViewState(
+                    placeId,
+                    urlPicture,
+                    name,
+                    info,
+                    chosenByCurrentUser,
+                    star1Color,
+                    star2Color,
+                    star3Color,
+                    phoneNumber,
+                    likedByCurrentUser,
+                    website,
+                    workmatesByPlaceId
+            );
+            detailRestaurantViewStateMediatorLiveData.setValue(detailRestaurantViewState);
         }
-        String urlPicture = (urlPhotos.size() > 0) ? urlPhotos.get(0) : null;
-        String name = placeDetails.getResult().getName();
-        String info = findAddress(placeDetails.getResult().getFormattedAddress(), placeDetails.getResult().getVicinity());
-        String phoneNumber = placeDetails.getResult().getInternationalPhoneNumber();
-        String website = placeDetails.getResult().getWebsite();
-
-        int likeCounter = likedRestaurantsByPlaceId.size();
-        int star1Color = getStarColorByLevel(STAR_LEVEL_1, likeCounter);
-        int star2Color = getStarColorByLevel(STAR_LEVEL_2, likeCounter);
-        int star3Color = getStarColorByLevel(STAR_LEVEL_3, likeCounter);
-
-        boolean likedByCurrentUser = isContainUid(cache.getUid(), likedRestaurantsByPlaceId);
-        boolean chosenByCurrentUser = isContainUid(cache.getUid(), chosenRestaurantsByPlaceId);
-
-        cache.setLikedByCurrentUser(likedByCurrentUser);
-        cache.setChosenByCurrentUser(chosenByCurrentUser);
-
-        DetailRestaurantViewState detailRestaurantViewState = new DetailRestaurantViewState(
-                placeId,
-                urlPicture,
-                name,
-                info,
-                chosenByCurrentUser,
-                star1Color,
-                star2Color,
-                star3Color,
-                phoneNumber,
-                likedByCurrentUser,
-                website,
-                workmatesByPlaceId
-        );
-        detailRestaurantViewStateMediatorLiveData.setValue(detailRestaurantViewState);
     }
 }
