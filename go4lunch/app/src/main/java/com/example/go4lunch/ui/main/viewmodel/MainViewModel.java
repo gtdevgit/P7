@@ -10,6 +10,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
 import com.example.go4lunch.data.firestore.model.User;
@@ -93,10 +94,16 @@ public class MainViewModel extends ViewModel {
     private void configureMediatorLiveData(){
         LiveData<Location> locationLiveData = locationRepository.getLocationLiveData();
         LiveData<List<UidPlaceIdAssociation>> chosenRestaurantsLiveData = firestoreChosenRepository.getChosenRestaurantsLiveData();
+        // placeIdsLiveData: To get a list of place id
+        // chosenRestaurantsLiveData->placeIdsLiveData
+        LiveData<List<String>> placeIdsLiveData = Transformations.map(chosenRestaurantsLiveData, this::UidPlaceIdAssociationListToPlaceIdList);
+        // simpleRestaurantsLiveData: to get détails of placeids
+        // placeIdsLiveData->simpleRestaurantsLiveData
+        LiveData<List<SimpleRestaurant>> simpleRestaurantsLiveData = Transformations.switchMap(placeIdsLiveData, getPlaceDetailsByPlaceIds::get);
         LiveData<List<User>> usersLiveData = firestoreUsersRepository.getUsersLiveData();
         LiveData<List<UidPlaceIdAssociation>> likedRestaurantsLiveData = firestoreLikedRepository.getLikedRestaurantsLiveData();
         LiveData<PlaceSearch> placeSearchLiveData = googlePlacesApiRepository.getNearbysearchLiveData();
-        final LiveData<List<SimpleRestaurant>>[] simpleRestaurantsLiveData = new LiveData[]{null};
+
 
         mainViewStateMediatorLiveData.addSource(locationLiveData, new Observer<Location>() {
             @Override
@@ -108,7 +115,7 @@ public class MainViewModel extends ViewModel {
                             likedRestaurantsLiveData.getValue(),
                             chosenRestaurantsLiveData.getValue(),
                             usersLiveData.getValue(),
-                            (simpleRestaurantsLiveData[0] == null) ? null : simpleRestaurantsLiveData[0].getValue());
+                            simpleRestaurantsLiveData.getValue());
                 }
             }
         });
@@ -125,20 +132,23 @@ public class MainViewModel extends ViewModel {
                         simpleRestaurants);
             }
         };
+        mainViewStateMediatorLiveData.addSource(simpleRestaurantsLiveData, simpleRestaurantsObserver);
 
         mainViewStateMediatorLiveData.addSource(chosenRestaurantsLiveData, new Observer<List<UidPlaceIdAssociation>>() {
             @Override
             public void onChanged(List<UidPlaceIdAssociation> uidPlaceIdAssociations) {
-                List<String> placeIds = UidPlaceIdAssociationListToPlaceIdList(uidPlaceIdAssociations);
-                simpleRestaurantsLiveData[0] = getPlaceDetailsByPlaceIds.get(placeIds);
-                mainViewStateMediatorLiveData.addSource(simpleRestaurantsLiveData[0], simpleRestaurantsObserver);
-
                 combine(locationLiveData.getValue(),
                         placeSearchLiveData.getValue(),
                         likedRestaurantsLiveData.getValue(),
                         uidPlaceIdAssociations,
                         usersLiveData.getValue(),
-                        (simpleRestaurantsLiveData[0] == null) ? null : simpleRestaurantsLiveData[0].getValue());
+                        simpleRestaurantsLiveData.getValue());
+            }
+        });
+
+        mainViewStateMediatorLiveData.addSource(placeIdsLiveData, new Observer<List<String>>() {
+            @Override
+            public void onChanged(List<String> strings) {
             }
         });
 
@@ -151,7 +161,7 @@ public class MainViewModel extends ViewModel {
                         likedRestaurantsLiveData.getValue(),
                         chosenRestaurantsLiveData.getValue(),
                         users,
-                        (simpleRestaurantsLiveData[0] == null) ? null : simpleRestaurantsLiveData[0].getValue());
+                        simpleRestaurantsLiveData.getValue());
             }
         });
 
@@ -164,7 +174,7 @@ public class MainViewModel extends ViewModel {
                         uidPlaceIdAssociations,
                         chosenRestaurantsLiveData.getValue(),
                         usersLiveData.getValue(),
-                        (simpleRestaurantsLiveData[0] == null) ? null : simpleRestaurantsLiveData[0].getValue());
+                        simpleRestaurantsLiveData.getValue());
             }
         });
 
@@ -177,7 +187,7 @@ public class MainViewModel extends ViewModel {
                         likedRestaurantsLiveData.getValue(),
                         chosenRestaurantsLiveData.getValue(),
                         usersLiveData.getValue(),
-                        (simpleRestaurantsLiveData[0] == null) ? null : simpleRestaurantsLiveData[0].getValue());
+                        simpleRestaurantsLiveData.getValue());
             }
         });
     }
