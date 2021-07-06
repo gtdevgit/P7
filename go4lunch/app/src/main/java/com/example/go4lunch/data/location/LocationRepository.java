@@ -14,7 +14,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 
 public class LocationRepository {
-    private static final int LOCATION_REQUEST_INTERVAL_MS = 120_000;
+    private static final int LOCATION_REQUEST_INTERVAL_MS = 10_000;
     private static final float SMALLEST_DISPLACEMENT_THRESHOLD_METER = 55;
 
     @NonNull

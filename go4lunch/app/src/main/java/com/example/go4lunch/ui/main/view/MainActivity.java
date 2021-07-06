@@ -14,7 +14,6 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.R;
 import com.example.go4lunch.notification.NotificationHelper;
-import com.example.go4lunch.ui.SettingActivity;
 import com.example.go4lunch.notification.NotificationWorker;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -107,27 +106,6 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
-    }
-
-    private void setting(){
-
-            Intent intent = new Intent(this, SettingActivity.class);
-            startActivity(intent);
-
-            //Intent intent = new Intent(MainActivity.this, AddActivity.class);
-            //startActivityForResult(intent, REQUESTCODE_START_ACTIVITY_ADD_ACTIVITY);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                setting();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 
     @Override
