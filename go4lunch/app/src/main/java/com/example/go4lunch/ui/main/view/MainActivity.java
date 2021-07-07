@@ -1,25 +1,23 @@
 package com.example.go4lunch.ui.main.view;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.R;
-import com.example.go4lunch.notification.NotificationHelper;
-import com.example.go4lunch.notification.NotificationWorker;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -28,9 +26,6 @@ import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkManager;
-import androidx.work.WorkRequest;
 
 //implements OnMapReadyCallback
 public class MainActivity extends AppCompatActivity {
@@ -51,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView textViewUserEmail;
     private Toolbar toolbar;
     private MenuItem menuItemSearch;
+    private SearchView searchView;
 
     private ConstraintLayout constraintLayout;
 
@@ -87,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
     public MenuItem getMenuItemSearch(){
         return menuItemSearch;
     }
+    public SearchView getSearchView() { return searchView; }
 
     public ConstraintLayout getConstraintLayout() {
         return constraintLayout;
@@ -97,7 +94,11 @@ public class MainActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         Log.d(TAG, "onCreateOptionsMenu() called with: menu = [" + menu + "]");
         getMenuInflater().inflate(R.menu.main, menu);
-        menuItemSearch = toolbar.getMenu().findItem(R.id.menu_item_toolbar_searchview);
+
+        menuItemSearch = menu.findItem(R.id.menu_item_toolbar_searchview);
+        searchView = (SearchView) menuItemSearch.getActionView();
+        searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
+
         return true;
     }
 

@@ -17,7 +17,6 @@ import com.example.go4lunch.data.firestore.model.User;
 import com.example.go4lunch.data.firestore.repository.FirestoreChosenRepository;
 import com.example.go4lunch.data.firestore.repository.FirestoreLikedRepository;
 import com.example.go4lunch.data.firestore.repository.FirestoreUsersRepository;
-import com.example.go4lunch.data.googleplace.model.placedetails.PlaceDetails;
 import com.example.go4lunch.data.location.LocationRepository;
 import com.example.go4lunch.data.permission_checker.PermissionChecker;
 import com.example.go4lunch.ui.main.model.Restaurant;
@@ -104,7 +103,6 @@ public class MainViewModel extends ViewModel {
         LiveData<List<UidPlaceIdAssociation>> likedRestaurantsLiveData = firestoreLikedRepository.getLikedRestaurantsLiveData();
         LiveData<PlaceSearch> placeSearchLiveData = googlePlacesApiRepository.getNearbysearchLiveData();
 
-
         mainViewStateMediatorLiveData.addSource(locationLiveData, new Observer<Location>() {
             @Override
             public void onChanged(Location location) {
@@ -115,7 +113,8 @@ public class MainViewModel extends ViewModel {
                             likedRestaurantsLiveData.getValue(),
                             chosenRestaurantsLiveData.getValue(),
                             usersLiveData.getValue(),
-                            simpleRestaurantsLiveData.getValue());
+                            simpleRestaurantsLiveData.getValue(),
+                            searchTextMutableLiveData.getValue());
                 }
             }
         });
@@ -129,7 +128,8 @@ public class MainViewModel extends ViewModel {
                         likedRestaurantsLiveData.getValue(),
                         chosenRestaurantsLiveData.getValue(),
                         usersLiveData.getValue(),
-                        simpleRestaurants);
+                        simpleRestaurants,
+                        searchTextMutableLiveData.getValue());
             }
         };
         mainViewStateMediatorLiveData.addSource(simpleRestaurantsLiveData, simpleRestaurantsObserver);
@@ -142,7 +142,8 @@ public class MainViewModel extends ViewModel {
                         likedRestaurantsLiveData.getValue(),
                         uidPlaceIdAssociations,
                         usersLiveData.getValue(),
-                        simpleRestaurantsLiveData.getValue());
+                        simpleRestaurantsLiveData.getValue(),
+                        searchTextMutableLiveData.getValue());
             }
         });
 
@@ -161,7 +162,8 @@ public class MainViewModel extends ViewModel {
                         likedRestaurantsLiveData.getValue(),
                         chosenRestaurantsLiveData.getValue(),
                         users,
-                        simpleRestaurantsLiveData.getValue());
+                        simpleRestaurantsLiveData.getValue(),
+                        searchTextMutableLiveData.getValue());
             }
         });
 
@@ -174,7 +176,8 @@ public class MainViewModel extends ViewModel {
                         uidPlaceIdAssociations,
                         chosenRestaurantsLiveData.getValue(),
                         usersLiveData.getValue(),
-                        simpleRestaurantsLiveData.getValue());
+                        simpleRestaurantsLiveData.getValue(),
+                        searchTextMutableLiveData.getValue());
             }
         });
 
@@ -187,7 +190,22 @@ public class MainViewModel extends ViewModel {
                         likedRestaurantsLiveData.getValue(),
                         chosenRestaurantsLiveData.getValue(),
                         usersLiveData.getValue(),
-                        simpleRestaurantsLiveData.getValue());
+                        simpleRestaurantsLiveData.getValue(),
+                        searchTextMutableLiveData.getValue());
+            }
+        });
+
+        // filter
+        mainViewStateMediatorLiveData.addSource(searchTextMutableLiveData, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                combine(locationLiveData.getValue(),
+                        placeSearchLiveData.getValue(),
+                        likedRestaurantsLiveData.getValue(),
+                        chosenRestaurantsLiveData.getValue(),
+                        usersLiveData.getValue(),
+                        simpleRestaurantsLiveData.getValue(),
+                        s);
             }
         });
     }
@@ -197,7 +215,6 @@ public class MainViewModel extends ViewModel {
         firestoreChosenRepository.loadAllChosenRestaurants();
         firestoreLikedRepository.loadLikedRestaurants();
         firestoreUsersRepository.loadAllUsers();
-
     }
 
     @SuppressLint("MissingPermission")
@@ -333,7 +350,6 @@ public class MainViewModel extends ViewModel {
         return simpleRestaurants.get(idx).getName();
     }
 
-
     private List<Workmate> createWorkmatesList(List<User> users,
                                                List<UidPlaceIdAssociation> chosenRestaurants,
                                                List<SimpleRestaurant> simpleRestaurants){
@@ -346,6 +362,13 @@ public class MainViewModel extends ViewModel {
             workmates.add(new Workmate(userName, userUrlPicture, placeId, restaurantName));
         }
         return workmates;
+    }
+
+    private boolean isValideSearch(String searchText, String name){
+        if (searchText == null || searchText.trim().isEmpty()) {
+            return true;
+        }
+        return (name.toLowerCase().contains(searchText.toLowerCase().trim()));
     }
 
     /**
@@ -361,7 +384,8 @@ public class MainViewModel extends ViewModel {
                          @Nullable List<UidPlaceIdAssociation> likedRestaurants,
                          @Nullable List<UidPlaceIdAssociation> chosenRestaurants,
                          @Nullable List<User> users,
-                         @Nullable List<SimpleRestaurant> simpleRestaurants){
+                         @Nullable List<SimpleRestaurant> simpleRestaurants,
+                         @Nullable String searchText){
         // canot compute without data
         if (location == null || placesearch == null || likedRestaurants == null ||
                 chosenRestaurants == null || users == null || simpleRestaurants == null) {
@@ -370,30 +394,32 @@ public class MainViewModel extends ViewModel {
 
         List<Restaurant> restaurants = new ArrayList<>();
         for (Result result : placesearch.getResults()) {
-            String palceId = result.getPlaceId();
             String name = result.getName();
-            double latitude = result.getGeometry().getLocation().getLat();
-            double longitude = result.getGeometry().getLocation().getLng();
-            float distance = calculateDistance(latitude, longitude, location);
-            String info = findAddress(result.getFormattedAddress(), result.getVicinity());
-            String hours = "";
-            double rating = result.getRating();
-            String urlPicture = findUrlPicture(result);
-            int workmatesCount = countWorkmates(palceId, chosenRestaurants);
-            int countLike = countLikeByRestaurant(palceId, likedRestaurants);
-            Restaurant restaurant = new Restaurant(
-                    palceId,
-                    name,
-                    latitude,
-                    longitude,
-                    distance,
-                    info,
-                    hours,
-                    workmatesCount,
-                    rating,
-                    urlPicture,
-                    countLike);
-            restaurants.add(restaurant);
+            if (isValideSearch(searchText, name)) {
+                String placeId = result.getPlaceId();
+                double latitude = result.getGeometry().getLocation().getLat();
+                double longitude = result.getGeometry().getLocation().getLng();
+                float distance = calculateDistance(latitude, longitude, location);
+                String info = findAddress(result.getFormattedAddress(), result.getVicinity());
+                String hours = "";
+                double rating = result.getRating();
+                String urlPicture = findUrlPicture(result);
+                int workmatesCount = countWorkmates(placeId, chosenRestaurants);
+                int countLike = countLikeByRestaurant(placeId, likedRestaurants);
+                Restaurant restaurant = new Restaurant(
+                        placeId,
+                        name,
+                        latitude,
+                        longitude,
+                        distance,
+                        info,
+                        hours,
+                        workmatesCount,
+                        rating,
+                        urlPicture,
+                        countLike);
+                restaurants.add(restaurant);
+            }
         }
         List<Workmate> workmates = createWorkmatesList(users, chosenRestaurants, simpleRestaurants);
         //restaurantsMutableLiveData.postValue(restaurants);
@@ -426,4 +452,14 @@ public class MainViewModel extends ViewModel {
     public void removeUsersRealTimeListener(){
         firestoreUsersRepository.removeRealTimeListener();
     }
+
+    private String searchText;
+
+    public void setSearchText(String searchText) {
+        this.searchText = searchText;
+        Log.d(Tag.TAG, "setSearchText() called with: searchText = [" + searchText + "]");
+        searchTextMutableLiveData.setValue(searchText);
+    }
+
+    private MutableLiveData<String> searchTextMutableLiveData = new MutableLiveData<>();
 }

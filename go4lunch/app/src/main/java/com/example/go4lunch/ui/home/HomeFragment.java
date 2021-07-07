@@ -3,11 +3,15 @@ package com.example.go4lunch.ui.home;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -25,6 +29,8 @@ import com.example.go4lunch.ui.main.viewmodel.MainViewModelFactory;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
+import org.jetbrains.annotations.NotNull;
+
 public class HomeFragment extends Fragment {
 
     private static final String TAG = Tag.TAG;
@@ -34,6 +40,10 @@ public class HomeFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+
+        // need setHasOptionsMenu to trigger onCreateOptionsMenu
+        setHasOptionsMenu(true);
+
         View root = inflater.inflate(R.layout.fragment_home, container, false);
 
         bottomNavigationView = root.findViewById(R.id.fragement_home_bottom_navigation_view);
@@ -50,13 +60,42 @@ public class HomeFragment extends Fragment {
         return root;
     }
 
+    @Override
+    public void onCreateOptionsMenu(@NonNull @NotNull Menu menu, @NonNull @NotNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        // use onCreateOptionsMenu to make sure searchView exits
+        configureSearchView();
+
+        Log.d(TAG, "onCreateOptionsMenu() called with: menu = [" + menu + "], inflater = [" + inflater + "]");
+    }
+
+    private void configureSearchView(){
+        SearchView searchView = ((MainActivity) getActivity()).getSearchView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                String s = newText;
+                Log.d(TAG, "onQueryTextChange() called with: newText = [" + newText + "]");
+                mainViewModel.setSearchText(newText);
+                return false;
+            }
+        });
+    }
+
+
+
     private boolean navigate(@NonNull MenuItem item) {
         MenuItem menuItemSearch = ((MainActivity) getActivity()).getMenuItemSearch();
 
         switch (item.getItemId()) {
             case R.id.menu_item_map_view:
                 loadFragmentMap();
-                // toto add text edit search
                 menuItemSearch.setVisible(true);
                 return true;
             case R.id.menu_item_list_view:
