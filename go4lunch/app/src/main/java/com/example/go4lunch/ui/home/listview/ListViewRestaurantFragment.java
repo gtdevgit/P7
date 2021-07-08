@@ -3,6 +3,9 @@ package com.example.go4lunch.ui.home.listview;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -23,6 +26,8 @@ import com.example.go4lunch.ui.detailrestaurant.view.DetailRestaurantActivity;
 import com.example.go4lunch.ui.main.viewmodel.MainViewModel;
 import com.example.go4lunch.ui.main.viewstate.MainViewState;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 
 public class ListViewRestaurantFragment extends Fragment {
@@ -32,6 +37,12 @@ public class ListViewRestaurantFragment extends Fragment {
     private RecyclerView.LayoutManager layoutManager;
 
     private MainViewModel mainViewModel;
+
+    public void setSearchView(SearchView searchView) {
+        this.searchView = searchView;
+    }
+
+    private SearchView searchView;
 
     ListViewRestaurantAdapter listViewRestaurantAdapter;
 
@@ -50,8 +61,15 @@ public class ListViewRestaurantFragment extends Fragment {
 
         configureViewModel();
         configureRecyclerView(root);
+        configureSearchView();
 
         return root;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        //configureSearchView();
     }
 
     private void configureRecyclerView(View view){
@@ -70,6 +88,24 @@ public class ListViewRestaurantFragment extends Fragment {
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
                 DividerItemDecoration.VERTICAL);
         recyclerView.addItemDecoration(dividerItemDecoration);
+    }
+
+    private void configureSearchView(){
+        if (searchView != null){
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    ListViewRestaurantAdapter listViewRestaurantAdapter = (ListViewRestaurantAdapter) recyclerView.getAdapter();
+                    listViewRestaurantAdapter.getFilter().filter(newText);
+                    return false;
+                }
+            });
+        }
     }
 
     private void configureViewModel(){

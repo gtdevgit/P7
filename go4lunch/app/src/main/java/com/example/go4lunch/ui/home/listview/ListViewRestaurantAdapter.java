@@ -4,6 +4,8 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -18,14 +20,16 @@ import com.example.go4lunch.ui.main.model.Restaurant;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ListViewRestaurantAdapter extends RecyclerView.Adapter<ListViewRestaurantViewHolder> {
+public class ListViewRestaurantAdapter extends RecyclerView.Adapter<ListViewRestaurantViewHolder> implements Filterable {
 
-    private List<Restaurant> restaurants;
+    private List<Restaurant> restaurantsFull;
+    private List<Restaurant> restaurantsFiltered;
     private OnClickListenerRestaurant onClickListenerRestaurant;
 
     public ListViewRestaurantAdapter(OnClickListenerRestaurant onClickListenerRestaurant) {
-        this.restaurants = new ArrayList<>();
-        this.onClickListenerRestaurant = onClickListenerRestaurant;
+        restaurantsFull = new ArrayList<>();
+        restaurantsFiltered = new ArrayList<>();
+        onClickListenerRestaurant = onClickListenerRestaurant;
     }
 
     @NonNull
@@ -38,7 +42,7 @@ public class ListViewRestaurantAdapter extends RecyclerView.Adapter<ListViewRest
             @Override
             public void onClick(View v) {
                 int position = listViewRestaurantViewHolder.getAdapterPosition();
-                String placeId = restaurants.get(position).getPlaceId();
+                String placeId = restaurantsFiltered.get(position).getPlaceId();
                 onClickListenerRestaurant.onCLickRestaurant(placeId);
             }
         });
@@ -55,7 +59,7 @@ public class ListViewRestaurantAdapter extends RecyclerView.Adapter<ListViewRest
 
     @Override
     public void onBindViewHolder(@NonNull ListViewRestaurantViewHolder holder, int position) {
-        Restaurant restaurant = restaurants.get(position);
+        Restaurant restaurant = restaurantsFiltered.get(position);
         holder.textViewRestaurantName.setText(restaurant.getName());
         holder.textViewRestaurantInfo.setText(restaurant.getInfo());
         holder.textViewRestaurantHours.setText(restaurant.getHours());
@@ -86,11 +90,51 @@ public class ListViewRestaurantAdapter extends RecyclerView.Adapter<ListViewRest
 
     @Override
     public int getItemCount() {
-        return restaurants.size();
+        return restaurantsFiltered.size();
     }
 
     public void updateData(List<Restaurant> restaurants) {
-        this.restaurants = restaurants;
+        restaurantsFull = restaurants;
+        updateDisplayedData(restaurants);
+    }
+
+    private void updateDisplayedData(List<Restaurant> restaurants){
+        restaurantsFiltered.clear();
+        restaurantsFiltered.addAll(restaurants);
         this.notifyDataSetChanged();
     }
+
+    @Override
+    public Filter getFilter() {
+        return restaurantFilter;
+    }
+
+    private Filter restaurantFilter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            List<Restaurant> filteredList = new ArrayList<>();
+
+            if (constraint == null || constraint.length() == 0) {
+                filteredList.addAll(restaurantsFull);
+            } else {
+                String filterPattern = constraint.toString().toLowerCase().trim();
+
+                for (Restaurant restaurant : restaurantsFull) {
+                    if (restaurant.getName().toLowerCase().contains(filterPattern)) {
+                        filteredList.add(restaurant);
+                    }
+                }
+            }
+
+            FilterResults filterResults = new FilterResults();
+            filterResults.values = filteredList;
+
+            return filterResults;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            updateDisplayedData((List<Restaurant>) results.values);
+        }
+    };
 }

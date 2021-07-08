@@ -37,6 +37,7 @@ public class HomeFragment extends Fragment {
     private BottomNavigationView bottomNavigationView;
 
     private MainViewModel mainViewModel;
+    private SearchView searchView;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -65,30 +66,14 @@ public class HomeFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
 
         // use onCreateOptionsMenu to make sure searchView exits
-        configureSearchView();
+        acquireSearchView();
 
         Log.d(TAG, "onCreateOptionsMenu() called with: menu = [" + menu + "], inflater = [" + inflater + "]");
     }
 
-    private void configureSearchView(){
-        SearchView searchView = ((MainActivity) getActivity()).getSearchView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                String s = newText;
-                Log.d(TAG, "onQueryTextChange() called with: newText = [" + newText + "]");
-                mainViewModel.setSearchText(newText);
-                return false;
-            }
-        });
+    private void acquireSearchView(){
+        searchView = ((MainActivity) getActivity()).getSearchView();
     }
-
-
 
     private boolean navigate(@NonNull MenuItem item) {
         MenuItem menuItemSearch = ((MainActivity) getActivity()).getMenuItemSearch();
@@ -117,7 +102,9 @@ public class HomeFragment extends Fragment {
     }
 
     private void loadFragmentListView(){
-        loadFragment(new ListViewRestaurantFragment(mainViewModel));
+        ListViewRestaurantFragment listViewRestaurantFragment = new ListViewRestaurantFragment(mainViewModel);
+        listViewRestaurantFragment.setSearchView(searchView);
+        loadFragment(listViewRestaurantFragment);
     }
 
     private void loadFragmentWorkmates(){
