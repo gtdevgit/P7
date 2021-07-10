@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.go4lunch.data.googleplace.api.GooglePlacesApiClient;
 import com.example.go4lunch.data.googleplace.api.GooglePlacesApiInterface;
+import com.example.go4lunch.data.googleplace.model.autocomplete.Autocomplete;
 import com.example.go4lunch.data.googleplace.model.placedetails.PlaceDetails;
 import com.example.go4lunch.data.googleplace.model.placesearch.PlaceSearch;
 import com.google.gson.JsonObject;
@@ -66,16 +67,39 @@ public class GooglePlacesApiRepository {
      * @param location
      * @return
      */
-    public Call<JsonObject> getAutocomplete(Location location) {
+    public Call<Autocomplete> getAutocomplete(Location location, String query) {
         Log.d(TAG, "GooglePlacesApiRepository.getAutocomplete() called with: location = [" + location + "]");
         String strLocation = "" + location.getLatitude() + "," + location.getLongitude();
+        //String inputQuery = String.format("restaurant+%s", query);
+        String inputQuery = query;
+
         Log.d(TAG, "GooglePlacesApiRepository.getAutocomplete() strLocation = [" + strLocation + "]");
         try {
-            return api.getAutocomplete("restaurant", strLocation, getDefaultRadius(), getApiKey());
+            return api.getAutocomplete(inputQuery, "establishment", strLocation, getDefaultRadius(), getApiKey());
         } catch (Exception e) {
             Log.d(TAG, "GooglePlacesApiRepository.getAutocomplete(). Exception = [" + e.getMessage() + "]");
             return null;
         }
+    }
+
+    private MutableLiveData<Autocomplete> autocompleteMutableLiveData = new MutableLiveData<>();
+    public LiveData<Autocomplete> getAutocompleteLiveData() { return autocompleteMutableLiveData; }
+
+    public void loadAutocomplete(Location location, String query){
+        Call<Autocomplete> call = getAutocomplete(location, query);
+        call.enqueue(new Callback<Autocomplete>() {
+            @Override
+            public void onResponse(Call<Autocomplete> call, Response<Autocomplete> response) {
+                if (response.isSuccessful()) {
+                    Autocomplete autocomplete = response.body();
+                    autocompleteMutableLiveData.setValue(autocomplete);
+                }
+            }
+            @Override
+            public void onFailure(Call<Autocomplete> call, Throwable t) {
+                errorMutableLiveData.postValue(t.getMessage());
+            }
+        });
     }
 
     public Call<PlaceSearch> getTextsearch(String query, Location location) {
@@ -88,8 +112,6 @@ public class GooglePlacesApiRepository {
             return null;
         }
     }
-
-
 
     public Call<PlaceDetails> getDetails(String placeId) {
         Log.d(TAG, "getDetails() called with: placeId = [" + placeId + "]");

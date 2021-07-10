@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.go4lunch.ui.home.listview.ListViewRestaurantFragment;
 import com.example.go4lunch.ui.home.map.MapFragment;
+import com.example.go4lunch.ui.home.search.SearchFragment;
 import com.example.go4lunch.ui.home.workmates.WorkmatesFragment;
 import com.example.go4lunch.ui.main.view.MainActivity;
 import com.example.go4lunch.R;
@@ -38,6 +39,7 @@ public class HomeFragment extends Fragment {
 
     private MainViewModel mainViewModel;
     private SearchView searchView;
+    private Fragment currentFragment;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -73,6 +75,14 @@ public class HomeFragment extends Fragment {
 
     private void acquireSearchView(){
         searchView = ((MainActivity) getActivity()).getSearchView();
+        if (currentFragment instanceof MapFragment){
+            ((MapFragment) currentFragment).configureSearchView(searchView);
+            return;
+        }
+        if (currentFragment instanceof ListViewRestaurantFragment){
+            ((ListViewRestaurantFragment) currentFragment).configureSearchView(searchView);
+            return;
+        }
     }
 
     private boolean navigate(@NonNull MenuItem item) {
@@ -98,12 +108,13 @@ public class HomeFragment extends Fragment {
     private void loadFragmentMap(){
         Log.d(TAG, "HomeFragment.loadFragmentMap() called");
         MapFragment mapFragment = new MapFragment(mainViewModel);
+        //mapFragment.setSearchView(searchView);
         loadFragment(mapFragment);
     }
 
     private void loadFragmentListView(){
         ListViewRestaurantFragment listViewRestaurantFragment = new ListViewRestaurantFragment(mainViewModel);
-        listViewRestaurantFragment.setSearchView(searchView);
+        //listViewRestaurantFragment.setSearchView(searchView);
         loadFragment(listViewRestaurantFragment);
     }
 
@@ -117,6 +128,9 @@ public class HomeFragment extends Fragment {
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         ft.addToBackStack(null);
         ft.commit();
+
+        currentFragment = fragment;
+        acquireSearchView();
     }
 
     public void initViewModel(){

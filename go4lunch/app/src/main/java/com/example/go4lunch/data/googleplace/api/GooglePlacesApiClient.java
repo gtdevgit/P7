@@ -19,7 +19,7 @@ public class GooglePlacesApiClient {
         OkHttpClient.Builder okHttpClient = new OkHttpClient.Builder();
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         // use this to set the log detail level
-        logging.setLevel(HttpLoggingInterceptor.Level.BASIC);
+        logging.setLevel(HttpLoggingInterceptor.Level.HEADERS);
         okHttpClient.addInterceptor(logging);
 
         Retrofit retrofit = new Retrofit.Builder()

@@ -1,5 +1,6 @@
 package com.example.go4lunch.data.googleplace.api;
 
+import com.example.go4lunch.data.googleplace.model.autocomplete.Autocomplete;
 import com.example.go4lunch.data.googleplace.model.placedetails.PlaceDetails;
 import com.example.go4lunch.data.googleplace.model.placesearch.PlaceSearch;
 import com.google.gson.JsonObject;
@@ -20,9 +21,10 @@ public interface GooglePlacesApiInterface {
         &key=[google api key]
      */
 
-    @GET("autocomplete/json")
-    Call<JsonObject>getAutocomplete(
+    @GET("autocomplete/json?strictbounds")
+    Call<Autocomplete>getAutocomplete(
             @Query("input") String input,
+            @Query("types") String types,
             @Query("location") String location,
             @Query("radius") String radius,
             @Query("key") String key);

@@ -10,6 +10,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 
@@ -17,12 +18,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import com.example.go4lunch.R;
+import com.example.go4lunch.ui.home.listview.ListViewRestaurantAdapter;
+import com.example.go4lunch.ui.home.search.SearchFragment;
 import com.example.go4lunch.ui.main.model.Restaurant;
 import com.example.go4lunch.tag.Tag;
 import com.example.go4lunch.ui.detailrestaurant.view.DetailRestaurantActivity;
+import com.example.go4lunch.ui.main.model.SearchViewResultItem;
 import com.example.go4lunch.ui.main.viewmodel.MainViewModel;
 import com.example.go4lunch.ui.main.viewstate.MainViewState;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -43,6 +49,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private GoogleMap mMap;
     private ProgressBar progressBar;
     private FloatingActionButton floatingActionButton;
+    private ListView listViewSearch;
 
     private Location location;
 
@@ -74,6 +81,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             }
         });
 
+        listViewSearch = view.findViewById(R.id.fragment_map_list_view);
+
         configureViewModel();
 
         return view;
@@ -85,9 +94,35 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             public void onChanged(MainViewState mainViewState) {
                 setLocation(mainViewState.getLocation());
                 setRestaurants(mainViewState.getRestaurants());
+                setListViewSearch(mainViewState.getSearchViewResultVisibility(), mainViewState.getSearchViewResultItems());
             }
         });
     };
+
+
+    public void configureSearchView(SearchView searchView){
+        if (searchView != null){
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    String text = newText.toLowerCase().trim();
+                    if (text.length() == 0) {
+                        listViewSearch.setVisibility(View.GONE);
+                    }
+                    if (text.length() >= 3) {
+                        mainViewModel.loadAutocomplet(newText);
+                    }
+
+                    return false;
+                }
+            });
+        }
+    }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -200,6 +235,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
         drawable.draw(canvas);
         return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
+    private void setListViewSearch(int visibility, List<SearchViewResultItem> searchViewResultItems){
+        listViewSearch.setVisibility(visibility);
+        ArrayAdapter<SearchViewResultItem> arrayAdapter = new ArrayAdapter<SearchViewResultItem>(
+                getContext(), android.R.layout.simple_list_item_1, searchViewResultItems);
+        listViewSearch.setAdapter(arrayAdapter);
     }
 
     @Override

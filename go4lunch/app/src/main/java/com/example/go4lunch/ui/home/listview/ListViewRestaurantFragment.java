@@ -20,6 +20,7 @@ import android.widget.ProgressBar;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.ui.home.listener.OnClickListenerRestaurant;
+import com.example.go4lunch.ui.home.search.SearchFragment;
 import com.example.go4lunch.ui.main.model.Restaurant;
 import com.example.go4lunch.tag.Tag;
 import com.example.go4lunch.ui.detailrestaurant.view.DetailRestaurantActivity;
@@ -38,12 +39,6 @@ public class ListViewRestaurantFragment extends Fragment {
 
     private MainViewModel mainViewModel;
 
-    public void setSearchView(SearchView searchView) {
-        this.searchView = searchView;
-    }
-
-    private SearchView searchView;
-
     ListViewRestaurantAdapter listViewRestaurantAdapter;
 
     public ListViewRestaurantFragment(MainViewModel mainViewModel) {
@@ -61,15 +56,8 @@ public class ListViewRestaurantFragment extends Fragment {
 
         configureViewModel();
         configureRecyclerView(root);
-        configureSearchView();
 
         return root;
-    }
-
-    @Override
-    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        //configureSearchView();
     }
 
     private void configureRecyclerView(View view){
@@ -90,7 +78,7 @@ public class ListViewRestaurantFragment extends Fragment {
         recyclerView.addItemDecoration(dividerItemDecoration);
     }
 
-    private void configureSearchView(){
+    public void configureSearchView(SearchView searchView){
         if (searchView != null){
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override

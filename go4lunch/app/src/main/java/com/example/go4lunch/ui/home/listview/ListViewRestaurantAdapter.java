@@ -17,6 +17,8 @@ import com.example.go4lunch.R;
 import com.example.go4lunch.ui.home.listener.OnClickListenerRestaurant;
 import com.example.go4lunch.ui.main.model.Restaurant;
 
+import java.text.Collator;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -110,6 +112,9 @@ public class ListViewRestaurantAdapter extends RecyclerView.Adapter<ListViewRest
     }
 
     private Filter restaurantFilter = new Filter() {
+        /*
+        worker thread
+         */
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             List<Restaurant> filteredList = new ArrayList<>();
@@ -120,9 +125,10 @@ public class ListViewRestaurantAdapter extends RecyclerView.Adapter<ListViewRest
                 String filterPattern = constraint.toString().toLowerCase().trim();
 
                 for (Restaurant restaurant : restaurantsFull) {
-                    if (restaurant.getName().toLowerCase().contains(filterPattern)) {
+                    if (restaurant.getName().toLowerCase().contains(filterPattern) ||
+                            restaurant.getInfo().toLowerCase().contains(filterPattern)) {
                         filteredList.add(restaurant);
-                    }
+                       }
                 }
             }
 
@@ -132,6 +138,9 @@ public class ListViewRestaurantAdapter extends RecyclerView.Adapter<ListViewRest
             return filterResults;
         }
 
+        /*
+        ui thread
+         */
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
             updateDisplayedData((List<Restaurant>) results.values);

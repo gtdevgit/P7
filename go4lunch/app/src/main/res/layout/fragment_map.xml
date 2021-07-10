@@ -11,6 +11,14 @@
         android:layout_height="match_parent"
         android:text="@string/hello_map_fragment" />
 
+    <ListView
+        android:id="@+id/fragment_map_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/primaryColor"
+        android:translationZ="100dp"
+        android:visibility="visible" />
+
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:map="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
