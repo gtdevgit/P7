@@ -31,7 +31,7 @@ public class ListViewRestaurantAdapter extends RecyclerView.Adapter<ListViewRest
     public ListViewRestaurantAdapter(OnClickListenerRestaurant onClickListenerRestaurant) {
         restaurantsFull = new ArrayList<>();
         restaurantsFiltered = new ArrayList<>();
-        onClickListenerRestaurant = onClickListenerRestaurant;
+        this.onClickListenerRestaurant = onClickListenerRestaurant;
     }
 
     @NonNull

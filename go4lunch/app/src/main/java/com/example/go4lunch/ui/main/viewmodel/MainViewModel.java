@@ -432,7 +432,6 @@ public class MainViewModel extends ViewModel {
                 if (prediction.getTypes().contains("restaurant")) {
                     searchViewResultItems.add(new SearchViewResultItem(prediction.getDescription(), prediction.getPlaceId()));
                 }
-                searchViewResultItems.add(new SearchViewResultItem(prediction.getDescription(), prediction.getPlaceId()));
             }
         }
 
