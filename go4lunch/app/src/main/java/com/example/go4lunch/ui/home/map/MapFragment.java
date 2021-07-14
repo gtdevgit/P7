@@ -13,6 +13,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,8 +26,9 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import com.example.go4lunch.R;
+import com.example.go4lunch.ui.home.listener.OnClickListenerRestaurant;
 import com.example.go4lunch.ui.home.listview.ListViewRestaurantAdapter;
-import com.example.go4lunch.ui.home.search.SearchFragment;
+import com.example.go4lunch.ui.home.search.SearchViewInterface;
 import com.example.go4lunch.ui.main.model.Restaurant;
 import com.example.go4lunch.tag.Tag;
 import com.example.go4lunch.ui.detailrestaurant.view.DetailRestaurantActivity;
@@ -44,7 +48,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
-public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, SearchViewInterface {
 
     private GoogleMap mMap;
     private ProgressBar progressBar;
@@ -52,6 +56,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private ListView listViewSearch;
 
     private Location location;
+
+    private RecyclerView recyclerView;
+    private RecyclerView.LayoutManager layoutManager;
+    MapFragmentAdapter mapFragmentAdapter;
 
     private MainViewModel mainViewModel;
 
@@ -81,9 +89,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             }
         });
 
-        listViewSearch = view.findViewById(R.id.fragment_map_list_view);
-
         configureViewModel();
+        configureRecyclerView(view);
 
         return view;
     }
@@ -94,13 +101,32 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             public void onChanged(MainViewState mainViewState) {
                 setLocation(mainViewState.getLocation());
                 setRestaurants(mainViewState.getRestaurants());
-                setListViewSearch(mainViewState.getSearchViewResultVisibility(), mainViewState.getSearchViewResultItems());
+                setSearch(mainViewState.getSearchViewResultVisibility(), mainViewState.getSearchViewResultItems());
             }
         });
     };
 
+    private void configureRecyclerView(View view){
+        recyclerView = view.findViewById(R.id.fragment_map_recyclerview);
+        layoutManager = new LinearLayoutManager(view.getContext());
+        recyclerView.setLayoutManager(layoutManager);
 
-    public void configureSearchView(SearchView searchView){
+        mapFragmentAdapter = new MapFragmentAdapter(new OnClickListenerRestaurant() {
+            @Override
+            public void onCLickRestaurant(String placeId) {
+                openDetailRestaurantActivity(placeId);
+            }
+        });
+
+        recyclerView.setAdapter(mapFragmentAdapter);
+
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+                DividerItemDecoration.VERTICAL);
+        recyclerView.addItemDecoration(dividerItemDecoration);
+    }
+
+    @Override
+    public void configureSearchView(SearchView searchView) {
         if (searchView != null){
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
@@ -112,7 +138,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 public boolean onQueryTextChange(String newText) {
                     String text = newText.toLowerCase().trim();
                     if (text.length() == 0) {
-                        listViewSearch.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.GONE);
                     }
                     if (text.length() >= 3) {
                         mainViewModel.loadAutocomplet(newText);
@@ -167,6 +193,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private void openDetailRestaurantActivity(String placeId){
+        recyclerView.setVisibility(View.GONE);
+
         Log.d(Tag.TAG, "openDetailRestaurantActivity() called with: placeId = [" + placeId + "]");
         Intent intent = new Intent(getContext(), DetailRestaurantActivity.class);
         Bundle bundle = new Bundle();
@@ -237,11 +265,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
-    private void setListViewSearch(int visibility, List<SearchViewResultItem> searchViewResultItems){
-        listViewSearch.setVisibility(visibility);
-        ArrayAdapter<SearchViewResultItem> arrayAdapter = new ArrayAdapter<SearchViewResultItem>(
-                getContext(), android.R.layout.simple_list_item_1, searchViewResultItems);
-        listViewSearch.setAdapter(arrayAdapter);
+    private void setSearch(int visibility, List<SearchViewResultItem> searchViewResultItems){
+        recyclerView.setVisibility(visibility);
+        mapFragmentAdapter.updateData(searchViewResultItems);
     }
 
     @Override

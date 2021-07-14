@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
@@ -20,7 +19,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.go4lunch.ui.home.listview.ListViewRestaurantFragment;
 import com.example.go4lunch.ui.home.map.MapFragment;
-import com.example.go4lunch.ui.home.search.SearchFragment;
+import com.example.go4lunch.ui.home.search.SearchViewInterface;
 import com.example.go4lunch.ui.home.workmates.WorkmatesFragment;
 import com.example.go4lunch.ui.main.view.MainActivity;
 import com.example.go4lunch.R;
@@ -73,15 +72,34 @@ public class HomeFragment extends Fragment {
         Log.d(TAG, "onCreateOptionsMenu() called with: menu = [" + menu + "], inflater = [" + inflater + "]");
     }
 
+    private boolean fragmentImplementsSearchViewInterface(Fragment fragment){
+        if (fragment != null) {
+            Class searchViewInterface = SearchViewInterface.class;
+            String searchViewInterfaceName = searchViewInterface.getName();
+
+            Class cf = currentFragment.getClass();
+            Class[] intfs = cf.getInterfaces();
+            for (Class c : intfs) {
+                String name = c.getName();
+                if (name.equals(searchViewInterfaceName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private void acquireSearchView(){
         searchView = ((MainActivity) getActivity()).getSearchView();
-        if (currentFragment instanceof MapFragment){
-            ((MapFragment) currentFragment).configureSearchView(searchView);
-            return;
-        }
-        if (currentFragment instanceof ListViewRestaurantFragment){
-            ((ListViewRestaurantFragment) currentFragment).configureSearchView(searchView);
-            return;
+        if (fragmentImplementsSearchViewInterface(currentFragment)) {
+            if (currentFragment instanceof MapFragment){
+                ((MapFragment) currentFragment).configureSearchView(searchView);
+                return;
+            }
+            if (currentFragment instanceof ListViewRestaurantFragment){
+                ((ListViewRestaurantFragment) currentFragment).configureSearchView(searchView);
+                return;
+            }
         }
     }
 

@@ -3,8 +3,6 @@ package com.example.go4lunch.ui.home.listview;
 import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
@@ -20,26 +18,24 @@ import android.widget.ProgressBar;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.ui.home.listener.OnClickListenerRestaurant;
-import com.example.go4lunch.ui.home.search.SearchFragment;
+import com.example.go4lunch.ui.home.search.SearchViewInterface;
 import com.example.go4lunch.ui.main.model.Restaurant;
 import com.example.go4lunch.tag.Tag;
 import com.example.go4lunch.ui.detailrestaurant.view.DetailRestaurantActivity;
 import com.example.go4lunch.ui.main.viewmodel.MainViewModel;
 import com.example.go4lunch.ui.main.viewstate.MainViewState;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
 
-public class ListViewRestaurantFragment extends Fragment {
+public class ListViewRestaurantFragment extends Fragment implements SearchViewInterface {
 
     private ProgressBar progressBar;
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
+    ListViewRestaurantAdapter listViewRestaurantAdapter;
 
     private MainViewModel mainViewModel;
 
-    ListViewRestaurantAdapter listViewRestaurantAdapter;
 
     public ListViewRestaurantFragment(MainViewModel mainViewModel) {
         // Required empty public constructor
@@ -78,7 +74,8 @@ public class ListViewRestaurantFragment extends Fragment {
         recyclerView.addItemDecoration(dividerItemDecoration);
     }
 
-    public void configureSearchView(SearchView searchView){
+    @Override
+    public void configureSearchView(SearchView searchView) {
         if (searchView != null){
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override

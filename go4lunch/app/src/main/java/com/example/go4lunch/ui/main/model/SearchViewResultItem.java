@@ -2,6 +2,8 @@ package com.example.go4lunch.ui.main.model;
 
 import androidx.annotation.NonNull;
 
+import com.example.go4lunch.data.googleplace.model.Location;
+
 import org.jetbrains.annotations.NotNull;
 
 public class SearchViewResultItem {

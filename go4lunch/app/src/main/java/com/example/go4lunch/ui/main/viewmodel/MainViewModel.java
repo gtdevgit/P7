@@ -429,9 +429,9 @@ public class MainViewModel extends ViewModel {
         List<SearchViewResultItem> searchViewResultItems = new ArrayList<>();
         if (autocomplete != null && (autocomplete.getStatus().equals("OK")) && autocomplete.getPredictions() != null) {
             for (Prediction prediction : autocomplete.getPredictions()) {
-/*                if (prediction.getTypes().contains("restaurant")) {
+                if (prediction.getTypes().contains("restaurant")) {
                     searchViewResultItems.add(new SearchViewResultItem(prediction.getDescription(), prediction.getPlaceId()));
-                }*/
+                }
                 searchViewResultItems.add(new SearchViewResultItem(prediction.getDescription(), prediction.getPlaceId()));
             }
         }
