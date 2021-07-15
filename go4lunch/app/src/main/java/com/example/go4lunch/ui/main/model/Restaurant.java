@@ -9,20 +9,20 @@ public class Restaurant {
     private double longitude;
     private float distance;
     private String info;
-    private String hours;
+    private int openNowResourceString;
     private int workmatesCount;
     private double rating;
     private String urlPicture;
     private int countLike;
 
-    public Restaurant(String placeId, String name, double latitude, double longitude, float distance, String info, String hours, int workmatesCount, double rating, String urlPicture, int countLike) {
+    public Restaurant(String placeId, String name, double latitude, double longitude, float distance, String info, int openNowResourceString, int workmatesCount, double rating, String urlPicture, int countLike) {
         this.placeId = placeId;
         this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
         this.distance = distance;
         this.info = info;
-        this.hours = hours;
+        this.openNowResourceString = openNowResourceString;
         this.workmatesCount = workmatesCount;
         this.rating = rating;
         this.urlPicture = urlPicture;
@@ -77,12 +77,12 @@ public class Restaurant {
         this.info = info;
     }
 
-    public String getHours() {
-        return hours;
+    public int getOpenNowResourceString() {
+        return openNowResourceString;
     }
 
-    public void setHours(String hours) {
-        this.hours = hours;
+    public void setOpenNowResourceString(int openNowResourceString) {
+        this.openNowResourceString = openNowResourceString;
     }
 
     public int getWorkmatesCount() {

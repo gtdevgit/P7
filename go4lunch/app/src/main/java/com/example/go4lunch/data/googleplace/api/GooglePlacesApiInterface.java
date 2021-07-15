@@ -3,7 +3,6 @@ package com.example.go4lunch.data.googleplace.api;
 import com.example.go4lunch.data.googleplace.model.autocomplete.Autocomplete;
 import com.example.go4lunch.data.googleplace.model.placedetails.PlaceDetails;
 import com.example.go4lunch.data.googleplace.model.placesearch.PlaceSearch;
-import com.google.gson.JsonObject;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -41,6 +40,9 @@ public interface GooglePlacesApiInterface {
             @Query("place_id") String placeId,
             @Query("key") String key);
 
+    /*
+    https://developers.google.com/maps/documentation/places/web-service/search#PlaceSearchRequests
+     */
     @GET("nearbysearch/json")
     Call<PlaceSearch>getNearbysearch(
             @Query("location") String location,

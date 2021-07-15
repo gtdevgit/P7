@@ -12,14 +12,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class GooglePlacesApiClient {
 
-
     public static GooglePlacesApiInterface getClient() {
         Log.d(Tag.TAG, "GooglePlacesApiClient.getClient() called");
 
         OkHttpClient.Builder okHttpClient = new OkHttpClient.Builder();
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         // use this to set the log detail level
-        logging.setLevel(HttpLoggingInterceptor.Level.HEADERS);
+        logging.setLevel(HttpLoggingInterceptor.Level.NONE);
         okHttpClient.addInterceptor(logging);
 
         Retrofit retrofit = new Retrofit.Builder()

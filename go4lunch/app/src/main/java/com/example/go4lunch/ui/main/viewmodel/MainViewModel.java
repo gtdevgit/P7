@@ -13,10 +13,12 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
+import com.example.go4lunch.R;
 import com.example.go4lunch.data.firestore.model.User;
 import com.example.go4lunch.data.firestore.repository.FirestoreChosenRepository;
 import com.example.go4lunch.data.firestore.repository.FirestoreLikedRepository;
 import com.example.go4lunch.data.firestore.repository.FirestoreUsersRepository;
+import com.example.go4lunch.data.googleplace.model.OpeningHours;
 import com.example.go4lunch.data.googleplace.model.autocomplete.Autocomplete;
 import com.example.go4lunch.data.googleplace.model.autocomplete.Prediction;
 import com.example.go4lunch.data.location.LocationRepository;
@@ -353,6 +355,10 @@ public class MainViewModel extends ViewModel {
         return simpleRestaurants.get(idx).getName();
     }
 
+    private int getOpenNowResourceString(OpeningHours openingHours){
+        return (openingHours == null) ? R.string.empty_string : (openingHours.getOpenNow()) ? R.string.open_now : R.string.closing_now;
+    }
+
     private List<Workmate> createWorkmatesList(List<User> users,
                                                List<UidPlaceIdAssociation> chosenRestaurants,
                                                List<SimpleRestaurant> simpleRestaurants){
@@ -405,7 +411,7 @@ public class MainViewModel extends ViewModel {
                 double longitude = result.getGeometry().getLocation().getLng();
                 float distance = calculateDistance(latitude, longitude, location);
                 String info = findAddress(result.getFormattedAddress(), result.getVicinity());
-                String hours = "";
+                int openNowResourceString = getOpenNowResourceString(result.getOpeningHours());
                 double rating = result.getRating();
                 String urlPicture = findUrlPicture(result);
                 int workmatesCount = countWorkmates(placeId, chosenRestaurants);
@@ -417,7 +423,7 @@ public class MainViewModel extends ViewModel {
                         longitude,
                         distance,
                         info,
-                        hours,
+                        openNowResourceString,
                         workmatesCount,
                         rating,
                         urlPicture,

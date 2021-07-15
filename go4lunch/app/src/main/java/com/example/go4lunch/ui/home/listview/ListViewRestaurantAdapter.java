@@ -27,8 +27,10 @@ public class ListViewRestaurantAdapter extends RecyclerView.Adapter<ListViewRest
     private List<Restaurant> restaurantsFull;
     private List<Restaurant> restaurantsFiltered;
     private OnClickListenerRestaurant onClickListenerRestaurant;
+    private Context context;
 
-    public ListViewRestaurantAdapter(OnClickListenerRestaurant onClickListenerRestaurant) {
+    public ListViewRestaurantAdapter(Context context, OnClickListenerRestaurant onClickListenerRestaurant) {
+        this.context = context;
         restaurantsFull = new ArrayList<>();
         restaurantsFiltered = new ArrayList<>();
         this.onClickListenerRestaurant = onClickListenerRestaurant;
@@ -64,7 +66,7 @@ public class ListViewRestaurantAdapter extends RecyclerView.Adapter<ListViewRest
         Restaurant restaurant = restaurantsFiltered.get(position);
         holder.textViewRestaurantName.setText(restaurant.getName());
         holder.textViewRestaurantInfo.setText(restaurant.getInfo());
-        holder.textViewRestaurantHours.setText(restaurant.getHours());
+        holder.textViewRestaurantHours.setText(context.getString(restaurant.getOpenNowResourceString()));
         holder.textViewRestaurantDistance.setText(restaurant.getFormatedDistance());
         holder.textViewRestaurantWorkmate.setText(String.format("(%d)",  restaurant.getWorkmatesCount()));
 

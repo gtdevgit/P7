@@ -61,7 +61,7 @@ public class ListViewRestaurantFragment extends Fragment implements SearchViewIn
         layoutManager = new LinearLayoutManager(view.getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        listViewRestaurantAdapter = new ListViewRestaurantAdapter(new OnClickListenerRestaurant() {
+        listViewRestaurantAdapter = new ListViewRestaurantAdapter(getContext(), new OnClickListenerRestaurant() {
             @Override
             public void onCLickRestaurant(String placeId) {
                 showDetailRestaurant(placeId);

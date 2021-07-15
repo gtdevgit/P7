@@ -86,6 +86,10 @@
     <string name="activity_detail_restaurant_bottom_navigation_website">Website</string>
 
     <string name="image_location_description">location</string>
+    <string name="empty_string"></string>
+    <string name="open_now">Open now</string>
+    <string name="closing_now">Closing now</string>
+
 
 
 </resources>
