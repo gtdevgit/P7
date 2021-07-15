@@ -34,6 +34,7 @@
             android:clickable="true"
             android:contentDescription="@string/activity_detail_restaurant_floating_action_button_description"
             android:focusable="true"
+            app:backgroundTint="@color/primaryColor"
             app:layout_constraintBottom_toBottomOf="@+id/activity_detail_restaurant_picture"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/activity_detail_restaurant_picture"

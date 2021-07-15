@@ -1,5 +1,6 @@
 package com.example.go4lunch.ui.detailrestaurant.view;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -279,8 +280,10 @@ public class DetailRestaurantActivity extends AppCompatActivity {
     private void setChosen(boolean isChosen){
         if (isChosen) {
             floatingActionButton.setImageResource(R.drawable.ic_baseline_check_24);
+            floatingActionButton.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.primaryColor));
         } else {
-            floatingActionButton.setImageResource(R.drawable.ic_baseline_star_24);
+            floatingActionButton.setImageResource(R.drawable.ic_baseline_check_circle_24);
+            floatingActionButton.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.secondaryColor));
         }
     }
 
