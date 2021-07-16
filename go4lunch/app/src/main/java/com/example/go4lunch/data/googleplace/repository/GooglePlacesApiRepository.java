@@ -187,7 +187,12 @@ public class GooglePlacesApiRepository {
             public void onResponse(Call<PlaceSearch> call, Response<PlaceSearch> response) {
                 if (response.isSuccessful()) {
                     PlaceSearch placeSearch = response.body();
-                    nearbysearchMutableLiveData.setValue(placeSearch);
+                    if (placeSearch.getStatus().equals("OK")) {
+                        nearbysearchMutableLiveData.setValue(placeSearch);
+                    } else {
+                        errorMutableLiveData.setValue(placeSearch.getStatus());
+                    }
+
                 }
             }
 

@@ -34,6 +34,8 @@ public class WorkmatesFragment extends Fragment {
     private WorkmatesAdapter workmatesAdapter;
     private ProgressBar workmateProgressBar;
 
+    public WorkmatesFragment(){}
+
     public WorkmatesFragment(MainViewModel mainViewModel) {
         // Required empty public constructor
         this.mainViewModel = mainViewModel;
@@ -77,13 +79,15 @@ public class WorkmatesFragment extends Fragment {
     }
 
     private void configureViewModel(){
-        mainViewModel.getMainViewStateMediatorLiveData().observe(getViewLifecycleOwner(), new Observer<MainViewState>() {
-            @Override
-            public void onChanged(MainViewState mainViewState) {
-                workmatesAdapter.updateData(mainViewState.getWorkmates());
-                workmateProgressBar.setVisibility(View.INVISIBLE);
-            }
-        });
+        if (mainViewModel != null){
+            mainViewModel.getMainViewStateMediatorLiveData().observe(getViewLifecycleOwner(), new Observer<MainViewState>() {
+                @Override
+                public void onChanged(MainViewState mainViewState) {
+                    workmatesAdapter.updateData(mainViewState.getWorkmates());
+                    workmateProgressBar.setVisibility(View.INVISIBLE);
+                }
+            });
+        }
     }
 
     private void showDetailRestaurant(String placeId){

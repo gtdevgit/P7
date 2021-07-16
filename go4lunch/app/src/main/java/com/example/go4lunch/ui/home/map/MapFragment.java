@@ -63,6 +63,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     private MainViewModel mainViewModel;
 
+    public MapFragment(){}
+
     public MapFragment(MainViewModel mainViewModel) {
         // Required empty public constructor
         Log.d(Tag.TAG, "MapFragment()");
@@ -89,23 +91,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             }
         });
 
-        configureViewModel();
         configureRecyclerView(view);
+        configureViewModel();
 
         return view;
     }
-
-    private void configureViewModel(){
-        mainViewModel.getMainViewStateMediatorLiveData().observe(getViewLifecycleOwner(), new Observer<MainViewState>() {
-            @Override
-            public void onChanged(MainViewState mainViewState) {
-                setLocation(mainViewState.getLocation());
-                setRestaurants(mainViewState.getRestaurants());
-                setSearch(mainViewState.getSearchViewResultVisibility(), mainViewState.getSearchViewResultItems());
-            }
-        });
-    };
-
     private void configureRecyclerView(View view){
         recyclerView = view.findViewById(R.id.fragment_map_recyclerview);
         layoutManager = new LinearLayoutManager(view.getContext());
@@ -124,6 +114,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 DividerItemDecoration.VERTICAL);
         recyclerView.addItemDecoration(dividerItemDecoration);
     }
+
+    private void configureViewModel(){
+        if (mainViewModel != null){
+            mainViewModel.getMainViewStateMediatorLiveData().observe(getViewLifecycleOwner(), new Observer<MainViewState>() {
+                @Override
+                public void onChanged(MainViewState mainViewState) {
+                    setLocation(mainViewState.getLocation());
+                    setRestaurants(mainViewState.getRestaurants());
+                    setSearch(mainViewState.getSearchViewResultVisibility(), mainViewState.getSearchViewResultItems());
+                }
+            });
+            mainViewModel.load();
+        }
+    };
 
     @Override
     public void configureSearchView(SearchView searchView) {
@@ -276,23 +280,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         Log.d(Tag.TAG, "MapFragment.onStart() called");
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        mainViewModel.load();
     }
 
     @Override
     public void onResume() {
         super.onResume();
         Log.d(Tag.TAG, "MapFragment.onResume()");
-        if ((mMap != null) && (this.location != null)) {
+        if ((mMap != null) && (this.location != null) && (mainViewModel != null)) {
             mainViewModel.load();
+            mainViewModel.activateChosenRestaurantListener();
         }
-        mainViewModel.activateChosenRestaurantListener();
     }
 
     @Override
     public void onPause() {
         Log.d(Tag.TAG, "MapFragment.onPause() called");
-        this.mainViewModel.removerChosenRestaurantListener();
+        if (mainViewModel != null) {
+            this.mainViewModel.removerChosenRestaurantListener();
+        }
         super.onPause();
     }
 

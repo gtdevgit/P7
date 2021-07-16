@@ -51,7 +51,7 @@ public class LogoutFragment extends Fragment {
     }
 
     private void configureComponents(View view){
-        textViewUserEmail = view.findViewById(R.id.fragment_logout__textView_user_email);
+        textViewUserEmail = view.findViewById(R.id.fragment_logout_textView_user_email);
         textViewUserName = view.findViewById(R.id.fragment_logout_textView_user_name);
         imageViewUserPicture = view.findViewById(R.id.fragment_logout_imageView_user_picture);
 

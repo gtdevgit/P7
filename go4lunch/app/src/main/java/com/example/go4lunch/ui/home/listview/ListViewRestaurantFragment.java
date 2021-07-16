@@ -36,6 +36,7 @@ public class ListViewRestaurantFragment extends Fragment implements SearchViewIn
 
     private MainViewModel mainViewModel;
 
+    public ListViewRestaurantFragment(){}
 
     public ListViewRestaurantFragment(MainViewModel mainViewModel) {
         // Required empty public constructor
@@ -50,8 +51,8 @@ public class ListViewRestaurantFragment extends Fragment implements SearchViewIn
         progressBar = root.findViewById(R.id.fragment_list_view_retaurants_progress_bar);
         progressBar.setVisibility(View.VISIBLE);
 
-        configureViewModel();
         configureRecyclerView(root);
+        configureViewModel();
 
         return root;
     }
@@ -74,6 +75,17 @@ public class ListViewRestaurantFragment extends Fragment implements SearchViewIn
         recyclerView.addItemDecoration(dividerItemDecoration);
     }
 
+    private void configureViewModel(){
+        if (mainViewModel != null) {
+            mainViewModel.getMainViewStateMediatorLiveData().observe(getViewLifecycleOwner(), new Observer<MainViewState>() {
+                @Override
+                public void onChanged(MainViewState mainViewState) {
+                    setRestaurants(mainViewState.getRestaurants());
+                }
+            });
+        }
+    }
+
     @Override
     public void configureSearchView(SearchView searchView) {
         if (searchView != null){
@@ -91,15 +103,6 @@ public class ListViewRestaurantFragment extends Fragment implements SearchViewIn
                 }
             });
         }
-    }
-
-    private void configureViewModel(){
-        mainViewModel.getMainViewStateMediatorLiveData().observe(getViewLifecycleOwner(), new Observer<MainViewState>() {
-            @Override
-            public void onChanged(MainViewState mainViewState) {
-                setRestaurants(mainViewState.getRestaurants());
-            }
-        });
     }
 
     private void setRestaurants(List<Restaurant> restaurants){

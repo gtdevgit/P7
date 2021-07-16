@@ -160,6 +160,12 @@ public class HomeFragment extends Fragment {
                 showSnackBar(s);
             }
         });
+        mainViewModel.getErrorMediatorLiveData().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                showSnackBar(s);
+            }
+        });
     }
 
     @Override

@@ -28,6 +28,8 @@ public class SettingFragment extends Fragment {
     private CompoundButton.OnCheckedChangeListener onCheckedChangeListener;
     private SettingViewModel settingViewModel;
 
+    public SettingFragment(){}
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_setting, container, false);

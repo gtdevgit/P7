@@ -1,5 +1,6 @@
 package com.example.go4lunch.ui.main.view;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -13,12 +14,17 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.R;
+import com.example.go4lunch.ui.main.model.CurrentUser;
+import com.example.go4lunch.ui.main.viewmodel.MainViewModel;
+import com.example.go4lunch.ui.main.viewmodel.MainViewModelFactory;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import androidx.appcompat.widget.SearchView;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -50,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ConstraintLayout constraintLayout;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,6 +85,34 @@ public class MainActivity extends AppCompatActivity {
         }
 
         constraintLayout = findViewById(R.id.activity_main_constraint_layout);
+
+        MainViewModel mainViewModel = new ViewModelProvider(this, MainViewModelFactory.getInstance()).get(MainViewModel.class);
+        mainViewModel.getCurrentUserLiveData().observe(this, new Observer<CurrentUser>() {
+            @Override
+            public void onChanged(CurrentUser currentUser) {
+                setUserName(currentUser.getName());
+                setUserEmail(currentUser.getEmail());
+                setUserPhotoUrl(currentUser.getPhotoUrl());
+            }
+        });
+        mainViewModel.loadCurrentUser();
+    }
+
+    private void setUserName(String userName){
+        textViewUserName.setText(userName);
+    };
+
+    private void setUserEmail(String userEmail){
+        textViewUserEmail.setText(userEmail);
+    };
+
+    private void setUserPhotoUrl(Uri photoUrl){
+        if (photoUrl != null) {
+            Glide.with(this)
+                    .load(photoUrl)
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(imageView);
+        }
     }
 
     public MenuItem getMenuItemSearch(){
@@ -113,30 +148,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         Log.d(TAG, "MainActivity.onStart() called");
-
-        FirebaseAuth mAuth;
-        mAuth = FirebaseAuth.getInstance();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null) {
-
-            if ((imageView != null) && (currentUser.getPhotoUrl() != null)) {
-                Glide.with(this)
-                        .load(currentUser.getPhotoUrl())
-                        .apply(RequestOptions.circleCropTransform())
-                        .into(imageView);
-            }
-
-            //Get email & username from Firebase
-            if (textViewUserName != null) {
-                String username = TextUtils.isEmpty(currentUser.getDisplayName()) ? getString(R.string.no_user_name_found) : currentUser.getDisplayName();
-                textViewUserName.setText(username);
-            }
-
-            if (textViewUserEmail != null) {
-                String email = TextUtils.isEmpty(currentUser.getEmail()) ? getString(R.string.no_user_email) : currentUser.getEmail();
-                textViewUserEmail.setText(email);
-            }
-        }
     }
 
     @Override

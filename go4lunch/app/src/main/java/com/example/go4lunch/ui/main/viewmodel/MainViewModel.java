@@ -2,6 +2,8 @@ package com.example.go4lunch.ui.main.viewmodel;
 
 import android.annotation.SuppressLint;
 import android.location.Location;
+import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -13,6 +15,9 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.example.go4lunch.MainApplication;
 import com.example.go4lunch.R;
 import com.example.go4lunch.data.firestore.model.User;
 import com.example.go4lunch.data.firestore.repository.FirestoreChosenRepository;
@@ -23,6 +28,7 @@ import com.example.go4lunch.data.googleplace.model.autocomplete.Autocomplete;
 import com.example.go4lunch.data.googleplace.model.autocomplete.Prediction;
 import com.example.go4lunch.data.location.LocationRepository;
 import com.example.go4lunch.data.permission_checker.PermissionChecker;
+import com.example.go4lunch.ui.main.model.CurrentUser;
 import com.example.go4lunch.ui.main.model.Restaurant;
 import com.example.go4lunch.data.firestore.model.UidPlaceIdAssociation;
 import com.example.go4lunch.data.googleplace.model.placesearch.Result;
@@ -33,6 +39,8 @@ import com.example.go4lunch.ui.main.model.SearchViewResultItem;
 import com.example.go4lunch.ui.main.model.SimpleRestaurant;
 import com.example.go4lunch.ui.main.model.Workmate;
 import com.example.go4lunch.ui.main.viewstate.MainViewState;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,10 +63,12 @@ public class MainViewModel extends ViewModel {
     /**
      * MutableLiveData properties are exposed as livedata to prevent external modifications
      */
-    public LiveData<String> getErrorLiveData(){
-        return this.errorMutableLiveData;
-    }
+
     private final MutableLiveData<String> errorMutableLiveData = new MutableLiveData<String>();
+    public LiveData<String> getErrorLiveData(){ return errorMutableLiveData; }
+
+    private final MediatorLiveData<String> errorMediatorLiveData = new MediatorLiveData<>();
+    public MediatorLiveData<String> getErrorMediatorLiveData() { return errorMediatorLiveData; }
 
     /**
      * Mediator expose MainViewState
@@ -78,7 +88,42 @@ public class MainViewModel extends ViewModel {
         this.locationRepository = locationRepository;
         getPlaceDetailsByPlaceIds = new GetPlaceDetailsByPlaceIds(googlePlacesApiRepository);
 
+        configureErrorMediatorLiveData();
         configureMediatorLiveData();
+    }
+
+    private void configureErrorMediatorLiveData() {
+        LiveData<String> googlePlacesErrorLiveData = googlePlacesApiRepository.getErrorLiveData();
+        errorMediatorLiveData.addSource(googlePlacesErrorLiveData, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                errorMediatorLiveData.setValue(s);
+            }
+        });
+
+        LiveData<String> firestoreUserRepositoryError = firestoreUsersRepository.getErrorLiveData();
+        errorMediatorLiveData.addSource(firestoreUserRepositoryError, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                errorMediatorLiveData.setValue(s);
+            }
+        });
+
+        LiveData<String> firestoreLikedRepositoryError = firestoreLikedRepository.getErrorLiveData();
+        errorMediatorLiveData.addSource(firestoreLikedRepositoryError, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                errorMediatorLiveData.setValue(s);
+            }
+        });
+
+        LiveData<String> firestoreChosenRepositoryError = firestoreChosenRepository.getErrorLiveData();
+        errorMediatorLiveData.addSource(firestoreChosenRepositoryError, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                errorMediatorLiveData.setValue(s);
+            }
+        });
     }
 
     private void configureMediatorLiveData(){
@@ -485,6 +530,36 @@ public class MainViewModel extends ViewModel {
         Location location = locationRepository.getLocationLiveData().getValue();
         if (location != null) {
             googlePlacesApiRepository.loadAutocomplete(location, query);
+        }
+    }
+
+    /**
+     * Current user
+     */
+    private final MutableLiveData<CurrentUser> currentUserMutableLiveData = new MutableLiveData<>();
+
+    public LiveData<CurrentUser> getCurrentUserLiveData() {
+        return currentUserMutableLiveData;
+    }
+
+    public void loadCurrentUser(){
+        FirebaseAuth mAuth;
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+        if (firebaseUser == null) {
+            currentUserMutableLiveData.setValue(new CurrentUser(
+                    MainApplication.getApplication().getString(R.string.no_user_name_found),
+                    MainApplication.getApplication().getString(R.string.no_user_email),
+                    null));
+        } else {
+            String name = TextUtils.isEmpty(firebaseUser.getDisplayName()) ?
+                    MainApplication.getApplication().getString(R.string.no_user_name_found) :
+                    firebaseUser.getDisplayName();
+            String email = TextUtils.isEmpty(firebaseUser.getEmail()) ?
+                    MainApplication.getApplication().getString(R.string.no_user_email) :
+                    firebaseUser.getEmail();
+            Uri photoUrl = firebaseUser.getPhotoUrl();
+            currentUserMutableLiveData.setValue(new CurrentUser(name, email, photoUrl));
         }
     }
 }
