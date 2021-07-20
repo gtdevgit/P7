@@ -3,9 +3,13 @@ package com.example.go4lunch;
 import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Bundle;
 
 import com.example.go4lunch.notification.NotificationHelper;
+import com.facebook.BuildConfig;
 
 public class MainApplication extends Application {
 
@@ -15,13 +19,25 @@ public class MainApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        googleApiKey = this.getString(R.string.google_api_key);
         application = this;
+
+/*
+        // build variable
+        String s = com.example.go4lunch.BuildConfig.GOOGLE_PLACES_KEY;
+        String S2 = application.getString(R.string.google_place_key);
+*/
+
+        ApplicationInfo ai = null;
+        try {
+            ai = getPackageManager().getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);
+            Bundle bundle = ai.metaData;
+            googleApiKey = bundle.getString("com.google.android.geo.API_KEY");
+        } catch (PackageManager.NameNotFoundException e) {
+            googleApiKey = "";
+            e.printStackTrace();
+        }
         NotificationHelper.createNotificationChannels(this);
-
     }
-
-    //public Application getApplication() {return this;}
 
     public static String getGoogleApiKey() {
         return googleApiKey;

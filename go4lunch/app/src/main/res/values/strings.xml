@@ -39,6 +39,7 @@
 
     <string name="sign_in_with_google">Sign in with Google</string>
     <string name="sign_in_with_facebook">Login with Facebook</string>
+    <string name="sign_in_with_twitter">Login with Twitter</string>
     <string name="login_subtitle">Find a nice restaurant and invite you co-workers for lunch !</string>
     <string name="login_title">Go4Lunch</string>
     <string name="no_user_email">No user email</string>

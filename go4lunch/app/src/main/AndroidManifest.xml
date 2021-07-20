@@ -19,12 +19,16 @@
         <activity
             android:name=".ui.detailrestaurant.view.DetailRestaurantActivity"
             android:label="@string/title_activity_detail_restaurant"
-            android:theme="@style/Theme.Go4lunch.NoActionBar"></activity>
+            android:theme="@style/Theme.Go4lunch.NoActionBar" />
         <activity android:name=".PermissionActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_api_key" />
+
+        <meta-data
+            android:name="my_key"
+            android:value="my_value" />
 
         <activity android:name=".ui.login.LoginActivity" />
         <activity
