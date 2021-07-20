@@ -1,5 +1,6 @@
 package com.example.go4lunch.ui.login;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -22,16 +23,29 @@ import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.FirebaseUiException;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.OAuthProvider;
+import com.google.firebase.auth.UserInfo;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
 
     private static final int RC_SIGN_IN = 1;
 
     private Button buttonFacebook;
+    private Button buttonTwitter;
     private SignInButton buttonGoogle;
+
     private ConstraintLayout constraintLayout;
 
     private LoginViewModel loginViewModel;
@@ -48,6 +62,14 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startSignInActivity(SupportedProvider.FACEBOOK);
+            }
+        });
+
+        buttonTwitter = findViewById(R.id.activity_login_button_login_twitter);
+        buttonTwitter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startSignInActivity(SupportedProvider.TWITTER);
             }
         });
 
@@ -82,20 +104,62 @@ public class LoginActivity extends AppCompatActivity {
 
     private void startSignInActivity(SupportedProvider supportedProvider){
         Log.d(Tag.TAG, "startSignInActivity() called with: supportedProvider = [" + supportedProvider + "]");
-        List<AuthUI.IdpConfig> providers = Authentication.getProviderBySupportedProvider(supportedProvider);
 
-        startActivityForResult(
+        if (supportedProvider == SupportedProvider.TWITTER) {
+            startSignInWithTwitter();
+        }
+        else
+            {
+            List<AuthUI.IdpConfig> providers = Authentication.getProviderBySupportedProvider(supportedProvider);
+
+            startActivityForResult(
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
                         .setAvailableProviders(providers)
                         .build(),
                 RC_SIGN_IN);
+        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(Tag.TAG, "onActivityResult() called with: requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+
+        Task<AuthResult> pendingResultTask = firebaseAuth.getPendingAuthResult();
+        if (pendingResultTask != null) {
+            // There's something already here! Finish the sign-in for your user.
+            pendingResultTask
+                    .addOnSuccessListener(
+                            new OnSuccessListener<AuthResult>() {
+                                @Override
+                                public void onSuccess(AuthResult authResult) {
+                                    Log.d(Tag.TAG, "onActivityResult. pendingResultTask. onSuccess() called with: authResult = [" + authResult + "]");
+                                    createUserInFirestore();
+                                    // go to main after login
+                                    if (Authentication.isConnected()) {
+                                        Intent intent;
+                                        intent = new Intent(LoginActivity.this, MainActivity.class);
+                                        startActivity(intent);
+                                        finish();
+                                    }
+                                }
+                            })
+                    .addOnFailureListener(
+                            new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    // Handle failure.
+                                    Log.d(Tag.TAG, "onFailure() called with: e = [" + e + "]");
+                                }
+                            });
+        } else {
+            // There's no pending result so you need to start the sign-in flow.
+            // See below.
+            startSignInWithTwitter();
+        }
+
         this.handleResponseAfterSignIn(requestCode, resultCode, data);
     }
 
@@ -104,9 +168,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void handleResponseAfterSignIn(int requestCode, int resultCode, Intent data){
-        Log.d(Tag.TAG, "handleResponseAfterSignIn() called with: requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
         IdpResponse response = IdpResponse.fromResultIntent(data);
-        Log.d(Tag.TAG, "handleResponseAfterSignIn() response = [" + response + "]");
 
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) { // SUCCESS
@@ -146,4 +208,37 @@ public class LoginActivity extends AppCompatActivity {
         Snackbar.make(this.constraintLayout, getString(resId), Snackbar.LENGTH_SHORT).show();
     }
 
+    private void startSignInWithTwitter(){
+        OAuthProvider.Builder provider = OAuthProvider.newBuilder("twitter.com");
+        String language = Locale.getDefault().getLanguage();
+        // Target specific email with login hint.
+        provider.addCustomParameter("lang", language);
+
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        firebaseAuth
+                .startActivityForSignInWithProvider(/* activity= */ this, provider.build())
+                .addOnSuccessListener(
+                        new OnSuccessListener<AuthResult>() {
+                            @Override
+                            public void onSuccess(AuthResult authResult) {
+                                // User is signed in.
+                                createUserInFirestore();
+                                // go to main after login
+                                if (Authentication.isConnected()) {
+                                    Intent intent;
+                                    intent = new Intent(LoginActivity.this, MainActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                            }
+                        })
+                .addOnFailureListener(
+                        new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                // Handle failure.
+                                Snackbar.make(constraintLayout, "startSignInWithTwitter " + e.getMessage(), Snackbar.LENGTH_SHORT).show();
+                            }
+                        });
+    }
 }

@@ -84,7 +84,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="3dp"
         android:backgroundTint="@color/white"
-        android:drawableLeft="@drawable/Twitter_Bird"
+        android:drawableLeft="@drawable/twitter_bird_icon"
         android:text="@string/sign_in_with_twitter"
         android:textAllCaps="false"
         android:textColor="@color/black"
