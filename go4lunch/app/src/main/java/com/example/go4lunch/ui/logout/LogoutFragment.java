@@ -7,6 +7,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -26,6 +29,9 @@ import com.example.go4lunch.R;
 import com.example.go4lunch.firebase.Authentication;
 import com.example.go4lunch.ui.login.LoginActivity;
 import com.example.go4lunch.tag.Tag;
+import com.example.go4lunch.ui.main.view.MainActivity;
+
+import org.jetbrains.annotations.NotNull;
 
 import static android.widget.Toast.LENGTH_SHORT;
 
@@ -42,6 +48,8 @@ public class LogoutFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+        // need setHasOptionsMenu to trigger onCreateOptionsMenu
+        setHasOptionsMenu(true);
 
         View root = inflater.inflate(R.layout.fragment_logout, container, false);
         configureComponents(root);
@@ -146,5 +154,13 @@ public class LogoutFragment extends Fragment {
                 buttonDeleteUser.setEnabled(logoutViewState.getButtonDeleteUserEnabled());
             }
         });
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull @NotNull Menu menu, @NonNull @NotNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        Log.d(Tag.TAG, "SettingFragment.onCreateOptionsMenu() called.");
+        MenuItem menuItemSearch = ((MainActivity) getActivity()).getMenuItemSearch();
+        menuItemSearch.setVisible(false);
     }
 }
