@@ -3,17 +3,17 @@ package com.example.go4lunch.ui.main.model;
 import java.text.DecimalFormat;
 
 public class Restaurant {
-    private String placeId;
-    private String name;
-    private double latitude;
-    private double longitude;
-    private float distance;
-    private String info;
-    private int openNowResourceString;
-    private int workmatesCount;
-    private double rating;
-    private String urlPicture;
-    private int countLike;
+    private final String placeId;
+    private final String name;
+    private final double latitude;
+    private final double longitude;
+    private final float distance;
+    private final String info;
+    private final int openNowResourceString;
+    private final int workmatesCount;
+    private final double rating;
+    private final String urlPicture;
+    private final int countLike;
 
     public Restaurant(String placeId, String name, double latitude, double longitude, float distance, String info, int openNowResourceString, int workmatesCount, double rating, String urlPicture, int countLike) {
         this.placeId = placeId;
@@ -33,88 +33,44 @@ public class Restaurant {
         return placeId;
     }
 
-    public void setPlaceId(String placeId) {
-        this.placeId = placeId;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        name = name;
     }
 
     public double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
     public double getLongitude() {
         return longitude;
-    }
-
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
     }
 
     public float getDistance() {
         return distance;
     }
 
-    public void setDistance(float distance) {
-        this.distance = distance;
-    }
-
     public String getInfo() {
         return info;
-    }
-
-    public void setInfo(String info) {
-        this.info = info;
     }
 
     public int getOpenNowResourceString() {
         return openNowResourceString;
     }
 
-    public void setOpenNowResourceString(int openNowResourceString) {
-        this.openNowResourceString = openNowResourceString;
-    }
-
     public int getWorkmatesCount() {
         return workmatesCount;
-    }
-
-    public void setWorkmatesCount(int workmatesCount) {
-        this.workmatesCount = workmatesCount;
     }
 
     public double getRating() {
         return rating;
     }
 
-    public void setRating(double rating) {
-        this.rating = rating;
-    }
-
     public String getUrlPicture() {
         return urlPicture;
     }
 
-    public void setUrlPicture(String urlPicture) {
-        this.urlPicture = urlPicture;
-    }
-
     public int getCountLike() {
         return countLike;
-    }
-
-    public void setCountLike(int countLike) {
-        this.countLike = countLike;
     }
 
     /**
