@@ -30,7 +30,7 @@ public class LogoutViewModel extends ViewModel {
 
     private ListenerLogoutUser listenerLogoutUser;
 
-    FirestoreUsersRepository firestoreUsersRepository = new FirestoreUsersRepository();
+    FirestoreUsersRepository firestoreUsersRepository;
     public LiveData<String> getErrorLiveData() { return firestoreUsersRepository.getErrorLiveData(); }
     public LiveData<Boolean> getDeletedUserWithSuccessLiveData() {return  firestoreUsersRepository.getDeletedUserWithSuccessLiveData();}
 
@@ -39,7 +39,8 @@ public class LogoutViewModel extends ViewModel {
         return logoutViewStateMutableLiveData;
     }
 
-    public LogoutViewModel() {
+    public LogoutViewModel(FirestoreUsersRepository firestoreUsersRepository) {
+        this.firestoreUsersRepository = firestoreUsersRepository;
     }
 
     public void setListenerLogoutUser(ListenerLogoutUser listenerLogoutUser) {
