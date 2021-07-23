@@ -7,6 +7,9 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.go4lunch.MainApplication;
+import com.example.go4lunch.data.firestore.repository.FirestoreChosenRepository;
+import com.example.go4lunch.data.firestore.repository.FirestoreLikedRepository;
+import com.example.go4lunch.data.firestore.repository.FirestoreUsersRepository;
 import com.example.go4lunch.data.location.LocationRepository;
 import com.example.go4lunch.data.permission_checker.PermissionChecker;
 import com.example.go4lunch.data.googleplace.repository.GooglePlacesApiRepository;
@@ -17,11 +20,17 @@ public class MainViewModelFactory implements ViewModelProvider.Factory {
     private volatile static MainViewModelFactory sInstance;
 
     @NonNull
-    private final GooglePlacesApiRepository googlePlacesApiRepository;
-    @NonNull
     private final PermissionChecker permissionChecker;
     @NonNull
     private final LocationRepository locationRepository;
+    @NonNull
+    private final FirestoreChosenRepository firestoreChosenRepository;
+    @NonNull
+    private final FirestoreLikedRepository firestoreLikedRepository;
+    @NonNull
+    private final FirestoreUsersRepository firestoreUsersRepository;
+    @NonNull
+    private final GooglePlacesApiRepository googlePlacesApiRepository;
 
     public static MainViewModelFactory getInstance() {
         if (sInstance == null) {
@@ -31,9 +40,12 @@ public class MainViewModelFactory implements ViewModelProvider.Factory {
                     Application application = MainApplication.getApplication();
 
                     sInstance = new MainViewModelFactory(
-                            new GooglePlacesApiRepository(MainApplication.getGoogleApiKey()),
                             new PermissionChecker(application),
-                            new LocationRepository(LocationServices.getFusedLocationProviderClient(application)));
+                            new LocationRepository(LocationServices.getFusedLocationProviderClient(application)),
+                            new FirestoreChosenRepository(),
+                            new FirestoreLikedRepository(),
+                            new FirestoreUsersRepository(),
+                            new GooglePlacesApiRepository(MainApplication.getGoogleApiKey()));
                 }
             }
         }
@@ -42,12 +54,18 @@ public class MainViewModelFactory implements ViewModelProvider.Factory {
     }
 
     private MainViewModelFactory(
-            @NonNull GooglePlacesApiRepository googlePlacesApiRepository,
             @NonNull PermissionChecker permissionChecker,
-            @NonNull LocationRepository locationRepository) {
-        this.googlePlacesApiRepository = googlePlacesApiRepository;
+            @NonNull LocationRepository locationRepository,
+            @NonNull FirestoreChosenRepository firestoreChosenRepository,
+            @NonNull FirestoreLikedRepository firestoreLikedRepository,
+            @NonNull FirestoreUsersRepository firestoreUsersRepository,
+            @NonNull GooglePlacesApiRepository googlePlacesApiRepository) {
         this.permissionChecker = permissionChecker;
         this.locationRepository = locationRepository;
+        this.firestoreChosenRepository = firestoreChosenRepository;
+        this.firestoreLikedRepository = firestoreLikedRepository;
+        this.firestoreUsersRepository = firestoreUsersRepository;
+        this.googlePlacesApiRepository = googlePlacesApiRepository;
     }
 
     @SuppressWarnings("unchecked")
@@ -55,7 +73,12 @@ public class MainViewModelFactory implements ViewModelProvider.Factory {
     @Override
     public <T extends ViewModel> T create(Class<T> modelClass) {
         if (modelClass.isAssignableFrom(MainViewModel.class)) {
-            return (T) new MainViewModel(googlePlacesApiRepository, permissionChecker, locationRepository);
+            return (T) new MainViewModel(permissionChecker,
+                    locationRepository,
+                    firestoreChosenRepository,
+                    firestoreLikedRepository,
+                    firestoreUsersRepository,
+                    googlePlacesApiRepository);
         }
         throw new IllegalArgumentException("Unknown ViewModel class : " + modelClass);
     }

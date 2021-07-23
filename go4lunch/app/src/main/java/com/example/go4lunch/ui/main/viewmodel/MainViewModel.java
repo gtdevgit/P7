@@ -51,14 +51,14 @@ public class MainViewModel extends ViewModel {
      * repositories
      */
     @NonNull
-    private GooglePlacesApiRepository googlePlacesApiRepository;
-    @NonNull
     private final PermissionChecker permissionChecker;
     @NonNull
     private final LocationRepository locationRepository;
-    private final FirestoreChosenRepository firestoreChosenRepository = new FirestoreChosenRepository();
-    private final FirestoreUsersRepository firestoreUsersRepository = new FirestoreUsersRepository();
-    private final FirestoreLikedRepository firestoreLikedRepository = new FirestoreLikedRepository();
+    private final FirestoreChosenRepository firestoreChosenRepository;
+    private final FirestoreUsersRepository firestoreUsersRepository;
+    private final FirestoreLikedRepository firestoreLikedRepository;
+    @NonNull
+    private GooglePlacesApiRepository googlePlacesApiRepository;
 
     /**
      * MutableLiveData properties are exposed as livedata to prevent external modifications
@@ -79,13 +79,21 @@ public class MainViewModel extends ViewModel {
     GetPlaceDetailsByPlaceIds getPlaceDetailsByPlaceIds;
 
     public MainViewModel(
-            GooglePlacesApiRepository googlePlacesApiRepository,
             PermissionChecker permissionChecker,
-            LocationRepository locationRepository) {
+            LocationRepository locationRepository,
+            FirestoreChosenRepository firestoreChosenRepository,
+            FirestoreLikedRepository firestoreLikedRepository,
+            FirestoreUsersRepository firestoreUsersRepository,
+            GooglePlacesApiRepository googlePlacesApiRepository) {
         Log.d(Tag.TAG, "MainViewModel() called with: googlePlacesApiRepository = [" + googlePlacesApiRepository + "]");
-        this.googlePlacesApiRepository = googlePlacesApiRepository;
+
         this.permissionChecker = permissionChecker;
         this.locationRepository = locationRepository;
+        this.firestoreChosenRepository = firestoreChosenRepository;
+        this.firestoreLikedRepository = firestoreLikedRepository;
+        this.firestoreUsersRepository = firestoreUsersRepository;
+
+        this.googlePlacesApiRepository = googlePlacesApiRepository;
         getPlaceDetailsByPlaceIds = new GetPlaceDetailsByPlaceIds(googlePlacesApiRepository);
 
         configureErrorMediatorLiveData();
