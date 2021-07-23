@@ -9,24 +9,16 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class LoginViewModel extends ViewModel {
-    private FirestoreUsersRepository firestoreUsersRepository = new FirestoreUsersRepository();
+    private FirestoreUsersRepository firestoreUsersRepository;
 
     public LiveData<String> getErrorLiveData() { return firestoreUsersRepository.getErrorLiveData(); }
     public LiveData<Boolean> getCreatedUserWithSuccessLiveData() {return  firestoreUsersRepository.getCreatedUserWithSuccessLiveData();}
 
-    public LoginViewModel() {
+    public LoginViewModel(FirestoreUsersRepository firestoreUsersRepository) {
+        this.firestoreUsersRepository = firestoreUsersRepository;
     }
 
-    public void addCurrentUserInFirestore(){
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (currentUser != null){
-
-            String urlPicture = (currentUser.getPhotoUrl() != null) ? currentUser.getPhotoUrl().toString() : null;
-            String userName = currentUser.getDisplayName();
-            String userEmail = currentUser.getEmail();
-            String uid = currentUser.getUid();
-
-            firestoreUsersRepository.createUser(uid, userName, userEmail, urlPicture);
-        }
+    public void addCurrentUserInFirestore(String uid, String userName, String userEmail, String urlPicture){
+        firestoreUsersRepository.createUser(uid, userName, userEmail, urlPicture);
     }
 }

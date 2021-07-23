@@ -13,6 +13,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.example.go4lunch.ui.detailrestaurant.viewmodel.DetailRestaurantViewModel;
+import com.example.go4lunch.ui.detailrestaurant.viewmodel.DetailRestaurantViewModelFactory;
 import com.example.go4lunch.ui.main.view.MainActivity;
 import com.example.go4lunch.R;
 import com.example.go4lunch.firebase.Authentication;
@@ -82,29 +84,23 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         configureViewModel();
+        enabledUI();
     }
 
     private void configureViewModel(){
-        loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
+        loginViewModel = new ViewModelProvider(this, LoginViewModelFactory.getInstance()).get(LoginViewModel.class);
+
         loginViewModel.getErrorLiveData().observe(this, new Observer<String>() {
             @Override
             public void onChanged(String s) {
                 Snackbar.make(constraintLayout, s, Snackbar.LENGTH_SHORT).show();
             }
         });
-        loginViewModel.getCreatedUserWithSuccessLiveData().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean aBoolean) {
-                if (aBoolean.booleanValue()) {
-                    showSnackBar(R.string.connection_succeed);
-                }
-            }
-        });
     }
 
     private void startSignInActivity(SupportedProvider supportedProvider){
         Log.d(Tag.TAG, "startSignInActivity() called with: supportedProvider = [" + supportedProvider + "]");
-
+        disableUI();
         if (supportedProvider == SupportedProvider.TWITTER) {
             startSignInWithTwitter();
         }
@@ -143,6 +139,8 @@ public class LoginActivity extends AppCompatActivity {
                                         intent = new Intent(LoginActivity.this, MainActivity.class);
                                         startActivity(intent);
                                         finish();
+                                    } else {
+                                        enabledUI();
                                     }
                                 }
                             })
@@ -152,6 +150,7 @@ public class LoginActivity extends AppCompatActivity {
                                 public void onFailure(@NonNull Exception e) {
                                     // Handle failure.
                                     Log.d(Tag.TAG, "onFailure() called with: e = [" + e + "]");
+                                    enabledUI();
                                 }
                             });
         } else {
@@ -164,10 +163,21 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void createUserInFirestore(){
-        loginViewModel.addCurrentUserInFirestore();
+        Log.d(Tag.TAG, "createUserInFirestore() called");
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null){
+
+            String uid = currentUser.getUid();
+            String userName = currentUser.getDisplayName();
+            String userEmail = currentUser.getEmail();
+            String urlPicture = (currentUser.getPhotoUrl() != null) ? currentUser.getPhotoUrl().toString() : null;
+
+            loginViewModel.addCurrentUserInFirestore(uid, userName, userEmail, urlPicture);
+        }
     }
 
     private void handleResponseAfterSignIn(int requestCode, int resultCode, Intent data){
+        Log.d(Tag.TAG, "handleResponseAfterSignIn() called with: requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
         IdpResponse response = IdpResponse.fromResultIntent(data);
 
         if (requestCode == RC_SIGN_IN) {
@@ -180,8 +190,12 @@ public class LoginActivity extends AppCompatActivity {
                     intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
                     finish();
+                } else {
+                    enabledUI();
                 }
-            } else { // ERRORS
+            } else {
+                // ERRORS
+                enabledUI();
                 if (response == null) {
                     showSnackBar(R.string.error_authentication_canceled);
                 }
@@ -221,6 +235,8 @@ public class LoginActivity extends AppCompatActivity {
                         new OnSuccessListener<AuthResult>() {
                             @Override
                             public void onSuccess(AuthResult authResult) {
+                                Log.d(Tag.TAG, "startSignInWithTwitter. onSuccess()");
+                                showSnackBar(R.string.connection_succeed);
                                 // User is signed in.
                                 createUserInFirestore();
                                 // go to main after login
@@ -240,5 +256,17 @@ public class LoginActivity extends AppCompatActivity {
                                 Snackbar.make(constraintLayout, "startSignInWithTwitter " + e.getMessage(), Snackbar.LENGTH_SHORT).show();
                             }
                         });
+    }
+
+    private void enabledUI(){
+        buttonFacebook.setEnabled(true);
+        buttonGoogle.setEnabled(true);
+        buttonTwitter.setEnabled(true);
+    }
+
+    private void disableUI(){
+        buttonFacebook.setEnabled(false);
+        buttonGoogle.setEnabled(false);
+        buttonTwitter.setEnabled(false);
     }
 }
