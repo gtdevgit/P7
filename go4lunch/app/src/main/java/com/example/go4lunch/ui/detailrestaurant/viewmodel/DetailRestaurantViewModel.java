@@ -29,33 +29,36 @@ public class DetailRestaurantViewModel extends ViewModel {
     private final int STAR_LEVEL_2 = 2;
     private final int STAR_LEVEL_3 = 3;
 
-    private GooglePlacesApiRepository googlePlacesApiRepository;
     // cache
     private CacheDetailRestaurantViewModel cache;
+    // repository
+    private final FirestoreUsersRepository firestoreUsersRepository;
+    private final FirestoreChosenRepository firestoreChosenRepository;
+    private final FirestoreLikedRepository firestoreLikedRepository;
+
+    private GooglePlacesApiRepository googlePlacesApiRepository;
 
     private final MutableLiveData<String> errorMutableLiveData = new MutableLiveData<String>();
     public LiveData<String> getErrorLiveData(){
         return this.errorMutableLiveData;
     }
 
-    private FirestoreUsersRepository firestoreUsersRepository;
-    private FirestoreChosenRepository firestoreChosenRepository;
-    private FirestoreLikedRepository firestoreLikedRepository;
-
     private final MediatorLiveData<DetailRestaurantViewState> detailRestaurantViewStateMediatorLiveData = new MediatorLiveData<>();
     public LiveData<DetailRestaurantViewState> getDetailRestaurantViewStateLiveData() {
         return detailRestaurantViewStateMediatorLiveData;
     }
 
-    public DetailRestaurantViewModel(GooglePlacesApiRepository googlePlacesApiRepository,
-                                     String currentUid) {
+    public DetailRestaurantViewModel(String currentUid,
+                                     FirestoreChosenRepository firestoreChosenRepository,
+                                     FirestoreLikedRepository firestoreLikedRepository,
+                                     FirestoreUsersRepository firestoreUsersRepository,
+                                     GooglePlacesApiRepository googlePlacesApiRepository) {
 
-        this.googlePlacesApiRepository = googlePlacesApiRepository;
         cache = new CacheDetailRestaurantViewModel(currentUid);
-
-        firestoreUsersRepository = new FirestoreUsersRepository();
-        firestoreChosenRepository = new FirestoreChosenRepository();
-        firestoreLikedRepository = new FirestoreLikedRepository();
+        this.firestoreChosenRepository = new FirestoreChosenRepository();
+        this.firestoreLikedRepository = new FirestoreLikedRepository();
+        this.firestoreUsersRepository = new FirestoreUsersRepository();
+        this.googlePlacesApiRepository = googlePlacesApiRepository;
 
         configureMediatorLiveData();
     }
