@@ -29,8 +29,6 @@ import com.example.go4lunch.R;
 import com.example.go4lunch.firebase.Authentication;
 import com.example.go4lunch.ui.login.LoginActivity;
 import com.example.go4lunch.tag.Tag;
-import com.example.go4lunch.ui.login.LoginViewModel;
-import com.example.go4lunch.ui.login.LoginViewModelFactory;
 import com.example.go4lunch.ui.main.view.MainActivity;
 
 import org.jetbrains.annotations.NotNull;

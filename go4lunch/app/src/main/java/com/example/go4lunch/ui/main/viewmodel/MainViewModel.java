@@ -456,32 +456,34 @@ public class MainViewModel extends ViewModel {
         }
 
         List<Restaurant> restaurants = new ArrayList<>();
-        for (Result result : placesearch.getResults()) {
-            String name = result.getName();
-            if (isValideSearch(searchText, name)) {
-                String placeId = result.getPlaceId();
-                double latitude = result.getGeometry().getLocation().getLat();
-                double longitude = result.getGeometry().getLocation().getLng();
-                float distance = calculateDistance(latitude, longitude, location);
-                String info = findAddress(result.getFormattedAddress(), result.getVicinity());
-                int openNowResourceString = getOpenNowResourceString(result.getOpeningHours());
-                double rating = result.getRating();
-                String urlPicture = findUrlPicture(result);
-                int workmatesCount = countWorkmates(placeId, chosenRestaurants);
-                int countLike = countLikeByRestaurant(placeId, likedRestaurants);
-                Restaurant restaurant = new Restaurant(
-                        placeId,
-                        name,
-                        latitude,
-                        longitude,
-                        distance,
-                        info,
-                        openNowResourceString,
-                        workmatesCount,
-                        rating,
-                        urlPicture,
-                        countLike);
-                restaurants.add(restaurant);
+        if (placesearch.getResults() != null) {
+            for (Result result : placesearch.getResults()) {
+                String name = result.getName();
+                if (isValideSearch(searchText, name)) {
+                    String placeId = result.getPlaceId();
+                    double latitude = result.getGeometry().getLocation().getLat();
+                    double longitude = result.getGeometry().getLocation().getLng();
+                    float distance = calculateDistance(latitude, longitude, location);
+                    String info = findAddress(result.getFormattedAddress(), result.getVicinity());
+                    int openNowResourceString = getOpenNowResourceString(result.getOpeningHours());
+                    double rating = result.getRating();
+                    String urlPicture = findUrlPicture(result);
+                    int workmatesCount = countWorkmates(placeId, chosenRestaurants);
+                    int countLike = countLikeByRestaurant(placeId, likedRestaurants);
+                    Restaurant restaurant = new Restaurant(
+                            placeId,
+                            name,
+                            latitude,
+                            longitude,
+                            distance,
+                            info,
+                            openNowResourceString,
+                            workmatesCount,
+                            rating,
+                            urlPicture,
+                            countLike);
+                    restaurants.add(restaurant);
+                }
             }
         }
         List<Workmate> workmates = createWorkmatesList(users, chosenRestaurants, simpleRestaurants);
