@@ -4,7 +4,6 @@ import android.location.Location;
 import android.util.Log;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.go4lunch.data.firestore.model.UidPlaceIdAssociation;
@@ -12,13 +11,17 @@ import com.example.go4lunch.data.firestore.model.User;
 import com.example.go4lunch.data.firestore.repository.FirestoreChosenRepository;
 import com.example.go4lunch.data.firestore.repository.FirestoreLikedRepository;
 import com.example.go4lunch.data.firestore.repository.FirestoreUsersRepository;
+import com.example.go4lunch.data.googleplace.model.Geometry;
+import com.example.go4lunch.data.googleplace.model.OpeningHours;
 import com.example.go4lunch.data.googleplace.model.autocomplete.Autocomplete;
 import com.example.go4lunch.data.googleplace.model.placesearch.PlaceSearch;
+import com.example.go4lunch.data.googleplace.model.placesearch.Result;
 import com.example.go4lunch.data.googleplace.repository.GooglePlacesApiRepository;
 import com.example.go4lunch.data.location.LocationRepository;
 import com.example.go4lunch.data.permission_checker.PermissionChecker;
 import com.example.go4lunch.tag.Tag;
 import com.example.go4lunch.testutils.LiveDataTestUtils;
+import com.example.go4lunch.ui.main.model.Restaurant;
 import com.example.go4lunch.ui.main.viewstate.MainViewState;
 
 import junit.framework.TestCase;
@@ -38,6 +41,11 @@ public class MainViewModelTest extends TestCase {
 
     @Rule
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
+
+    //private Location location = new Location("47.4055044477,0.698770997973");
+    private Location location = Mockito.mock(android.location.Location.class);
+    private final double fakeLatitude = 47.4055044477;
+    private final double fakeLongitue = 0.698770997973;
 
     private PermissionChecker permissionChecker = Mockito.mock(PermissionChecker.class);
     private LocationRepository locationRepository = Mockito.mock(LocationRepository.class);
@@ -62,6 +70,11 @@ public class MainViewModelTest extends TestCase {
     public void setUp() throws Exception {
         super.setUp();
         Log.d(Tag.TAG, "setUp() called");
+
+        Mockito.doReturn(fakeLatitude).when(location).getLatitude();
+        Mockito.doReturn(fakeLongitue).when(location).getLongitude();
+        //Mockito.doReturn(1000).when(location).distanceTo(location2);
+
         // for configureErrorMediatorLiveData
         localFirestoreChosenRepositoryError = new MutableLiveData<>();
         localFirestoreLikedRepositoryError = new MutableLiveData<>();
@@ -169,37 +182,77 @@ public class MainViewModelTest extends TestCase {
                 firestoreUsersRepository,
                 googlePlacesApiRepository);
 
-        Location location = new Location("47.4055044477,0.698770997973");
+        // dummy location
         localLocationMutableLiveData.setValue(location);
-
+        // dummy users
         List<User> users = new ArrayList<>();
-        User user1 = new User("1", "Dupond", "dupond@gamil.com", "https://www.picture/dupond.png");
-        users.add(user1);
-        User user2 = new User("2", "Martin", "martin@gamil.com", "https://www.picture/martin.png");
-        users.add(user2);
+        users.add(new User("1", "Dupond", "dupond@gamil.com", "https://www.picture/dupond.png"));
+        users.add(new User("2", "Martin", "martin@gamil.com", "https://www.picture/martin.png"));
         localUsersLiveData.setValue(users);
-
+        // dummy liked restaurant
         List<UidPlaceIdAssociation> likedRestaurants = new ArrayList<>();
-        UidPlaceIdAssociation uidPlaceIdAssociation1 = new UidPlaceIdAssociation("1", "1");
-        likedRestaurants.add(uidPlaceIdAssociation1);
-        UidPlaceIdAssociation uidPlaceIdAssociation2 = new UidPlaceIdAssociation("1", "2");
-        likedRestaurants.add(uidPlaceIdAssociation2);
+        likedRestaurants.add(new UidPlaceIdAssociation("1", "1"));
+        likedRestaurants.add(new UidPlaceIdAssociation("1", "2"));
         localLikedRestaurantsLiveData.setValue(likedRestaurants);
-
+        // dummy chosen restaurants
         List<UidPlaceIdAssociation> chosenRestaurants = new ArrayList<>();
-        UidPlaceIdAssociation uidPlaceIdAssociation3 = new UidPlaceIdAssociation("1", "1");
-        //chosenRestaurants.add(uidPlaceIdAssociation3);
+        //chosenRestaurants.add(new UidPlaceIdAssociation("1", "1"));
         localChosenRestaurantsLiveData.setValue(chosenRestaurants);
+        // dummy place
+        PlaceSearch placeSearch = new PlaceSearch();
+        List<Result> results = new ArrayList<>();
+        results.add(new Result("", "152 rue de l'Ermitage, Tours", "",
+                new Geometry(
+                        new com.example.go4lunch.data.googleplace.model.Location(47.4055044477, 0.698770997973), null ),
+                "",
+                "O152",
+                new OpeningHours(true),
+                null,
+                "1",
+                null,
+                0,
+                0,
+                "",
+                null,
+                0,
+                false));
+        placeSearch.setResults(results);
+        localPlaceSearchLiveData.setValue(placeSearch);
 
-        PlaceSearch placeSearchLiveData = new PlaceSearch();
-        localPlaceSearchLiveData.setValue(placeSearchLiveData);
-
-
+        // let's work the MainViewModel and get mainViewState
         MainViewState mainViewState = LiveDataTestUtils.getOrAwaitValue(mainViewModel.getMainViewStateMediatorLiveData(), 1);
 
-        //mainViewModel.load();
-        assertEquals(mainViewState.getLocation(), location);
+        // compare location
+        double latitude = mainViewState.getLocation().getLatitude();
+        assertEquals(latitude, location.getLatitude());
+        double longitude = mainViewState.getLocation().getLongitude();
+        assertEquals(longitude, location.getLongitude());
+        // compare users
+        assertEquals(users, mainViewState.getUsers());
+        // compare restaurants
+        Restaurant restaurant = new Restaurant(
+                "1",
+                "O152",
+                fakeLatitude,
+                fakeLongitue,
+                0,
+                "152 rue de l'Ermitage",
+                2131820849,
+                0,
+                0,
+                "",
+                1);
+        Restaurant mainViewStateRestaurant = mainViewState.getRestaurants().get(0);
+        assertEquals(mainViewStateRestaurant.getPlaceId(), restaurant.getPlaceId());
+        assertEquals(mainViewStateRestaurant.getName(), restaurant.getName());
+        assertEquals(mainViewStateRestaurant.getLatitude(), restaurant.getLatitude());
+        assertEquals(mainViewStateRestaurant.getLongitude(), restaurant.getLongitude());
+        assertEquals(mainViewStateRestaurant.getDistance(), restaurant.getDistance());
+        assertEquals(mainViewStateRestaurant.getInfo(), restaurant.getInfo());
+        assertEquals(mainViewStateRestaurant.getOpenNowResourceString(), restaurant.getOpenNowResourceString());
+        assertEquals(mainViewStateRestaurant.getWorkmatesCount(), restaurant.getWorkmatesCount());
+        assertEquals(mainViewStateRestaurant.getRating(), restaurant.getRating());
+        assertEquals(mainViewStateRestaurant.getUrlPicture(), restaurant.getUrlPicture());
+        assertEquals(mainViewStateRestaurant.getCountLike(), restaurant.getCountLike());
     }
-
-
 }
