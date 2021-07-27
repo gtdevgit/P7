@@ -101,17 +101,6 @@ public class MainViewModelTest extends TestCase {
         Mockito.doReturn(localAutocompleteLiveData).when(googlePlacesApiRepository).getAutocompleteLiveData();
     }
 
-
-    private MainViewModel createViewModel(){
-        return new MainViewModel(
-                permissionChecker,
-                locationRepository,
-                firestoreChosenRepository,
-                firestoreLikedRepository,
-                firestoreUsersRepository,
-                googlePlacesApiRepository);
-    }
-
     @Test
     public void testFirestoreChosenRepositoryError() throws InterruptedException {
         MainViewModel mainViewModel = new MainViewModel(
@@ -184,20 +173,24 @@ public class MainViewModelTest extends TestCase {
 
         // dummy location
         localLocationMutableLiveData.setValue(location);
+
         // dummy users
         List<User> users = new ArrayList<>();
         users.add(new User("1", "Dupond", "dupond@gamil.com", "https://www.picture/dupond.png"));
         users.add(new User("2", "Martin", "martin@gamil.com", "https://www.picture/martin.png"));
         localUsersLiveData.setValue(users);
+
         // dummy liked restaurant
         List<UidPlaceIdAssociation> likedRestaurants = new ArrayList<>();
         likedRestaurants.add(new UidPlaceIdAssociation("1", "1"));
         likedRestaurants.add(new UidPlaceIdAssociation("1", "2"));
         localLikedRestaurantsLiveData.setValue(likedRestaurants);
+
         // dummy chosen restaurants
         List<UidPlaceIdAssociation> chosenRestaurants = new ArrayList<>();
         //chosenRestaurants.add(new UidPlaceIdAssociation("1", "1"));
         localChosenRestaurantsLiveData.setValue(chosenRestaurants);
+
         // dummy place
         PlaceSearch placeSearch = new PlaceSearch();
         List<Result> results = new ArrayList<>();

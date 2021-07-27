@@ -55,9 +55,9 @@ public class DetailRestaurantViewModel extends ViewModel {
                                      GooglePlacesApiRepository googlePlacesApiRepository) {
 
         cache = new CacheDetailRestaurantViewModel(currentUid);
-        this.firestoreChosenRepository = new FirestoreChosenRepository();
-        this.firestoreLikedRepository = new FirestoreLikedRepository();
-        this.firestoreUsersRepository = new FirestoreUsersRepository();
+        this.firestoreChosenRepository = firestoreChosenRepository;
+        this.firestoreLikedRepository = firestoreLikedRepository;
+        this.firestoreUsersRepository = firestoreUsersRepository;
         this.googlePlacesApiRepository = googlePlacesApiRepository;
 
         configureMediatorLiveData();
