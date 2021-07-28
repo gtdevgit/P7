@@ -1,11 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Go4Lunch</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Android Studio</string>
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Settings</string>
 
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
@@ -22,16 +19,12 @@
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 
-    <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
-    <string name="floatingactionbutton">FloatingActionButton</string>
-
     <string name="connection_succeed">Successful authentication</string>
     <string name="error_authentication_canceled">Authentication canceled</string>
     <string name="error_no_internet">No internet connection</string>
     <string name="error_unknown_error">An unknown error has occurred</string>
 
-    <string name="facebook_application_id">757140525003096</string>
+    <string name="facebook_application_id" translatable="false">757140525003096</string>
     <string name="facebook_login_protocol_scheme" translatable="false" tools:ignore="UnusedResources">fb757140525003096</string>
     <string name="logout_user">logout</string>
     <string name="delete_user">delete user</string>
@@ -49,7 +42,6 @@
     <string name="label_email_value">Email value</string>
     <string name="label_user_name">User Name :</string>
     <string name="label_user_name_value">User Name value</string>
-    <string name="update_user_name">Update User Name</string>
     <string name="profile_picture_description">Profile picture</string>
 
     <string name="bottom_navigation_map_view">Map View</string>

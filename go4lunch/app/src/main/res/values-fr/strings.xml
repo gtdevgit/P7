@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Go4Lunch</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+
+    <string name="menu_home">Accueil</string>
+    <string name="menu_gallery">Gallerie</string>
+    <string name="menu_slideshow">Diaporama</string>
+    <string name="menu_your_lunch">Votre déjeuné</string>
+    <string name="menu_settings">Paramètres</string>
+    <string name="menu_logout">Déconnexion</string>
+
+    <string name="title_activity_setting">Informations utilisateur</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">Premier fragment</string>
+    <string name="second_fragment_label">Deuxième fragment</string>
+    <string name="next">Suivant</string>
+    <string name="previous">Précedent</string>
+
+    <string name="connection_succeed">Authentification réussie</string>
+    <string name="error_authentication_canceled">Authentification annulée</string>
+    <string name="error_no_internet">Pas de connexion internet</string>
+    <string name="error_unknown_error">Une erreur inconnue s\'est produite</string>
+
+    <string name="logout_user">Déconnexion</string>
+    <string name="delete_user">Supprimer l\'utilisateur</string>
+    <string name="user_deleted">L\'utilisateur a été supprimé</string>
+
+    <string name="sign_in_with_google">Connectez-vous avec Google</string>
+    <string name="sign_in_with_facebook">Connectez-vous avec Facebook</string>
+    <string name="sign_in_with_twitter">Connectez-vous avec Twitter</string>
+    <string name="login_subtitle">Trouvez un bon restaurant et invitez vos collègues à déjeuner !</string>
+    <string name="login_title">Go4Lunch</string>
+    <string name="no_user_email">Aucun e-mail utilisateur</string>
+    <string name="no_user_name_found">Aucun nom d\'utilisateur</string>
+    <string name="no_user_connected">Utilisateur non connecté</string>
+    <string name="label_email">EMail :</string>
+    <string name="label_email_value">Email</string>
+    <string name="label_user_name">Nom Utilisateur:</string>
+    <string name="label_user_name_value">Nom utilisateur</string>
+
+    <string name="profile_picture_description">Photo de profile</string>
+
+    <string name="bottom_navigation_map_view">Carte</string>
+    <string name="bottom_navigation_list_view">Liste</string>
+    <string name="bottom_navigation_workmates">Collègues</string>
+    <string name="authorize_notifications">Autoriser les notifications </string>
+    <string name="search">Chercher</string>
+    <string name="confirm_delete_account">Veuillez confirmer la suppression du compte.</string>
+    <string name="yes">Oui</string>
+    <string name="no">Non</string>
+    <string name="error_deleting_account">Erreur lors de la suppression du compte </string>
+    <string name="error_disconnecting_account">Error while disconnecting the account</string>
+    <string name="error_during_connection">Error during connection</string>
+    <string name="other_exception">Autre exception</string>
+    <string name="no_exception">Pas d\'exception</string>
+    <string name="permission_request">Demande d\'autorisation </string>
+    <string name="permission_message">L\'application a besoin d\'une autorisation pour accéder à l\'emplacement de l\'appareil afin de fournir les services requis. Veuillez accorder l\'autorisation.</string>
+    <string name="grant_permission">Accorder la permission</string>
+    <string name="discard_permission">Refuser la permission</string>
+    <string name="localisation_allowed">L\'autorisation de localisation est accordée pour cette application</string>
+    <string name="localisation_not_allowed">L\'autorisation de localisation n\'est pas accordée à cette application</string>
+    <string name="permission_denied_message">Permission refusée. L\'application ne peut pas être utilisée.</string>
+    <string name="permission_granted_message">Permission accordée</string>
+    <string name="title_activity_detail_restaurant">Détails du restaurant</string>
+
+    <string name="activity_detail_restaurant_floating_action_button_description">Chosir ce restaurant</string>
+    <string name="activity_detail_restaurant_bottom_navigation_call">Appler</string>
+    <string name="activity_detail_restaurant_bottom_navigation_like">Like</string>
+    <string name="activity_detail_restaurant_bottom_navigation_website">Site web</string>
+
+    <string name="image_location_description">Lieu</string>
+    <string name="empty_string"></string>
+    <string name="open_now">Ouvert</string>
+    <string name="closing_now">Fermée</string>
+
+</resources>

@@ -141,11 +141,4 @@ public class DetailRestaurantViewModelTest extends TestCase {
         assertEquals(detailRestaurantViewState.getStar2Color(), R.color.yellow);
         assertEquals(detailRestaurantViewState.getStar3Color(), R.color.white);
     }
-
-    public void testChangeLike() {
-    }
-
-    public void testChangeChose() {
-    }
-
 }
