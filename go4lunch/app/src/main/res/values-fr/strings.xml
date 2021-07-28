@@ -72,7 +72,7 @@
     <string name="activity_detail_restaurant_bottom_navigation_website">Site web</string>
 
     <string name="image_location_description">Lieu</string>
-    <string name="empty_string"></string>
+    <string name="empty_string" />
     <string name="open_now">Ouvert</string>
     <string name="closing_now">Fermée</string>
 

@@ -47,12 +47,7 @@
     <string name="bottom_navigation_map_view">Map View</string>
     <string name="bottom_navigation_list_view">List View</string>
     <string name="bottom_navigation_workmates">Workmates</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_map_fragment">Hello map fragment</string>
-    <string name="hello_list_view_fragment">Hello list view fragment</string>
-    <string name="hello_workmates_fragment">Hello workmates fragment</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
     <string name="authorize_notifications">Authorize notifications</string>
     <string name="search">search</string>
     <string name="confirm_delete_account">Please, confirm delete account ?</string>
@@ -79,7 +74,7 @@
     <string name="activity_detail_restaurant_bottom_navigation_website">Website</string>
 
     <string name="image_location_description">location</string>
-    <string name="empty_string"></string>
+    <string name="empty_string" />
     <string name="open_now">Open now</string>
     <string name="closing_now">Closing now</string>
 
