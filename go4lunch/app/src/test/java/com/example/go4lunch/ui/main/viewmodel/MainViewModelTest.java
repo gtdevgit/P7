@@ -43,17 +43,12 @@ public class MainViewModelTest extends TestCase {
     @Rule
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
-    //private Location location = new Location("47.4055044477,0.698770997973");
-    private Location location = Mockito.mock(android.location.Location.class);
-    private final double fakeLatitude = 47.4055044477;
-    private final double fakeLongitue = 0.698770997973;
-
-    private PermissionChecker permissionChecker = Mockito.mock(PermissionChecker.class);
-    private LocationRepository locationRepository = Mockito.mock(LocationRepository.class);
-    private FirestoreChosenRepository firestoreChosenRepository = Mockito.mock(FirestoreChosenRepository.class);
-    private FirestoreLikedRepository firestoreLikedRepository = Mockito.mock(FirestoreLikedRepository.class);
-    private FirestoreUsersRepository firestoreUsersRepository = Mockito.mock(FirestoreUsersRepository.class);
-    private GooglePlacesApiRepository googlePlacesApiRepository = Mockito.mock(GooglePlacesApiRepository.class);
+    private final PermissionChecker permissionChecker = Mockito.mock(PermissionChecker.class);
+    private final LocationRepository locationRepository = Mockito.mock(LocationRepository.class);
+    private final FirestoreChosenRepository firestoreChosenRepository = Mockito.mock(FirestoreChosenRepository.class);
+    private final FirestoreLikedRepository firestoreLikedRepository = Mockito.mock(FirestoreLikedRepository.class);
+    private final FirestoreUsersRepository firestoreUsersRepository = Mockito.mock(FirestoreUsersRepository.class);
+    private final GooglePlacesApiRepository googlePlacesApiRepository = Mockito.mock(GooglePlacesApiRepository.class);
 
     private MutableLiveData<String> localFirestoreChosenRepositoryError;
     private MutableLiveData<String> localFirestoreLikedRepositoryError;
@@ -65,16 +60,11 @@ public class MainViewModelTest extends TestCase {
     private MutableLiveData<List<UidPlaceIdAssociation>> localLikedRestaurantsLiveData;
     private MutableLiveData<List<User>> localUsersLiveData;
     private MutableLiveData<PlaceSearch> localPlaceSearchLiveData;
-    private MutableLiveData<Autocomplete> localAutocompleteLiveData;
 
     @Before
     public void setUp() throws Exception {
         super.setUp();
         Log.d(Tag.TAG, "setUp() called");
-
-        Mockito.doReturn(fakeLatitude).when(location).getLatitude();
-        Mockito.doReturn(fakeLongitue).when(location).getLongitude();
-        //Mockito.doReturn(1000).when(location).distanceTo(location2);
 
         // for configureErrorMediatorLiveData
         localFirestoreChosenRepositoryError = new MutableLiveData<>();
@@ -92,7 +82,7 @@ public class MainViewModelTest extends TestCase {
         localLikedRestaurantsLiveData = new MutableLiveData<>();
         localUsersLiveData = new MutableLiveData<>();
         localPlaceSearchLiveData = new MutableLiveData<>();
-        localAutocompleteLiveData = new MutableLiveData<>();
+        MutableLiveData<Autocomplete> localAutocompleteLiveData = new MutableLiveData<>();
 
         Mockito.doReturn(localLocationMutableLiveData).when(locationRepository).getLocationLiveData();
         Mockito.doReturn(localChosenRestaurantsLiveData).when(firestoreChosenRepository).getChosenRestaurantsLiveData();
@@ -173,6 +163,13 @@ public class MainViewModelTest extends TestCase {
                 googlePlacesApiRepository);
 
         // dummy location
+        //private Location location = new Location("47.4055044477,0.698770997973");
+        final double fakeLatitude = 47.4055044477;
+        final double fakeLongitue = 0.698770997973;
+        Location location = Mockito.mock(android.location.Location.class);
+        Mockito.doReturn(fakeLatitude).when(location).getLatitude();
+        Mockito.doReturn(fakeLongitue).when(location).getLongitude();
+
         localLocationMutableLiveData.setValue(location);
 
         // dummy users
