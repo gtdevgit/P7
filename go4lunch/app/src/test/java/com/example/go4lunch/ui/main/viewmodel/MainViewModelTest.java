@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.go4lunch.R;
 import com.example.go4lunch.data.firestore.model.UidPlaceIdAssociation;
 import com.example.go4lunch.data.firestore.model.User;
 import com.example.go4lunch.data.firestore.repository.FirestoreChosenRepository;
@@ -230,7 +231,7 @@ public class MainViewModelTest extends TestCase {
                 fakeLongitue,
                 0,
                 "152 rue de l'Ermitage",
-                2131820849,
+                R.string.open_now,
                 0,
                 0,
                 "",
