@@ -64,6 +64,9 @@ public class MainViewModel extends ViewModel {
      * MutableLiveData properties are exposed as livedata to prevent external modifications
      */
 
+    //private String searchText;
+    private MutableLiveData<String> searchTextMutableLiveData = new MutableLiveData<>();
+
     private final MutableLiveData<String> errorMutableLiveData = new MutableLiveData<String>();
     public LiveData<String> getErrorLiveData(){ return errorMutableLiveData; }
 
@@ -159,7 +162,8 @@ public class MainViewModel extends ViewModel {
                             chosenRestaurantsLiveData.getValue(),
                             usersLiveData.getValue(),
                             simpleRestaurantsLiveData.getValue(),
-                            autocompleteLiveData.getValue());
+                            autocompleteLiveData.getValue(),
+                            searchTextMutableLiveData.getValue());
                 }
             }
         });
@@ -174,7 +178,8 @@ public class MainViewModel extends ViewModel {
                         chosenRestaurantsLiveData.getValue(),
                         usersLiveData.getValue(),
                         simpleRestaurants,
-                        autocompleteLiveData.getValue());
+                        autocompleteLiveData.getValue(),
+                        searchTextMutableLiveData.getValue());
             }
         };
         mainViewStateMediatorLiveData.addSource(simpleRestaurantsLiveData, simpleRestaurantsObserver);
@@ -188,7 +193,8 @@ public class MainViewModel extends ViewModel {
                         uidPlaceIdAssociations,
                         usersLiveData.getValue(),
                         simpleRestaurantsLiveData.getValue(),
-                        autocompleteLiveData.getValue());
+                        autocompleteLiveData.getValue(),
+                        searchTextMutableLiveData.getValue());
             }
         });
 
@@ -208,7 +214,8 @@ public class MainViewModel extends ViewModel {
                         chosenRestaurantsLiveData.getValue(),
                         users,
                         simpleRestaurantsLiveData.getValue(),
-                        autocompleteLiveData.getValue());
+                        autocompleteLiveData.getValue(),
+                        searchTextMutableLiveData.getValue());
             }
         });
 
@@ -222,7 +229,8 @@ public class MainViewModel extends ViewModel {
                         chosenRestaurantsLiveData.getValue(),
                         usersLiveData.getValue(),
                         simpleRestaurantsLiveData.getValue(),
-                        autocompleteLiveData.getValue());
+                        autocompleteLiveData.getValue(),
+                        searchTextMutableLiveData.getValue());
             }
         });
 
@@ -236,7 +244,22 @@ public class MainViewModel extends ViewModel {
                         chosenRestaurantsLiveData.getValue(),
                         usersLiveData.getValue(),
                         simpleRestaurantsLiveData.getValue(),
-                        autocompleteLiveData.getValue());
+                        autocompleteLiveData.getValue(),
+                        searchTextMutableLiveData.getValue());
+            }
+        });
+
+        mainViewStateMediatorLiveData.addSource(autocompleteLiveData, new Observer<Autocomplete>() {
+            @Override
+            public void onChanged(Autocomplete autocomplete) {
+                combine(locationLiveData.getValue(),
+                        placeSearchLiveData.getValue(),
+                        likedRestaurantsLiveData.getValue(),
+                        chosenRestaurantsLiveData.getValue(),
+                        usersLiveData.getValue(),
+                        simpleRestaurantsLiveData.getValue(),
+                        autocomplete,
+                        searchTextMutableLiveData.getValue());
             }
         });
 
@@ -250,20 +273,8 @@ public class MainViewModel extends ViewModel {
                         chosenRestaurantsLiveData.getValue(),
                         usersLiveData.getValue(),
                         simpleRestaurantsLiveData.getValue(),
-                        autocompleteLiveData.getValue());
-            }
-        });
-
-        mainViewStateMediatorLiveData.addSource(autocompleteLiveData, new Observer<Autocomplete>() {
-            @Override
-            public void onChanged(Autocomplete autocomplete) {
-                combine(locationLiveData.getValue(),
-                        placeSearchLiveData.getValue(),
-                        likedRestaurantsLiveData.getValue(),
-                        chosenRestaurantsLiveData.getValue(),
-                        usersLiveData.getValue(),
-                        simpleRestaurantsLiveData.getValue(),
-                        autocomplete);
+                        autocompleteLiveData.getValue(),
+                        s);
             }
         });
     }
@@ -426,6 +437,10 @@ public class MainViewModel extends ViewModel {
         return workmates;
     }
 
+    private boolean isActiveSearch(String searchText){
+        return ((searchText != null) && (searchText.trim().length() >= 3));
+    }
+
     private boolean isValideSearch(String searchText, String name){
         if (searchText == null || searchText.trim().isEmpty()) {
             return true;
@@ -447,7 +462,8 @@ public class MainViewModel extends ViewModel {
                          @Nullable List<UidPlaceIdAssociation> chosenRestaurants,
                          @Nullable List<User> users,
                          @Nullable List<SimpleRestaurant> simpleRestaurants,
-                         @Nullable Autocomplete autocomplete){
+                         @Nullable Autocomplete autocomplete,
+                         @Nullable String searchText){
         // canot compute without data
         // autocomplete may be null
         if (location == null || placesearch == null || likedRestaurants == null ||
@@ -488,10 +504,13 @@ public class MainViewModel extends ViewModel {
         }
         List<Workmate> workmates = createWorkmatesList(users, chosenRestaurants, simpleRestaurants);
         List<SearchViewResultItem> searchViewResultItems = new ArrayList<>();
-        if (autocomplete != null && (autocomplete.getStatus().equals("OK")) && autocomplete.getPredictions() != null) {
-            for (Prediction prediction : autocomplete.getPredictions()) {
-                if (prediction.getTypes().contains("restaurant")) {
-                    searchViewResultItems.add(new SearchViewResultItem(prediction.getDescription(), prediction.getPlaceId()));
+        // no search result if empty text
+        if (isActiveSearch(searchText)) {
+            if (autocomplete != null && (autocomplete.getStatus().equals("OK")) && autocomplete.getPredictions() != null) {
+                for (Prediction prediction : autocomplete.getPredictions()) {
+                    if (prediction.getTypes().contains("restaurant")) {
+                        searchViewResultItems.add(new SearchViewResultItem(prediction.getDescription(), prediction.getPlaceId()));
+                    }
                 }
             }
         }
@@ -526,22 +545,29 @@ public class MainViewModel extends ViewModel {
         firestoreUsersRepository.removeRealTimeListener();
     }
 
-    private String searchText;
-
-    public void setSearchText(String searchText) {
-        this.searchText = searchText;
-        Log.d(Tag.TAG, "setSearchText() called with: searchText = [" + searchText + "]");
-        searchTextMutableLiveData.setValue(searchText);
+    public void clearSearch(){
+        setSearchText("");
     }
 
-    private MutableLiveData<String> searchTextMutableLiveData = new MutableLiveData<>();
+    public void setSearchText(String searchText) {
+        Log.d(Tag.TAG, "setSearchText() called with: searchText = [" + searchText + "]");
+        if (searchText != null) {
+            String text = searchText.toLowerCase().trim();
+            searchTextMutableLiveData.setValue(text);
+            if (text.length() >= 3){
+                loadAutocomplet(text);
+            }
+        }
+    }
 
-    public void loadAutocomplet(String query){
+    private void loadAutocomplet(String query){
         Location location = locationRepository.getLocationLiveData().getValue();
         if (location != null) {
             googlePlacesApiRepository.loadAutocomplete(location, query);
         }
     }
+
+
 
     /**
      * Current user
@@ -572,4 +598,5 @@ public class MainViewModel extends ViewModel {
             currentUserMutableLiveData.setValue(new CurrentUser(name, email, photoUrl));
         }
     }
+
 }

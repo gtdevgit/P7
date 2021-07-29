@@ -53,7 +53,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private GoogleMap mMap;
     private ProgressBar progressBar;
     private FloatingActionButton floatingActionButton;
-    private ListView listViewSearch;
+    private SearchView searchView;
 
     private Location location;
 
@@ -132,31 +132,22 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     @Override
     public void configureSearchView(SearchView searchView) {
         if (searchView != null){
+            this.searchView = searchView;
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
+                    Log.d(Tag.TAG, "onQueryTextSubmit() called with: query = [" + query + "]");
                     return false;
                 }
 
                 @Override
                 public boolean onQueryTextChange(String newText) {
-                    String text = newText.toLowerCase().trim();
-                    if (text.length() == 0) {
-                        recyclerView.setVisibility(View.GONE);
-                    }
-                    if (text.length() >= 3) {
-                        mainViewModel.loadAutocomplet(newText);
-                    }
-
+                    Log.d(Tag.TAG, "onQueryTextChange() called with: newText = [" + newText + "]");
+                    mainViewModel.setSearchText(newText);
                     return false;
                 }
             });
         }
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
     }
 
     @Override
@@ -197,7 +188,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private void openDetailRestaurantActivity(String placeId){
-        recyclerView.setVisibility(View.GONE);
+        mainViewModel.clearSearch();
+        if (searchView != null && !searchView.isIconified()){
+            searchView.setQuery("", false);
+            searchView.setIconified(true);
+        }
 
         Log.d(Tag.TAG, "openDetailRestaurantActivity() called with: placeId = [" + placeId + "]");
         Intent intent = new Intent(getContext(), DetailRestaurantActivity.class);
@@ -270,6 +265,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private void setSearch(int visibility, List<SearchViewResultItem> searchViewResultItems){
+        Log.d(Tag.TAG, "MapFragment.setSearch() called with: visibility = [" + visibility + "], searchViewResultItems = [" + searchViewResultItems + "]");
         recyclerView.setVisibility(visibility);
         mapFragmentAdapter.updateData(searchViewResultItems);
     }
@@ -297,6 +293,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         Log.d(Tag.TAG, "MapFragment.onPause() called");
         if (mainViewModel != null) {
             this.mainViewModel.removerChosenRestaurantListener();
+            this.mainViewModel.clearSearch();
         }
         super.onPause();
     }
