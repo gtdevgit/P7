@@ -10,7 +10,8 @@ android {
 
     defaultConfig {
         applicationId 'com.example.gtlabgo4lunch'
-        minSdkVersion 29
+        minSdkVersion 19
+        multiDexEnabled true
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -43,6 +44,9 @@ android {
 
 
 dependencies {
+
+    def multidex_version = "2.0.1"
+    implementation "androidx.multidex:multidex:$multidex_version"
 
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation platform('com.google.firebase:firebase-bom:28.2.1')
