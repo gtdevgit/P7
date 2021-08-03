@@ -19,7 +19,6 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "GOOGLE_PLACES_KEY", "${OC_P7_Google_Places_key}")
-        resValue("string", "google_place_key", "${OC_P7_Google_Places_key}")
     }
 
     buildTypes {
@@ -45,6 +44,7 @@ android {
 
 dependencies {
 
+    // compatibility with Android 4.4
     def multidex_version = "2.0.1"
     implementation "androidx.multidex:multidex:$multidex_version"
 

@@ -26,16 +26,7 @@ public class MainApplication extends Application {
         String s = com.example.go4lunch.BuildConfig.GOOGLE_PLACES_KEY;
         String S2 = application.getString(R.string.google_place_key);
 */
-
-        ApplicationInfo ai = null;
-        try {
-            ai = getPackageManager().getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);
-            Bundle bundle = ai.metaData;
-            googleApiKey = bundle.getString("com.google.android.geo.API_KEY");
-        } catch (PackageManager.NameNotFoundException e) {
-            googleApiKey = "";
-            e.printStackTrace();
-        }
+        googleApiKey = com.example.go4lunch.BuildConfig.GOOGLE_PLACES_KEY;
         NotificationHelper.createNotificationChannels(this);
     }
 
