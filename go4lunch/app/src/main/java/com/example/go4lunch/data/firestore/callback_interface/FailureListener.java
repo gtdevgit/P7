@@ -1,5 +1,0 @@
-package com.example.go4lunch.data.firestore.callback_interface;
-
-public interface FailureListener {
-    public void onFailure(Exception e);
-}

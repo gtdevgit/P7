@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.go4lunch">
+    package="com.example.gtlabgo4lunch">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
-        android:name=".MainApplication"
+        android:name="com.example.gtlabgo4lunch.MainApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -17,25 +17,25 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Go4lunch">
         <activity
-            android:name=".ui.detailrestaurant.view.DetailRestaurantActivity"
+            android:name="com.example.gtlabgo4lunch.ui.detailrestaurant.view.DetailRestaurantActivity"
             android:label="@string/title_activity_detail_restaurant"
             android:theme="@style/Theme.Go4lunch.NoActionBar" />
-        <activity android:name=".PermissionActivity" />
+        <activity android:name="com.example.gtlabgo4lunch.PermissionActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value= "$GOOGLE_PLACES_KEY" />
+            android:value= "@string/google_places_key_p7" />
 
         <meta-data
             android:name="my_key"
             android:value="my_value" />
 
-        <activity android:name=".ui.login.LoginActivity" />
+        <activity android:name="com.example.gtlabgo4lunch.ui.login.LoginActivity" />
         <activity
-            android:name=".ui.main.view.MainActivity"
+            android:name="com.example.gtlabgo4lunch.ui.main.view.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.Go4lunch.NoActionBar" />
-        <activity android:name=".navigation.NavigationActivity"
+        <activity android:name="com.example.gtlabgo4lunch.navigation.NavigationActivity"
             android:launchMode="singleTask"
             android:taskAffinity=""
             android:excludeFromRecents="true" >

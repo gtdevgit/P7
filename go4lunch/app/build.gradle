@@ -5,6 +5,14 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file('C:\\OpenClassRooms\\TP\\P7\\go4lunch\\app\\debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+    }
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
 
@@ -18,7 +26,8 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "GOOGLE_PLACES_KEY", "${OC_P7_Google_Places_key}")
+        buildConfigField("String", "GOOGLE_PLACES_KEY_P7", "${GOOGLE_API_KEY_P7}")
+        resValue "string", "google_places_key_p7", "${GOOGLE_API_KEY_P7}"
     }
 
     buildTypes {
@@ -49,7 +58,7 @@ dependencies {
     implementation "androidx.multidex:multidex:$multidex_version"
 
     // When using the BoM, you don't specify versions in Firebase library dependencies
-    implementation platform('com.google.firebase:firebase-bom:28.2.1')
+    implementation platform('com.google.firebase:firebase-bom:28.3.0')
     implementation 'com.google.firebase:firebase-analytics'
     // Declare the dependency for the Firebase Authentication library
     implementation 'com.firebaseui:firebase-ui-auth:6.4.0'
