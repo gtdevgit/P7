@@ -1,3 +1,4 @@
+![Android](https://img.shields.io/badge/Android-Studio-blue)
 # Projet 7
 ## Application Go4lunch
 Trouvez un restaurant pour déjeuner avec vos collègues
