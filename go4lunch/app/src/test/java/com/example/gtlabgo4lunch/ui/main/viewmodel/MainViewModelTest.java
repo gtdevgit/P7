@@ -1,4 +1,4 @@
-package com.example.go4lunch.ui.main.viewmodel;
+package com.example.gtlabgo4lunch.ui.main.viewmodel;
 
 import android.location.Location;
 import android.util.Log;
@@ -6,7 +6,7 @@ import android.util.Log;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.go4lunch.R;
+import com.example.gtlabgo4lunch.R;
 import com.example.gtlabgo4lunch.data.firestore.model.UidPlaceIdAssociation;
 import com.example.gtlabgo4lunch.data.firestore.model.User;
 import com.example.gtlabgo4lunch.data.firestore.repository.FirestoreChosenRepository;
@@ -21,9 +21,8 @@ import com.example.gtlabgo4lunch.data.googleplace.repository.GooglePlacesApiRepo
 import com.example.gtlabgo4lunch.data.location.LocationRepository;
 import com.example.gtlabgo4lunch.data.permission_checker.PermissionChecker;
 import com.example.gtlabgo4lunch.tag.Tag;
-import com.example.go4lunch.testutils.LiveDataTestUtils;
+import com.example.gtlabgo4lunch.testutils.LiveDataTestUtils;
 import com.example.gtlabgo4lunch.ui.main.model.Restaurant;
-import com.example.gtlabgo4lunch.ui.main.viewmodel.MainViewModel;
 import com.example.gtlabgo4lunch.ui.main.viewstate.MainViewState;
 
 import junit.framework.TestCase;

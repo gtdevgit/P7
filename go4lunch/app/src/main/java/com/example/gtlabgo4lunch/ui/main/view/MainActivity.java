@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.go4lunch.R;
+import com.example.gtlabgo4lunch.R;
 import com.example.gtlabgo4lunch.ui.main.model.CurrentUser;
 import com.example.gtlabgo4lunch.ui.main.viewmodel.MainViewModel;
 import com.example.gtlabgo4lunch.ui.main.viewmodel.MainViewModelFactory;
@@ -32,14 +32,6 @@ import androidx.appcompat.widget.Toolbar;
 
 //implements OnMapReadyCallback
 public class MainActivity extends AppCompatActivity {
-    // todo : Main : supprimer l'ancienne activité de setting
-    // todo : Main : gérer les notifications
-    // todo : Main gérer les recherches
-    // todo : Test unitaires
-    // todo : test intrumentalisés
-    // todo : réorganiser un peu l'architecture. centraliser les view model / créer un factory + injection
-    // Todo : optionnel : MAP : Tracer le chemin vers le restaurant choisi.
-    // suppression utilisateur, supprimer les choix, aussi les like ?
 
     private static final String TAG = "MainActivity";
 

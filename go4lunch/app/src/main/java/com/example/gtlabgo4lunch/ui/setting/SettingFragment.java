@@ -20,7 +20,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.go4lunch.R;
+import com.example.gtlabgo4lunch.R;
 import com.example.gtlabgo4lunch.notification.NotificationHelper;
 import com.example.gtlabgo4lunch.tag.Tag;
 import com.example.gtlabgo4lunch.ui.main.view.MainActivity;

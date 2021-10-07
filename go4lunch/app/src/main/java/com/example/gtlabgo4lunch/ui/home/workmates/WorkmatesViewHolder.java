@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
-import com.example.go4lunch.R;
+import com.example.gtlabgo4lunch.R;
 import com.example.gtlabgo4lunch.tag.Tag;
 
 public class WorkmatesViewHolder extends ViewHolder {

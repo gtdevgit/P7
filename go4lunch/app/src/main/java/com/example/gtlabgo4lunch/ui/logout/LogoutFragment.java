@@ -24,7 +24,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.go4lunch.R;
+import com.example.gtlabgo4lunch.R;
 import com.example.gtlabgo4lunch.firebase.Authentication;
 import com.example.gtlabgo4lunch.ui.login.LoginActivity;
 import com.example.gtlabgo4lunch.tag.Tag;

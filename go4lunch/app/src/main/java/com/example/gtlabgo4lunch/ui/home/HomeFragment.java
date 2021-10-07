@@ -22,7 +22,7 @@ import com.example.gtlabgo4lunch.ui.home.map.MapFragment;
 import com.example.gtlabgo4lunch.ui.home.search.SearchViewInterface;
 import com.example.gtlabgo4lunch.ui.home.workmates.WorkmatesFragment;
 import com.example.gtlabgo4lunch.ui.main.view.MainActivity;
-import com.example.go4lunch.R;
+import com.example.gtlabgo4lunch.R;
 import com.example.gtlabgo4lunch.tag.Tag;
 import com.example.gtlabgo4lunch.ui.main.viewmodel.MainViewModel;
 import com.example.gtlabgo4lunch.ui.main.viewmodel.MainViewModelFactory;

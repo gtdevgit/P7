@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.go4lunch.R;
+import com.example.gtlabgo4lunch.R;
 import com.example.gtlabgo4lunch.ui.home.listener.OnClickListenerRestaurant;
 import com.example.gtlabgo4lunch.ui.main.model.SearchViewResultItem;
 

@@ -33,7 +33,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.go4lunch.R;
+import com.example.gtlabgo4lunch.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -42,9 +42,6 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.List;
 
 public class DetailRestaurantActivity extends AppCompatActivity {
-
-    // todo : Detail d'un restaurant ajouter toutes les photo. => optionel
-    // todo : Detail d'un restaurant. Remplacer le bottom navigation par 3 images
 
     private static final String TAG = Tag.TAG;
 
@@ -160,7 +157,6 @@ public class DetailRestaurantActivity extends AppCompatActivity {
      * create viewModel and configure observers
      */
     private void configureViewModel(){
-        // todo : DetailRestaurantActivity : use ViewModelProvider to create VM. Create Factory ViewModelFactory to pass arguments.
         Log.d(TAG, "configureViewModel() called " + placeId);
         detailRestaurantViewModel = new ViewModelProvider(this,
                 DetailRestaurantViewModelFactory.getInstance(uid))

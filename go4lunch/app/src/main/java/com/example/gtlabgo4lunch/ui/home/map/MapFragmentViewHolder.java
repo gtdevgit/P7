@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.go4lunch.R;
+import com.example.gtlabgo4lunch.R;
 
 import org.jetbrains.annotations.NotNull;
 

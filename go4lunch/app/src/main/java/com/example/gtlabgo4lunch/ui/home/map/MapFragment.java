@@ -23,7 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-import com.example.go4lunch.R;
+import com.example.gtlabgo4lunch.R;
 import com.example.gtlabgo4lunch.ui.home.listener.OnClickListenerRestaurant;
 import com.example.gtlabgo4lunch.ui.home.search.SearchViewInterface;
 import com.example.gtlabgo4lunch.ui.main.model.Restaurant;
@@ -233,7 +233,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         Log.d(Tag.TAG, "MapFragment.setRestaurants(restaurants) (mMap==null) = " + (mMap==null));
         if(mMap!=null) {
             progressBar.setVisibility(View.VISIBLE);
-            // todo : this Bitmap must be in ressources
             Bitmap bitmapUnselected = drawableToBitmap(getResources().getDrawable(R.drawable.ic_baseline_restaurant_24_primary_color, getContext().getTheme()));
             Bitmap bitmapSelected = drawableToBitmap(getResources().getDrawable(R.drawable.ic_baseline_restaurant_24_selected, getContext().getTheme()));
             for (Restaurant restaurant : restaurants){

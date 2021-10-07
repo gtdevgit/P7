@@ -8,7 +8,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
-import com.example.go4lunch.R;
+import com.example.gtlabgo4lunch.R;
 import com.example.gtlabgo4lunch.data.firestore.repository.FirestoreChosenRepository;
 import com.example.gtlabgo4lunch.data.firestore.repository.FirestoreLikedRepository;
 import com.example.gtlabgo4lunch.data.firestore.repository.FirestoreUsersRepository;

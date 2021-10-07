@@ -14,7 +14,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.example.gtlabgo4lunch.ui.main.view.MainActivity;
-import com.example.go4lunch.R;
+import com.example.gtlabgo4lunch.R;
 import com.example.gtlabgo4lunch.firebase.Authentication;
 import com.example.gtlabgo4lunch.firebase.SupportedProvider;
 import com.example.gtlabgo4lunch.tag.Tag;

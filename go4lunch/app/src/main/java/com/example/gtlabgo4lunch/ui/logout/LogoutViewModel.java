@@ -9,7 +9,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.gtlabgo4lunch.MainApplication;
-import com.example.go4lunch.R;
+import com.example.gtlabgo4lunch.R;
 import com.example.gtlabgo4lunch.data.firestore.repository.FirestoreUsersRepository;
 import com.example.gtlabgo4lunch.tag.Tag;
 import com.firebase.ui.auth.AuthUI;

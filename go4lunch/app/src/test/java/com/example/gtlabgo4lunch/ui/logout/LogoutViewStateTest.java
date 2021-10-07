@@ -1,6 +1,4 @@
-package com.example.go4lunch.ui.logout;
-
-import com.example.gtlabgo4lunch.ui.logout.LogoutViewState;
+package com.example.gtlabgo4lunch.ui.logout;
 
 import junit.framework.TestCase;
 

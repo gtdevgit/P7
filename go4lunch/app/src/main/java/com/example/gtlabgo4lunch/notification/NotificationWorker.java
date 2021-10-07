@@ -7,7 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import com.example.go4lunch.R;
+import com.example.gtlabgo4lunch.R;
 import com.example.gtlabgo4lunch.data.applicationsettings.SettingRepository;
 import com.example.gtlabgo4lunch.data.firestore.callback_interface.FailureListener;
 import com.example.gtlabgo4lunch.data.googleplace.repository.GooglePlacesApiRepository;

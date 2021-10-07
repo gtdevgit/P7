@@ -16,7 +16,7 @@ import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
 import com.example.gtlabgo4lunch.MainApplication;
-import com.example.go4lunch.R;
+import com.example.gtlabgo4lunch.R;
 import com.example.gtlabgo4lunch.data.firestore.model.User;
 import com.example.gtlabgo4lunch.data.firestore.repository.FirestoreChosenRepository;
 import com.example.gtlabgo4lunch.data.firestore.repository.FirestoreLikedRepository;
@@ -462,7 +462,7 @@ public class MainViewModel extends ViewModel {
                          @Nullable List<SimpleRestaurant> simpleRestaurants,
                          @Nullable Autocomplete autocomplete,
                          @Nullable String searchText){
-        // canot compute without data
+        // cannot compute without data
         // autocomplete may be null
         if (location == null || placesearch == null || likedRestaurants == null ||
                 chosenRestaurants == null || users == null || simpleRestaurants == null) {

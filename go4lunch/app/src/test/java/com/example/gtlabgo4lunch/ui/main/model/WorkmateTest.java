@@ -1,6 +1,4 @@
-package com.example.go4lunch.ui.main.model;
-
-import com.example.gtlabgo4lunch.ui.main.model.Workmate;
+package com.example.gtlabgo4lunch.ui.main.model;
 
 import junit.framework.TestCase;
 

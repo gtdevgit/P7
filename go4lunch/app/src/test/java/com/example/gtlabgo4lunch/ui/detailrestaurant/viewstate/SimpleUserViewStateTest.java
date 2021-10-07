@@ -1,6 +1,4 @@
-package com.example.go4lunch.ui.detailrestaurant.viewstate;
-
-import com.example.gtlabgo4lunch.ui.detailrestaurant.viewstate.SimpleUserViewState;
+package com.example.gtlabgo4lunch.ui.detailrestaurant.viewstate;
 
 import junit.framework.TestCase;
 

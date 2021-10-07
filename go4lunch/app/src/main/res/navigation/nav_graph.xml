@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/FirstFragment"
-        android:name="com.example.go4lunch.ui.FirstFragment"
+        android:name="com.example.gtlabgo4lunch.ui.FirstFragment"
         android:label="@string/first_fragment_label"
         tools:layout="@layout/fragment_first">
 
@@ -17,7 +17,7 @@
     </fragment>
     <fragment
         android:id="@+id/SecondFragment"
-        android:name="com.example.go4lunch.ui.SecondFragment"
+        android:name="com.example.gtlabgo4lunch.ui.SecondFragment"
         android:label="@string/second_fragment_label"
         tools:layout="@layout/fragment_second">
 
@@ -27,7 +27,7 @@
     </fragment>
     <fragment
         android:id="@+id/FirstFragment"
-        android:name="com.example.go4lunch.ui.detailrestaurant.FirstFragment"
+        android:name="com.example.gtlabgo4lunch.ui.detailrestaurant.FirstFragment"
         android:label="@string/first_fragment_label"
         tools:layout="@layout/fragment_first">
 
@@ -37,7 +37,7 @@
     </fragment>
     <fragment
         android:id="@+id/SecondFragment"
-        android:name="com.example.go4lunch.ui.detailrestaurant.SecondFragment"
+        android:name="com.example.gtlabgo4lunch.ui.detailrestaurant.SecondFragment"
         android:label="@string/second_fragment_label"
         tools:layout="@layout/fragment_second">
 

@@ -15,7 +15,7 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
-import com.example.go4lunch.R;
+import com.example.gtlabgo4lunch.R;
 import com.example.gtlabgo4lunch.data.firestore.callback_interface.FailureListener;
 import com.example.gtlabgo4lunch.data.firestore.callback_interface.UserListListener;
 import com.example.gtlabgo4lunch.data.firestore.callback_interface.UserRestaurantAssociationListListener;

@@ -1,4 +1,4 @@
-package com.example.go4lunch.testutils;
+package com.example.gtlabgo4lunch.testutils;
 
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
