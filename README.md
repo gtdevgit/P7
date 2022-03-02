@@ -57,7 +57,7 @@ Les sources de l’application sont hébergées sur **Github**
 
 - La base de données est une base de données *No SQL* **Google Firestore**.
 
-- L'application reqiére une **cle d'API** Google qui doit être intégrée dans le fichier *gradle.property*.
+- L'application requiére une **cle d'API** Google qui doit être intégrée dans le fichier *gradle.property*.
 
 - **Geolocation** obtenue avec *FusedLocationProviderClient*.
 
